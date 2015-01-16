@@ -51,9 +51,19 @@ extern uint16_t u16LPcounter;
 void TSS1_fCallBack1(TSS_CONTROL_ID u8ControlId)
 {
   /* Set LED brightness */
-  SET_LED_RED(cASlider1.Position);
-  SET_LED_GREEN(cASlider1.Position);
-  SET_LED_BLUE(cASlider1.Position);
+	// achieving full brightness requires mapping 8 bit value to 16 bit. need some mapping because larger difference in brightness at low levels than high levels
+	unsigned int adjPosition = cASlider1.Position;
+	if (adjPosition > 170) {
+		if (adjPosition > 250){
+			adjPosition = 0xFFFF;			// full brightness (0xFFFF) is indistinguishable from ~1000
+		}
+		else {
+			adjPosition = adjPosition + (adjPosition - 170)*9;
+		}
+	}
+  SET_LED_RED(adjPosition);
+  SET_LED_GREEN(adjPosition);
+  SET_LED_BLUE(adjPosition);
 
   (void)u8ControlId;
 }
