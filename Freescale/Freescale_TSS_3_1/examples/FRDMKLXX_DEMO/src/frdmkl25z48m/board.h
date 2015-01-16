@@ -68,7 +68,7 @@
 #define LPTMR_STOP LPTMRStop()
 #define LPTMR_INIT LPTMRInit()
 
-#define LOW_POWER_TSI   1
+#define LOW_POWER_TSI   0
 
 #define APP_LPTRM_USE_OSCERKSEL 1
 

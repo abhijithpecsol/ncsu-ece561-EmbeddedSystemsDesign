@@ -66,7 +66,7 @@
 
   #define TSS_USE_DATA_CORRUPTION_CHECK          1
 
-  #define TSS_USE_FREEMASTER_GUI                 1
+  #define TSS_USE_FREEMASTER_GUI                 0
 
   #define TSS_USE_SIGNAL_SHIELDING               0
 
