@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\TWRK20DX50_DEMO.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\TWRK20DX72_DEMO.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\TWRK40X256_DEMO.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\TWRK53N512_DEMO.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\TWRK60D100M_DEMO.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\TWRK60N512_DEMO.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\TWRK70F120M_DEMO.ewp</path>
+  </project>
+  <batchBuild>
+    <batchDefinition>
+      <name>all</name>
+      <member>
+        <project>TWRK20DX50_DEMO</project>
+        <configuration>FLASH_128KB</configuration>
+      </member>
+      <member>
+        <project>TWRK20DX72_DEMO</project>
+        <configuration>FLASH_128KB</configuration>
+      </member>
+      <member>
+        <project>TWRK40X256_DEMO</project>
+        <configuration>FLASH_256KB_PFLASH_K40</configuration>
+      </member>
+      <member>
+        <project>TWRK40X256_DEMO</project>
+        <configuration>RAM_64KB_K40</configuration>
+      </member>
+      <member>
+        <project>TWRK53N512_DEMO</project>
+        <configuration>FLASH_512KB_PFLASH_K53</configuration>
+      </member>
+      <member>
+        <project>TWRK53N512_DEMO</project>
+        <configuration>RAM_64KB_K53</configuration>
+      </member>
+      <member>
+        <project>TWRK60N512_DEMO</project>
+        <configuration>FLASH_512KB_PFLASH_K60</configuration>
+      </member>
+      <member>
+        <project>TWRK60N512_DEMO</project>
+        <configuration>RAM_128KB_K60</configuration>
+      </member>
+      <member>
+        <project>TWRK70F120M_DEMO</project>
+        <configuration>FLASH_1024KB_PFLASH</configuration>
+      </member>
+      <member>
+        <project>TWRK70F120M_DEMO</project>
+        <configuration>RAM_128KB</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
+</workspace>
+
+
