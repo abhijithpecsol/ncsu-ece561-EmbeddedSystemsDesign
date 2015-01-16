@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\FRDMKL02Z_DEMO.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\FRDMKL05Z_DEMO.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\FRDMKL25Z_DEMO.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\FRDMKL26Z_DEMO.ewp</path>
+  </project>
+  <batchBuild/>
+</workspace>
+
+
