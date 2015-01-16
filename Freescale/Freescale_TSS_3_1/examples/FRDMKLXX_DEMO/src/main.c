@@ -30,6 +30,10 @@
 #include "events.h"
 #include "main.h"
 #include "board.h"
+#include "i2c.h"
+#include "mma8451.h"
+#include "LEDs.h"
+#include <math.h>
 
 uint16_t u16LPcounter = 0u;
 
@@ -60,17 +64,29 @@ uint16_t u16LPcounter = 0u;
 int main (void)
 {
   InitPorts();
+	
   /* Default TSS init */
   TSS_Init_ASlider();
+	
   /* Init PWM for LED control */
   PWM_init();
-  #if TSS_USE_FREEMASTER_GUI
-    FreeMASTER_Init();
-  #endif
+	
   /* Enable Interrupts globally */
   EnableInterrupts();
+	
   /* Reset Low Power Counter flag */
   u16LPcounter = 0u;
+	
+	/* Init i2c	*/
+	i2c_init();
+
+	/* init mma peripheral */
+	if (!init_mma()) {									// enter this statement if error
+		setLEDColor(500,0,500);						// magenta indicates error
+		while (1);												// hold execution
+	}
+	
+	DelayMS(100);
 
   for(;;)
   {
@@ -85,6 +101,16 @@ int main (void)
       #endif
     }
 
-    /* Write your code here ... */
+    // check accelerometer position
+		read_full_xyz();								// take a reading
+		convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
+		
+		// perform action based on position more than 33 degrees from horizontal
+		if (fabs(roll) > 33 || fabs(pitch) > 33){
+			setLEDColor(100,100,0);
+		}
+		else {
+			setLEDColor(0,0,0);
+		}
   }
 }

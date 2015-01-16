@@ -22,3 +22,8 @@
 .\frdmkl25z48m_demo\main.o: ..\..\..\src\main.h
 .\frdmkl25z48m_demo\main.o: ..\..\..\src\frdmkl25z48m\derivative.h
 .\frdmkl25z48m_demo\main.o: ..\..\..\src\frdmkl25z48m\MKL25Z4.h
+.\frdmkl25z48m_demo\main.o: ..\..\..\src\i2c.h
+.\frdmkl25z48m_demo\main.o: ..\..\..\src\frdmkl25z48m\MKL25Z4.H
+.\frdmkl25z48m_demo\main.o: ..\..\..\src\mma8451.h
+.\frdmkl25z48m_demo\main.o: ..\..\..\src\LEDs.h
+.\frdmkl25z48m_demo\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
