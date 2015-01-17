@@ -30,6 +30,7 @@
 #include "events.h"
 
 extern uint16_t u16LPcounter;
+extern unsigned int lastBrightness;
 
 /**
  * \brief TSS callback for control 0
@@ -64,6 +65,7 @@ void TSS1_fCallBack1(TSS_CONTROL_ID u8ControlId)
   SET_LED_RED(adjPosition);
   SET_LED_GREEN(adjPosition);
   SET_LED_BLUE(adjPosition);
+	lastBrightness = adjPosition;
 
   (void)u8ControlId;
 }

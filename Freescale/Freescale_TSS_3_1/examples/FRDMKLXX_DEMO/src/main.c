@@ -35,7 +35,11 @@
 #include "LEDs.h"
 #include <math.h>
 
+#define OFF_STATE		(0x01)
+#define ON_STATE 		(0x02)
+
 uint16_t u16LPcounter = 0u;
+unsigned int lastBrightness = 200;	// the last brightness value, used to turn on light by accelerometer, starts to a nice moderate value
 
 /*********************** GUI - FreeMASTER TSA table ************************/
 
@@ -63,14 +67,16 @@ uint16_t u16LPcounter = 0u;
  */
 int main (void)
 {
+	unsigned int state = OFF_STATE;			// variable to hold state information
+	
   InitPorts();
 	
   /* Default TSS init */
   TSS_Init_ASlider();
 	
-  /* Init PWM for LED control */
-  PWM_init();
-	
+	/* init PWM for LED control */
+	PWM_init();
+		
   /* Enable Interrupts globally */
   EnableInterrupts();
 	
@@ -94,23 +100,29 @@ int main (void)
       FMSTR_Poll();
     #endif
 
-    if (TSS_Task() == TSS_STATUS_OK)
-    {
-      #if (LOW_POWER_TSI)
-        LowPowerControl();
-      #endif
-    }
-
-    // check accelerometer position
-		read_full_xyz();								// take a reading
-		convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
-		
-		// perform action based on position more than 33 degrees from horizontal
-		if (fabs(roll) > 33 || fabs(pitch) > 33){
-			setLEDColor(100,100,0);
+		// Check for touch and adjust the LED brightness
+		if (TSS_Task() == TSS_STATUS_OK)
+		{
+			#if (LOW_POWER_TSI)
+				LowPowerControl();
+			#endif
 		}
-		else {
-			setLEDColor(0,0,0);
+		
+		// While in OFF state, check for accelerometer position > 33 degrees from horizontal
+		if (state & OFF_STATE){
+			// check accelerometer position
+			read_full_xyz();								// take a reading
+			convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
+			
+			// perform action based on position more than 33 degrees from horizontal
+			if (fabs(roll) > 33 || fabs(pitch) > 33){				
+				// adjust state to on
+				state &= ~OFF_STATE;
+				state |= ON_STATE;
+				
+				// default LEDs to the last brightness value (defaulted above)
+				setLEDColor(lastBrightness,lastBrightness,lastBrightness);	
+			}
 		}
   }
 }
