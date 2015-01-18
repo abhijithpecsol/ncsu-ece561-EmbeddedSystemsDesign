@@ -33,6 +33,7 @@
 #include "i2c.h"
 #include "mma8451.h"
 #include "LEDs.h"
+#include "timers.h"
 #include <math.h>
 
 #define OFF_STATE		(0x01)
@@ -93,6 +94,11 @@ int main (void)
 	}
 	
 	DelayMS(100);
+	
+	// init PIT
+	PIT_init(23999);										// interrupt every 1 ms
+	
+	Start_PIT();
 
   for(;;)
   {
