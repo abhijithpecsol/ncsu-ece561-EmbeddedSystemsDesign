@@ -15,6 +15,7 @@
 #include "LEDs.h"
 
 unsigned int timer1ms = 0;
+unsigned int timer250ms = 0;
 
 // Sets up configuration for the PIT. Period is how long for an interrupt.
 void PIT_init(unsigned period) {
@@ -62,14 +63,12 @@ void PIT_IRQHandler() {
 		// clear status flag for timer channel 0
 		PIT->CHANNEL[0].TFLG &= PIT_TFLG_TIF_MASK;
 		
-		// Do ISR work
+		// increment 1 ms timer
 		timer1ms++;
-		if (timer1ms == 5000){
-			setLEDColor(200,0,0);
-		}
-		if (timer1ms == 10000){
-			timer1ms = 0;
-			setLEDColor(0,0,0);
+		
+		// increment 250 ms timer if necessary
+		if (timer1ms % 250 == 0){
+			timer250ms++;
 		}
 	} 
 	// channel 2

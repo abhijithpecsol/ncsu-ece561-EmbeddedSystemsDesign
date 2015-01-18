@@ -35,12 +35,12 @@
 #include "LEDs.h"
 #include "timers.h"
 #include <math.h>
-
-#define OFF_STATE		(0x01)
-#define ON_STATE 		(0x02)
+#include "project1.h"
 
 uint16_t u16LPcounter = 0u;
 unsigned int lastBrightness = 200;	// the last brightness value, used to turn on light by accelerometer, starts to a nice moderate value
+unsigned int state = OFF_STATE;			// variable to hold state information
+extern volatile unsigned int timer250ms;
 
 /*********************** GUI - FreeMASTER TSA table ************************/
 
@@ -67,8 +67,8 @@ unsigned int lastBrightness = 200;	// the last brightness value, used to turn on
  * \return int
  */
 int main (void)
-{
-	unsigned int state = OFF_STATE;			// variable to hold state information
+{	
+	unsigned int timeoutPeriodStart;
 	
   InitPorts();
 	
@@ -96,10 +96,10 @@ int main (void)
 	DelayMS(100);
 	
 	// init PIT
-	PIT_init(23999);										// interrupt every 1 ms
+	PIT_init(23999);										// interrupt every 1 ms (24 MHz)
 	
 	Start_PIT();
-
+	
   for(;;)
   {
     #if TSS_USE_FREEMASTER_GUI
@@ -126,8 +126,25 @@ int main (void)
 				state &= ~OFF_STATE;
 				state |= ON_STATE;
 				
-				// default LEDs to the last brightness value (defaulted above)
-				setLEDColor(lastBrightness,lastBrightness,lastBrightness);	
+				// fade into white
+				fadeWhite(lastBrightness);
+			}
+		}
+		
+		// While in ON state, check for 10 second timeout
+		if (state & ON_STATE){
+			if (!(state & TIMEOUT_COUNTING)){
+				timeoutPeriodStart = timer250ms;			// initalize timeout period start
+				state |= TIMEOUT_COUNTING;
+			}
+			
+			// Timeout condition
+			if (timer250ms == timeoutPeriodStart + 40){
+				state &= ~ON_STATE;
+				state &= ~TIMEOUT_COUNTING;
+				state |= OFF_STATE;
+				
+				setLEDColor(0,0,0);
 			}
 		}
   }

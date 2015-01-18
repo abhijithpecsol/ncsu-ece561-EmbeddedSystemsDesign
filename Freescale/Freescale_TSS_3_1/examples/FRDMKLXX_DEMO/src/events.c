@@ -28,9 +28,12 @@
 #include "board.h"
 #include "app_init.h"
 #include "events.h"
+#include "project1.h"
+#include "LEDs.h"
 
 extern uint16_t u16LPcounter;
 extern unsigned int lastBrightness;
+extern unsigned int state;			
 
 /**
  * \brief TSS callback for control 0
@@ -62,11 +65,20 @@ void TSS1_fCallBack1(TSS_CONTROL_ID u8ControlId)
 			adjPosition = adjPosition + (adjPosition - 170)*9;
 		}
 	}
-  SET_LED_RED(adjPosition);
-  SET_LED_GREEN(adjPosition);
-  SET_LED_BLUE(adjPosition);
+	
+	// if previously the light was off, transition into the on state
+	if (state & OFF_STATE){
+		state &= ~OFF_STATE;
+		state |= ON_STATE;
+		fadeWhite(adjPosition);
+	}
+	else {
+		SET_LED_RED(adjPosition);
+		SET_LED_GREEN(adjPosition);
+		SET_LED_BLUE(adjPosition);
+	}
 	lastBrightness = adjPosition;
-
+	
   (void)u8ControlId;
 }
 
