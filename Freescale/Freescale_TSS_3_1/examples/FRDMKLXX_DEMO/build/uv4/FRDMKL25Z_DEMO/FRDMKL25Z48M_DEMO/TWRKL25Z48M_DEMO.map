@@ -10,11 +10,13 @@ Section Cross References
     app_init.o(.text) refers to tss_main.o(i.TSS_SetSystemConfig) for TSS_SetSystemConfig
     app_init.o(.text) refers to tss_asliderdecoder.o(i.TSS_SetASliderConfig) for TSS_SetASliderConfig
     app_init.o(.text) refers to tss_systemsetupdata.o(.data) for cASlider1
-    events.o(.text) refers to leds.o(.text) for fadeWhite
+    events.o(.text) refers to uidiv.o(.text) for __aeabi_uidivmod
     events.o(.text) refers to tss_main.o(i.TSS_SetSystemConfig) for TSS_SetSystemConfig
     events.o(.text) refers to board.o(.text) for InitDevices
     events.o(.text) refers to tss_systemsetupdata.o(.data) for cASlider1
+    events.o(.text) refers to timers.o(.data) for timer1ms
     events.o(.text) refers to main.o(.data) for state
+    events.o(.text) refers to main.o(.data) for lastBrightness
     events.o(.text) refers to tss_systemsetupdata.o(.bss) for tss_CSSys
     events.o(.text) refers to tss_sensor.o(.data) for tss_u8SampleIntFlag
     freemaster_protocol.o(.text) refers to freemaster_tsa.o(.text) for FMSTR_InitTsa
@@ -106,11 +108,9 @@ Section Cross References
     main.o(.text) refers to mma8451.o(.text) for init_mma
     main.o(.text) refers to timers.o(.text) for PIT_init
     main.o(.text) refers to tss_main.o(i.TSS_Task) for TSS_Task
-    main.o(.text) refers to cfrcmple.o(.text) for __aeabi_cfrcmple
-    main.o(.text) refers to leds.o(.text) for fadeWhite
+    main.o(.text) refers to leds.o(.text) for fadeOutWhite
     main.o(.text) refers to main.o(.data) for .data
     main.o(.text) refers to timers.o(.data) for timer250ms
-    main.o(.text) refers to mma8451.o(.data) for roll
     main.o(.data) refers to main.o(.conststring) for .conststring
     mma8451.o(.text) refers to i2c.o(.text) for i2c_read_byte
     mma8451.o(.text) refers to app_init.o(.text) for DelayMS
@@ -125,6 +125,8 @@ Section Cross References
     mma8451.o(.text) refers to fadd.o(.text) for __aeabi_fadd
     mma8451.o(.text) refers to sqrt.o(i.sqrt) for sqrt
     mma8451.o(.text) refers to mma8451.o(.data) for .data
+    leds.o(.text) refers to uidiv.o(.text) for __aeabi_uidivmod
+    leds.o(.text) refers to timers.o(.data) for timer1ms
     timers.o(.text) refers to arm_cm0.o(.text) for set_irq_priority
     timers.o(.text) refers to uidiv.o(.text) for __aeabi_uidivmod
     timers.o(.text) refers to timers.o(.data) for .data
@@ -576,7 +578,6 @@ Section Cross References
     f2d.o(.text) refers (Special) to iusefp.o(.text) for __I$use$fp
     d2f.o(.text) refers (Special) to iusefp.o(.text) for __I$use$fp
     d2f.o(.text) refers to fepilogue.o(.text) for _float_round
-    cfrcmple.o(.text) refers (Special) to iusefp.o(.text) for __I$use$fp
     atan.o(i.__softfp_atan) refers (Special) to iusefp.o(.text) for __I$use$fp
     atan.o(i.__softfp_atan) refers to atan.o(i.atan) for atan
     atan.o(i.atan) refers (Special) to iusefp.o(.text) for __I$use$fp
@@ -714,22 +715,22 @@ Image Symbol Table
     ../clib/microlib/division.c              0x00000000   Number         0  uidiv.o ABSOLUTE
     ../clib/microlib/division.c              0x00000000   Number         0  idiv.o ABSOLUTE
     ../clib/microlib/errno.c                 0x00000000   Number         0  errno.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
-    ../clib/microlib/longlong.c              0x00000000   Number         0  llsshr.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llshl.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llushr.o ABSOLUTE
+    ../clib/microlib/longlong.c              0x00000000   Number         0  llsshr.o ABSOLUTE
     ../clib/microlib/stubs.s                 0x00000000   Number         0  iusefp.o ABSOLUTE
     ../fplib/microlib/d2f.c                  0x00000000   Number         0  d2f.o ABSOLUTE
     ../fplib/microlib/f2d.c                  0x00000000   Number         0  f2d.o ABSOLUTE
@@ -740,12 +741,12 @@ Image Symbol Table
     ../fplib/microlib/fpepilogue.c           0x00000000   Number         0  depilogue.o ABSOLUTE
     ../fplib/microlib/fpepilogue.c           0x00000000   Number         0  fepilogue.o ABSOLUTE
     ../fplib/microlib/fpfix.c                0x00000000   Number         0  ffixui.o ABSOLUTE
-    ../fplib/microlib/fpflt.c                0x00000000   Number         0  fflti.o ABSOLUTE
     ../fplib/microlib/fpflt.c                0x00000000   Number         0  dflti.o ABSOLUTE
-    ../fplib/microlib/fpmul.c                0x00000000   Number         0  fmul.o ABSOLUTE
+    ../fplib/microlib/fpflt.c                0x00000000   Number         0  fflti.o ABSOLUTE
     ../fplib/microlib/fpmul.c                0x00000000   Number         0  dmul.o ABSOLUTE
-    ../fplib/microlib/fpscalb.c              0x00000000   Number         0  fscalb.o ABSOLUTE
+    ../fplib/microlib/fpmul.c                0x00000000   Number         0  fmul.o ABSOLUTE
     ../fplib/microlib/fpscalb.c              0x00000000   Number         0  dscalb.o ABSOLUTE
+    ../fplib/microlib/fpscalb.c              0x00000000   Number         0  fscalb.o ABSOLUTE
     ../fplib/microlib/fpsqrt.c               0x00000000   Number         0  dsqrt.o ABSOLUTE
     ../mathlib/atan.c                        0x00000000   Number         0  atan.o ABSOLUTE
     ../mathlib/atan.c                        0x00000000   Number         0  atan_x.o ABSOLUTE
@@ -755,8 +756,8 @@ Image Symbol Table
     ../mathlib/fpclassify.c                  0x00000000   Number         0  fpclassify.o ABSOLUTE
     ../mathlib/poly.c                        0x00000000   Number         0  poly.o ABSOLUTE
     ../mathlib/qnan.c                        0x00000000   Number         0  qnan.o ABSOLUTE
-    ../mathlib/sqrt.c                        0x00000000   Number         0  sqrt_x.o ABSOLUTE
     ../mathlib/sqrt.c                        0x00000000   Number         0  sqrt.o ABSOLUTE
+    ../mathlib/sqrt.c                        0x00000000   Number         0  sqrt_x.o ABSOLUTE
     ..\..\..\..\..\GUI\source\src_common\freemaster_appcmd.c 0x00000000   Number         0  freemaster_appcmd.o ABSOLUTE
     ..\..\..\..\..\GUI\source\src_common\freemaster_bdm.c 0x00000000   Number         0  freemaster_bdm.o ABSOLUTE
     ..\..\..\..\..\GUI\source\src_common\freemaster_can.c 0x00000000   Number         0  freemaster_can.o ABSOLUTE
@@ -791,7 +792,6 @@ Image Symbol Table
     ..\..\..\src\mma8451.c                   0x00000000   Number         0  mma8451.o ABSOLUTE
     ..\..\..\src\timers.c                    0x00000000   Number         0  timers.o ABSOLUTE
     cdcmple.s                                0x00000000   Number         0  cdcmple.o ABSOLUTE
-    cfrcmple.s                               0x00000000   Number         0  cfrcmple.o ABSOLUTE
     dc.s                                     0x00000000   Number         0  dc.o ABSOLUTE
     handlers.s                               0x00000000   Number         0  handlers.o ABSOLUTE
     init.s                                   0x00000000   Number         0  init.o ABSOLUTE
@@ -809,14 +809,11 @@ Image Symbol Table
     __lit__00000000                          0x000000d0   Data           4  entry2.o(.ARM.Collect$$$$00002712)
     .text                                    0x000000d4   Section        0  app_init.o(.text)
     .text                                    0x000001ac   Section        0  events.o(.text)
-    .text                                    0x0000026c   Section        0  freemaster_scope.o(.text)
-    .text                                    0x00000300   Section        0  freemaster_kxx.o(.text)
+    .text                                    0x000002cc   Section        0  freemaster_scope.o(.text)
+    .text                                    0x00000360   Section        0  arm_cm0.o(.text)
     .text                                    0x000003cc   Section        0  wdog_kl25.o(.text)
     .text                                    0x000003d8   Section        0  tss_systemsetupdata.o(.text)
-    .text                                    0x000003e4   Section        0  leds.o(.text)
-    .text                                    0x000003fc   Section        0  iusefp.o(.text)
-    i.__scatterload_null                     0x000003fc   Section        2  handlers.o(i.__scatterload_null)
-    .constdata                               0x000003fe   Section        2  tss_systemsetupdata.o(.constdata)
+    .text                                    0x000003e4   Section       28  startup_mkl25z4.o(.text)
     .ARM.__at_0x400                          0x00000400   Section       16  startup_mkl25z4.o(.ARM.__at_0x400)
     .text                                    0x00000410   Section        0  freemaster_protocol.o(.text)
     .text                                    0x000005d4   Section        0  freemaster_serial.o(.text)
@@ -824,176 +821,178 @@ Image Symbol Table
     FMSTR_SendError                          0x00000835   Thumb Code    10  freemaster_serial.o(.text)
     .text                                    0x0000084c   Section        0  freemaster_tsa.o(.text)
     FMSTR_CheckMemSpace                      0x0000098b   Thumb Code    26  freemaster_tsa.o(.text)
-    .text                                    0x000009a4   Section        0  arm_cm0.o(.text)
-    .text                                    0x00000a10   Section        0  sysinit_kl25.o(.text)
-    .text                                    0x00000ab4   Section        0  mcg_kl25.o(.text)
-    .text                                    0x00001e4c   Section        0  uart_kl25.o(.text)
-    .text                                    0x00001f3c   Section        0  tss_sensor.o(.text)
-    .text                                    0x00001f68   Section        0  tss_sensortsil.o(.text)
-    .text                                    0x00002814   Section        0  main.o(.text)
-    .text                                    0x00002900   Section        0  i2c.o(.text)
-    .text                                    0x00002a90   Section        0  mma8451.o(.text)
-    .text                                    0x00002c24   Section        0  timers.o(.text)
-    .text                                    0x00002ccc   Section       28  startup_mkl25z4.o(.text)
-    .text                                    0x00002ce8   Section        0  system_mkl25z4.o(.text)
-    .text                                    0x00002cf4   Section        0  board.o(.text)
-    .text                                    0x00002f10   Section        0  uidiv.o(.text)
-    .text                                    0x00002f3c   Section        0  idiv.o(.text)
-    .text                                    0x00002f64   Section        0  fadd.o(.text)
-    .text                                    0x00003016   Section        0  fmul.o(.text)
-    .text                                    0x00003090   Section        0  fdiv.o(.text)
-    .text                                    0x0000310c   Section        0  fscalb.o(.text)
-    .text                                    0x00003124   Section        0  dmul.o(.text)
-    .text                                    0x000031f4   Section        0  ddiv.o(.text)
-    .text                                    0x000032e4   Section        0  dscalb.o(.text)
-    .text                                    0x00003310   Section        0  fflti.o(.text)
-    .text                                    0x00003328   Section        0  dflti.o(.text)
-    .text                                    0x00003350   Section        0  ffixui.o(.text)
-    .text                                    0x00003378   Section        0  f2d.o(.text)
-    .text                                    0x000033a0   Section        0  d2f.o(.text)
-    .text                                    0x000033d8   Section       20  cfrcmple.o(.text)
-    .text                                    0x000033ec   Section        0  fepilogue.o(.text)
-    .text                                    0x0000346e   Section        0  depilogue.o(.text)
-    .text                                    0x0000352c   Section        0  dadd.o(.text)
-    .text                                    0x00003690   Section        0  dsqrt.o(.text)
-    .text                                    0x00003734   Section       36  init.o(.text)
-    .text                                    0x00003758   Section        0  llshl.o(.text)
-    .text                                    0x00003778   Section        0  llushr.o(.text)
-    .text                                    0x0000379a   Section        0  llsshr.o(.text)
-    i.TSS_ASliderCalculatePosIIRFilter       0x000037c0   Section        0  tss_asliderdecoder.o(i.TSS_ASliderCalculatePosIIRFilter)
-    i.TSS_ASliderDecoder                     0x0000382c   Section        0  tss_asliderdecoder.o(i.TSS_ASliderDecoder)
-    i.TSS_ASliderTrendControl                0x00003c84   Section        0  tss_asliderdecoder.o(i.TSS_ASliderTrendControl)
-    i.TSS_ASliderTrendThreshold              0x00003d70   Section        0  tss_asliderdecoder.o(i.TSS_ASliderTrendThreshold)
-    i.TSS_BrowseModules                      0x00003d98   Section        0  tss_main.o(i.TSS_BrowseModules)
-    i.TSS_CutSInt16ToSInt8                   0x00003e2c   Section        0  tss_filters.o(i.TSS_CutSInt16ToSInt8)
-    i.TSS_DataCorruptionCheck                0x00003e44   Section        0  tss_main.o(i.TSS_DataCorruptionCheck)
-    i.TSS_DecodersControl                    0x00003f00   Section        0  tss_main.o(i.TSS_DecodersControl)
-    i.TSS_FaultEvaluation                    0x00003f78   Section        0  tss_main.o(i.TSS_FaultEvaluation)
-    i.TSS_GetSystemConfig                    0x00003ff4   Section        0  tss_main.o(i.TSS_GetSystemConfig)
-    i.TSS_Init                               0x00004104   Section        0  tss_main.o(i.TSS_Init)
-    i.TSS_InitInternalArrays                 0x00004170   Section        0  tss_main.o(i.TSS_InitInternalArrays)
-    i.TSS_InitRegisterArrays                 0x000041c4   Section        0  tss_main.o(i.TSS_InitRegisterArrays)
-    i.TSS_KeyBasicDeltaNoiseAnalysisIIRControl 0x0000421c   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicDeltaNoiseAnalysisIIRControl)
-    i.TSS_KeyBasicDetect                     0x00004290   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicDetect)
-    i.TSS_KeyBasicElectrodeEval              0x00004428   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicElectrodeEval)
-    i.TSS_KeyBasicEvaluateNoiseData          0x000046b8   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicEvaluateNoiseData)
-    TSS_KeyBasicEvaluateNoiseData            0x000046b9   Thumb Code    96  tss_keydetectornormal.o(i.TSS_KeyBasicEvaluateNoiseData)
-    i.TSS_KeyBasicNegativeBaselineDrop       0x0000472c   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicNegativeBaselineDrop)
-    i.TSS_KeyBasicSensAutoCalibration        0x000047bc   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicSensAutoCalibration)
-    i.TSS_KeyBasicStuckKeyControl            0x000049fc   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicStuckKeyControl)
-    i.TSS_KeyDetectorCalculateDelta          0x00004a48   Section        0  tss_keydetector.o(i.TSS_KeyDetectorCalculateDelta)
-    i.TSS_KeyDetectorCalculateIIRFilter      0x00004a68   Section        0  tss_filters.o(i.TSS_KeyDetectorCalculateIIRFilter)
-    i.TSS_KeyDetectorCalibrate               0x00004a84   Section        0  tss_keydetector.o(i.TSS_KeyDetectorCalibrate)
-    i.TSS_KeyDetectorDCTrackerEvalExecution  0x00004aa4   Section        0  tss_keydetector.o(i.TSS_KeyDetectorDCTrackerEvalExecution)
-    TSS_KeyDetectorDCTrackerEvalExecution    0x00004aa5   Thumb Code    50  tss_keydetector.o(i.TSS_KeyDetectorDCTrackerEvalExecution)
-    i.TSS_KeyDetectorElectrodeStatusUpdate   0x00004ae0   Section        0  tss_keydetector.o(i.TSS_KeyDetectorElectrodeStatusUpdate)
-    i.TSS_KeyDetectorFaultDecoder            0x00004b10   Section        0  tss_keydetector.o(i.TSS_KeyDetectorFaultDecoder)
-    TSS_KeyDetectorFaultDecoder              0x00004b11   Thumb Code    38  tss_keydetector.o(i.TSS_KeyDetectorFaultDecoder)
-    i.TSS_KeyDetectorFillDeltaLogBuffer      0x00004b38   Section        0  tss_keydetector.o(i.TSS_KeyDetectorFillDeltaLogBuffer)
-    i.TSS_KeyDetectorFillSignalLogBuffer     0x00004b48   Section        0  tss_keydetector.o(i.TSS_KeyDetectorFillSignalLogBuffer)
-    i.TSS_KeyDetectorGetDCTrackerCounter     0x00004b5c   Section        0  tss_keydetector.o(i.TSS_KeyDetectorGetDCTrackerCounter)
-    i.TSS_KeyDetectorGetElectrodeEnablerStatus 0x00004b68   Section        0  tss_keydetector.o(i.TSS_KeyDetectorGetElectrodeEnablerStatus)
-    i.TSS_KeyDetectorGetElectrodeGroupStatus 0x00004ba8   Section        0  tss_keydetector.o(i.TSS_KeyDetectorGetElectrodeGroupStatus)
-    i.TSS_KeyDetectorGetShieldElectrodeReleaseStatus 0x00004be8   Section        0  tss_keydetector.o(i.TSS_KeyDetectorGetShieldElectrodeReleaseStatus)
-    i.TSS_KeyDetectorGetSlowDCTrackerCounter 0x00004c28   Section        0  tss_keydetector.o(i.TSS_KeyDetectorGetSlowDCTrackerCounter)
-    i.TSS_KeyDetectorInit                    0x00004c34   Section        0  tss_keydetector.o(i.TSS_KeyDetectorInit)
-    i.TSS_KeyDetectorInitPrevCapSample       0x00004c74   Section        0  tss_filters.o(i.TSS_KeyDetectorInitPrevCapSample)
-    i.TSS_KeyDetectorMain                    0x00004c88   Section        0  tss_keydetector.o(i.TSS_KeyDetectorMain)
-    i.TSS_KeyDetectorRecalibrateElectrode    0x00004e20   Section        0  tss_keydetector.o(i.TSS_KeyDetectorRecalibrateElectrode)
-    TSS_KeyDetectorRecalibrateElectrode      0x00004e21   Thumb Code   124  tss_keydetector.o(i.TSS_KeyDetectorRecalibrateElectrode)
-    i.TSS_KeyDetectorRecalibrateModules      0x00004ea8   Section        0  tss_keydetector.o(i.TSS_KeyDetectorRecalibrateModules)
-    i.TSS_KeyDetectorRecalibrationRequest    0x00004ebc   Section        0  tss_keydetector.o(i.TSS_KeyDetectorRecalibrationRequest)
-    i.TSS_KeyDetectorReleaseElectrode        0x00004ecc   Section        0  tss_keydetector.o(i.TSS_KeyDetectorReleaseElectrode)
-    i.TSS_KeyDetectorResetElectrode          0x00004ef0   Section        0  tss_keydetector.o(i.TSS_KeyDetectorResetElectrode)
-    i.TSS_KeyDetectorResetElectrodeDebouncing 0x00004f04   Section        0  tss_keydetector.o(i.TSS_KeyDetectorResetElectrodeDebouncing)
-    i.TSS_KeyDetectorResetElectrodeMeasured  0x00004f20   Section        0  tss_keydetector.o(i.TSS_KeyDetectorResetElectrodeMeasured)
-    i.TSS_KeyDetectorResetStuckKeyCounter    0x00004f44   Section        0  tss_keydetector.o(i.TSS_KeyDetectorResetStuckKeyCounter)
-    i.TSS_KeyDetectorRestartElectrode        0x00004f50   Section        0  tss_keydetector.o(i.TSS_KeyDetectorRestartElectrode)
-    i.TSS_KeyDetectorSignalDivider           0x00004f94   Section        0  tss_filters.o(i.TSS_KeyDetectorSignalDivider)
-    i.TSS_LowPowerConfig                     0x00004fb0   Section        0  tss_main.o(i.TSS_LowPowerConfig)
-    i.TSS_SetASliderConfig                   0x00005050   Section        0  tss_asliderdecoder.o(i.TSS_SetASliderConfig)
-    i.TSS_SetControlElectrodesEnablers       0x0000514c   Section        0  tss_main.o(i.TSS_SetControlElectrodesEnablers)
-    i.TSS_SetSystemConfig                    0x000051ec   Section        0  tss_main.o(i.TSS_SetSystemConfig)
-    i.TSS_SubUInt16WithUInt16ToSInt16        0x00005514   Section        0  tss_filters.o(i.TSS_SubUInt16WithUInt16ToSInt16)
-    i.TSS_Task                               0x00005540   Section        0  tss_main.o(i.TSS_Task)
-    i.TSS_TriggerConfig                      0x00005610   Section        0  tss_main.o(i.TSS_TriggerConfig)
-    i.TSS_TriggerControl                     0x0000567c   Section        0  tss_main.o(i.TSS_TriggerControl)
-    i.__ARM_clz                              0x000056c0   Section        0  depilogue.o(i.__ARM_clz)
-    i.__ARM_common_switch8                   0x000056ee   Section        0  tss_sensortsil.o(i.__ARM_common_switch8)
-    i.__ARM_fpclassify                       0x00005708   Section        0  fpclassify.o(i.__ARM_fpclassify)
-    i.__kernel_poly                          0x00005734   Section        0  poly.o(i.__kernel_poly)
-    i.__mathlib_dbl_infnan                   0x000057e0   Section        0  dunder.o(i.__mathlib_dbl_infnan)
-    i.__mathlib_dbl_infnan2                  0x000057ea   Section        0  dunder.o(i.__mathlib_dbl_infnan2)
-    i.__mathlib_dbl_underflow                0x000057f4   Section        0  dunder.o(i.__mathlib_dbl_underflow)
-    i.__scatterload_copy                     0x00005808   Section       14  handlers.o(i.__scatterload_copy)
-    i.__scatterload_zeroinit                 0x00005816   Section       14  handlers.o(i.__scatterload_zeroinit)
-    i.__set_errno                            0x00005824   Section        0  errno.o(i.__set_errno)
-    i.atan                                   0x00005830   Section        0  atan.o(i.atan)
-    i.atan2                                  0x00005a4c   Section        0  atan2.o(i.atan2)
-    i.sqrt                                   0x00005bc4   Section        0  sqrt.o(i.sqrt)
-    .constdata                               0x00005c0c   Section        8  tss_sensor.o(.constdata)
-    .constdata                               0x00005c14   Section        8  tss_sensor.o(.constdata)
-    .constdata                               0x00005c1c   Section       16  tss_sensortsil.o(.constdata)
-    .constdata                               0x00005c2c   Section       12  tss_sensortsil.o(.constdata)
-    .constdata                               0x00005c38   Section       12  tss_sensortsil.o(.constdata)
-    .constdata                               0x00005c44   Section        4  tss_sensortsil.o(.constdata)
-    .constdata                               0x00005c48   Section       28  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c64   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c68   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c6c   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c70   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c74   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c78   Section        1  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c79   Section        2  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c7c   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c80   Section        1  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c81   Section        1  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c82   Section        1  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c84   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c88   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c8c   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c90   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c94   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c98   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005c9c   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005ca0   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005ca4   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005ca8   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cac   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cb0   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cb4   Section        1  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cb8   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cbc   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cc0   Section        1  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cc1   Section        1  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cc4   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cc8   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005ccc   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cd0   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cd4   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cd8   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cdc   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005ce0   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005ce4   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005ce8   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cec   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cf0   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cf4   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cf8   Section        1  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cf9   Section        1  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cfa   Section        2  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005cfc   Section        6  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005d04   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005d08   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005d0c   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005d10   Section        4  tss_systemsetupdata.o(.constdata)
-    .constdata                               0x00005d18   Section      152  atan.o(.constdata)
-    atanhi                                   0x00005d18   Data          32  atan.o(.constdata)
-    atanlo                                   0x00005d38   Data          32  atan.o(.constdata)
-    aTodd                                    0x00005d58   Data          40  atan.o(.constdata)
-    aTeven                                   0x00005d80   Data          48  atan.o(.constdata)
-    .constdata                               0x00005db0   Section        8  qnan.o(.constdata)
-    .conststring                             0x00005db8   Section       18  main.o(.conststring)
+    .text                                    0x000009a4   Section        0  freemaster_kxx.o(.text)
+    .text                                    0x00000a70   Section        0  sysinit_kl25.o(.text)
+    .text                                    0x00000b14   Section        0  mcg_kl25.o(.text)
+    .text                                    0x00001eac   Section        0  uart_kl25.o(.text)
+    .text                                    0x00001f9c   Section        0  tss_sensor.o(.text)
+    .text                                    0x00001fc8   Section        0  tss_sensortsil.o(.text)
+    .text                                    0x00002874   Section        0  main.o(.text)
+    .text                                    0x0000292c   Section        0  i2c.o(.text)
+    .text                                    0x00002abc   Section        0  mma8451.o(.text)
+    .text                                    0x00002c50   Section        0  leds.o(.text)
+    .text                                    0x00002d34   Section        0  timers.o(.text)
+    .text                                    0x00002ddc   Section        0  system_mkl25z4.o(.text)
+    .text                                    0x00002de8   Section        0  board.o(.text)
+    .text                                    0x00003004   Section        0  uidiv.o(.text)
+    .text                                    0x00003030   Section        0  idiv.o(.text)
+    .text                                    0x00003058   Section        0  fadd.o(.text)
+    .text                                    0x0000310a   Section        0  fmul.o(.text)
+    .text                                    0x00003184   Section        0  fdiv.o(.text)
+    .text                                    0x00003200   Section        0  fscalb.o(.text)
+    .text                                    0x00003218   Section        0  dmul.o(.text)
+    .text                                    0x000032e8   Section        0  ddiv.o(.text)
+    .text                                    0x000033d8   Section        0  dscalb.o(.text)
+    .text                                    0x00003404   Section        0  fflti.o(.text)
+    .text                                    0x0000341c   Section        0  dflti.o(.text)
+    .text                                    0x00003444   Section        0  ffixui.o(.text)
+    .text                                    0x0000346c   Section        0  f2d.o(.text)
+    .text                                    0x00003494   Section        0  d2f.o(.text)
+    .text                                    0x000034cc   Section        0  iusefp.o(.text)
+    .text                                    0x000034cc   Section        0  fepilogue.o(.text)
+    .text                                    0x0000354e   Section        0  depilogue.o(.text)
+    .text                                    0x0000360c   Section        0  dadd.o(.text)
+    .text                                    0x00003770   Section        0  dsqrt.o(.text)
+    .text                                    0x00003814   Section       36  init.o(.text)
+    .text                                    0x00003838   Section        0  llshl.o(.text)
+    .text                                    0x00003858   Section        0  llushr.o(.text)
+    .text                                    0x0000387a   Section        0  llsshr.o(.text)
+    i.TSS_ASliderCalculatePosIIRFilter       0x000038a0   Section        0  tss_asliderdecoder.o(i.TSS_ASliderCalculatePosIIRFilter)
+    i.TSS_ASliderDecoder                     0x0000390c   Section        0  tss_asliderdecoder.o(i.TSS_ASliderDecoder)
+    i.TSS_ASliderTrendControl                0x00003d64   Section        0  tss_asliderdecoder.o(i.TSS_ASliderTrendControl)
+    i.TSS_ASliderTrendThreshold              0x00003e50   Section        0  tss_asliderdecoder.o(i.TSS_ASliderTrendThreshold)
+    i.TSS_BrowseModules                      0x00003e78   Section        0  tss_main.o(i.TSS_BrowseModules)
+    i.TSS_CutSInt16ToSInt8                   0x00003f0c   Section        0  tss_filters.o(i.TSS_CutSInt16ToSInt8)
+    i.TSS_DataCorruptionCheck                0x00003f24   Section        0  tss_main.o(i.TSS_DataCorruptionCheck)
+    i.TSS_DecodersControl                    0x00003fe0   Section        0  tss_main.o(i.TSS_DecodersControl)
+    i.TSS_FaultEvaluation                    0x00004058   Section        0  tss_main.o(i.TSS_FaultEvaluation)
+    i.TSS_GetSystemConfig                    0x000040d4   Section        0  tss_main.o(i.TSS_GetSystemConfig)
+    i.TSS_Init                               0x000041e4   Section        0  tss_main.o(i.TSS_Init)
+    i.TSS_InitInternalArrays                 0x00004250   Section        0  tss_main.o(i.TSS_InitInternalArrays)
+    i.TSS_InitRegisterArrays                 0x000042a4   Section        0  tss_main.o(i.TSS_InitRegisterArrays)
+    i.TSS_KeyBasicDeltaNoiseAnalysisIIRControl 0x000042fc   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicDeltaNoiseAnalysisIIRControl)
+    i.TSS_KeyBasicDetect                     0x00004370   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicDetect)
+    i.TSS_KeyBasicElectrodeEval              0x00004508   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicElectrodeEval)
+    i.TSS_KeyBasicEvaluateNoiseData          0x00004798   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicEvaluateNoiseData)
+    TSS_KeyBasicEvaluateNoiseData            0x00004799   Thumb Code    96  tss_keydetectornormal.o(i.TSS_KeyBasicEvaluateNoiseData)
+    i.TSS_KeyBasicNegativeBaselineDrop       0x0000480c   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicNegativeBaselineDrop)
+    i.TSS_KeyBasicSensAutoCalibration        0x0000489c   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicSensAutoCalibration)
+    i.TSS_KeyBasicStuckKeyControl            0x00004adc   Section        0  tss_keydetectornormal.o(i.TSS_KeyBasicStuckKeyControl)
+    i.TSS_KeyDetectorCalculateDelta          0x00004b28   Section        0  tss_keydetector.o(i.TSS_KeyDetectorCalculateDelta)
+    i.TSS_KeyDetectorCalculateIIRFilter      0x00004b48   Section        0  tss_filters.o(i.TSS_KeyDetectorCalculateIIRFilter)
+    i.TSS_KeyDetectorCalibrate               0x00004b64   Section        0  tss_keydetector.o(i.TSS_KeyDetectorCalibrate)
+    i.TSS_KeyDetectorDCTrackerEvalExecution  0x00004b84   Section        0  tss_keydetector.o(i.TSS_KeyDetectorDCTrackerEvalExecution)
+    TSS_KeyDetectorDCTrackerEvalExecution    0x00004b85   Thumb Code    50  tss_keydetector.o(i.TSS_KeyDetectorDCTrackerEvalExecution)
+    i.TSS_KeyDetectorElectrodeStatusUpdate   0x00004bc0   Section        0  tss_keydetector.o(i.TSS_KeyDetectorElectrodeStatusUpdate)
+    i.TSS_KeyDetectorFaultDecoder            0x00004bf0   Section        0  tss_keydetector.o(i.TSS_KeyDetectorFaultDecoder)
+    TSS_KeyDetectorFaultDecoder              0x00004bf1   Thumb Code    38  tss_keydetector.o(i.TSS_KeyDetectorFaultDecoder)
+    i.TSS_KeyDetectorFillDeltaLogBuffer      0x00004c18   Section        0  tss_keydetector.o(i.TSS_KeyDetectorFillDeltaLogBuffer)
+    i.TSS_KeyDetectorFillSignalLogBuffer     0x00004c28   Section        0  tss_keydetector.o(i.TSS_KeyDetectorFillSignalLogBuffer)
+    i.TSS_KeyDetectorGetDCTrackerCounter     0x00004c3c   Section        0  tss_keydetector.o(i.TSS_KeyDetectorGetDCTrackerCounter)
+    i.TSS_KeyDetectorGetElectrodeEnablerStatus 0x00004c48   Section        0  tss_keydetector.o(i.TSS_KeyDetectorGetElectrodeEnablerStatus)
+    i.TSS_KeyDetectorGetElectrodeGroupStatus 0x00004c88   Section        0  tss_keydetector.o(i.TSS_KeyDetectorGetElectrodeGroupStatus)
+    i.TSS_KeyDetectorGetShieldElectrodeReleaseStatus 0x00004cc8   Section        0  tss_keydetector.o(i.TSS_KeyDetectorGetShieldElectrodeReleaseStatus)
+    i.TSS_KeyDetectorGetSlowDCTrackerCounter 0x00004d08   Section        0  tss_keydetector.o(i.TSS_KeyDetectorGetSlowDCTrackerCounter)
+    i.TSS_KeyDetectorInit                    0x00004d14   Section        0  tss_keydetector.o(i.TSS_KeyDetectorInit)
+    i.TSS_KeyDetectorInitPrevCapSample       0x00004d54   Section        0  tss_filters.o(i.TSS_KeyDetectorInitPrevCapSample)
+    i.TSS_KeyDetectorMain                    0x00004d68   Section        0  tss_keydetector.o(i.TSS_KeyDetectorMain)
+    i.TSS_KeyDetectorRecalibrateElectrode    0x00004f00   Section        0  tss_keydetector.o(i.TSS_KeyDetectorRecalibrateElectrode)
+    TSS_KeyDetectorRecalibrateElectrode      0x00004f01   Thumb Code   124  tss_keydetector.o(i.TSS_KeyDetectorRecalibrateElectrode)
+    i.TSS_KeyDetectorRecalibrateModules      0x00004f88   Section        0  tss_keydetector.o(i.TSS_KeyDetectorRecalibrateModules)
+    i.TSS_KeyDetectorRecalibrationRequest    0x00004f9c   Section        0  tss_keydetector.o(i.TSS_KeyDetectorRecalibrationRequest)
+    i.TSS_KeyDetectorReleaseElectrode        0x00004fac   Section        0  tss_keydetector.o(i.TSS_KeyDetectorReleaseElectrode)
+    i.TSS_KeyDetectorResetElectrode          0x00004fd0   Section        0  tss_keydetector.o(i.TSS_KeyDetectorResetElectrode)
+    i.TSS_KeyDetectorResetElectrodeDebouncing 0x00004fe4   Section        0  tss_keydetector.o(i.TSS_KeyDetectorResetElectrodeDebouncing)
+    i.TSS_KeyDetectorResetElectrodeMeasured  0x00005000   Section        0  tss_keydetector.o(i.TSS_KeyDetectorResetElectrodeMeasured)
+    i.TSS_KeyDetectorResetStuckKeyCounter    0x00005024   Section        0  tss_keydetector.o(i.TSS_KeyDetectorResetStuckKeyCounter)
+    i.TSS_KeyDetectorRestartElectrode        0x00005030   Section        0  tss_keydetector.o(i.TSS_KeyDetectorRestartElectrode)
+    i.TSS_KeyDetectorSignalDivider           0x00005074   Section        0  tss_filters.o(i.TSS_KeyDetectorSignalDivider)
+    i.TSS_LowPowerConfig                     0x00005090   Section        0  tss_main.o(i.TSS_LowPowerConfig)
+    i.TSS_SetASliderConfig                   0x00005130   Section        0  tss_asliderdecoder.o(i.TSS_SetASliderConfig)
+    i.TSS_SetControlElectrodesEnablers       0x0000522c   Section        0  tss_main.o(i.TSS_SetControlElectrodesEnablers)
+    i.TSS_SetSystemConfig                    0x000052cc   Section        0  tss_main.o(i.TSS_SetSystemConfig)
+    i.TSS_SubUInt16WithUInt16ToSInt16        0x000055f4   Section        0  tss_filters.o(i.TSS_SubUInt16WithUInt16ToSInt16)
+    i.TSS_Task                               0x00005620   Section        0  tss_main.o(i.TSS_Task)
+    i.TSS_TriggerConfig                      0x000056f0   Section        0  tss_main.o(i.TSS_TriggerConfig)
+    i.TSS_TriggerControl                     0x0000575c   Section        0  tss_main.o(i.TSS_TriggerControl)
+    i.__ARM_clz                              0x000057a0   Section        0  depilogue.o(i.__ARM_clz)
+    i.__ARM_common_switch8                   0x000057ce   Section        0  tss_sensortsil.o(i.__ARM_common_switch8)
+    i.__ARM_fpclassify                       0x000057e8   Section        0  fpclassify.o(i.__ARM_fpclassify)
+    i.__kernel_poly                          0x00005814   Section        0  poly.o(i.__kernel_poly)
+    i.__mathlib_dbl_infnan                   0x000058c0   Section        0  dunder.o(i.__mathlib_dbl_infnan)
+    i.__mathlib_dbl_infnan2                  0x000058ca   Section        0  dunder.o(i.__mathlib_dbl_infnan2)
+    i.__mathlib_dbl_underflow                0x000058d4   Section        0  dunder.o(i.__mathlib_dbl_underflow)
+    i.__scatterload_copy                     0x000058e8   Section       14  handlers.o(i.__scatterload_copy)
+    i.__scatterload_null                     0x000058f6   Section        2  handlers.o(i.__scatterload_null)
+    i.__scatterload_zeroinit                 0x000058f8   Section       14  handlers.o(i.__scatterload_zeroinit)
+    i.__set_errno                            0x00005908   Section        0  errno.o(i.__set_errno)
+    i.atan                                   0x00005914   Section        0  atan.o(i.atan)
+    i.atan2                                  0x00005b30   Section        0  atan2.o(i.atan2)
+    i.sqrt                                   0x00005ca8   Section        0  sqrt.o(i.sqrt)
+    .constdata                               0x00005cf0   Section        8  tss_sensor.o(.constdata)
+    .constdata                               0x00005cf8   Section        8  tss_sensor.o(.constdata)
+    .constdata                               0x00005d00   Section       16  tss_sensortsil.o(.constdata)
+    .constdata                               0x00005d10   Section       12  tss_sensortsil.o(.constdata)
+    .constdata                               0x00005d1c   Section       12  tss_sensortsil.o(.constdata)
+    .constdata                               0x00005d28   Section        4  tss_sensortsil.o(.constdata)
+    .constdata                               0x00005d2c   Section        2  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d30   Section       28  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d4c   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d50   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d54   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d58   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d5c   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d60   Section        1  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d61   Section        2  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d64   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d68   Section        1  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d69   Section        1  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d6a   Section        1  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d6c   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d70   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d74   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d78   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d7c   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d80   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d84   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d88   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d8c   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d90   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d94   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d98   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005d9c   Section        1  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005da0   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005da4   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005da8   Section        1  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005da9   Section        1  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005dac   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005db0   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005db4   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005db8   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005dbc   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005dc0   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005dc4   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005dc8   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005dcc   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005dd0   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005dd4   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005dd8   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005ddc   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005de0   Section        1  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005de1   Section        1  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005de2   Section        2  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005de4   Section        6  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005dec   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005df0   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005df4   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005df8   Section        4  tss_systemsetupdata.o(.constdata)
+    .constdata                               0x00005e00   Section      152  atan.o(.constdata)
+    atanhi                                   0x00005e00   Data          32  atan.o(.constdata)
+    atanlo                                   0x00005e20   Data          32  atan.o(.constdata)
+    aTodd                                    0x00005e40   Data          40  atan.o(.constdata)
+    aTeven                                   0x00005e68   Data          48  atan.o(.constdata)
+    .constdata                               0x00005e98   Section        8  qnan.o(.constdata)
+    .conststring                             0x00005ea0   Section       18  main.o(.conststring)
     .data                                    0x20000000   Section        9  freemaster_scope.o(.data)
     pcm_nScopeVarCount                       0x20000000   Data           1  freemaster_scope.o(.data)
     pcm_pScopeVarSize                        0x20000001   Data           8  freemaster_scope.o(.data)
@@ -1037,8 +1036,9 @@ Image Symbol Table
     .data                                    0x20000065   Section        6  tss_systemsetupdata.o(.data)
     .data                                    0x2000006b   Section        2  tss_systemsetupdata.o(.data)
     .data                                    0x2000006d   Section        1  tss_systemsetupdata.o(.data)
-    .data                                    0x20000070   Section       28  main.o(.data)
-    fmstr_tsatable                           0x2000007c   Data          16  main.o(.data)
+    .data                                    0x20000070   Section       24  main.o(.data)
+    fmstr_tsatable                           0x20000078   Data          16  main.o(.data)
+    .data                                    0x20000088   Section        4  main.o(.data)
     .data                                    0x2000008c   Section       16  mma8451.o(.data)
     .data                                    0x2000009c   Section        8  timers.o(.data)
     .data                                    0x200000a4   Section        8  tss_keydetector.o(.data)
@@ -1092,32 +1092,59 @@ Image Symbol Table
     InitPorts                                0x000000d5   Thumb Code     8  app_init.o(.text)
     DelayMS                                  0x000000dd   Thumb Code    94  app_init.o(.text)
     TSS_Init_ASlider                         0x0000013b   Thumb Code    98  app_init.o(.text)
-    TSS1_fCallBack1                          0x000001ad   Thumb Code    70  events.o(.text)
-    TSS_fOnFault                             0x000001f3   Thumb Code    58  events.o(.text)
-    TSS_fOnInit                              0x0000022d   Thumb Code     8  events.o(.text)
-    TSS_FmstrIsrCallbackCustom               0x00000235   Thumb Code    14  events.o(.text)
-    FMSTR_InitScope                          0x0000026d   Thumb Code     2  freemaster_scope.o(.text)
-    FMSTR_SetUpScope                         0x0000026f   Thumb Code    84  freemaster_scope.o(.text)
-    FMSTR_ReadScope                          0x000002c3   Thumb Code    54  freemaster_scope.o(.text)
-    FMSTR_Isr                                0x00000301   Thumb Code    12  freemaster_kxx.o(.text)
-    FMSTR_CopyMemory                         0x0000030d   Thumb Code    22  freemaster_kxx.o(.text)
-    FMSTR_CopyToBuffer                       0x00000323   Thumb Code    22  freemaster_kxx.o(.text)
-    FMSTR_CopyFromBuffer                     0x00000339   Thumb Code    26  freemaster_kxx.o(.text)
-    FMSTR_ValueFromBuffer16                  0x00000353   Thumb Code     4  freemaster_kxx.o(.text)
-    FMSTR_ValueFromBuffer32                  0x00000357   Thumb Code     4  freemaster_kxx.o(.text)
-    FMSTR_ValueToBuffer16                    0x0000035b   Thumb Code    12  freemaster_kxx.o(.text)
-    FMSTR_ValueToBuffer32                    0x00000367   Thumb Code    12  freemaster_kxx.o(.text)
-    FMSTR_CopyFromBufferWithMask             0x00000373   Thumb Code    38  freemaster_kxx.o(.text)
-    FMSTR_SetExAddr                          0x00000399   Thumb Code     6  freemaster_kxx.o(.text)
-    FMSTR_AddressToBuffer                    0x0000039f   Thumb Code    24  freemaster_kxx.o(.text)
-    FMSTR_AddressFromBuffer                  0x000003b7   Thumb Code    16  freemaster_kxx.o(.text)
+    TSS1_fCallBack1                          0x000001ad   Thumb Code   170  events.o(.text)
+    TSS_fOnFault                             0x00000257   Thumb Code    58  events.o(.text)
+    TSS_fOnInit                              0x00000291   Thumb Code     8  events.o(.text)
+    TSS_FmstrIsrCallbackCustom               0x00000299   Thumb Code    14  events.o(.text)
+    FMSTR_InitScope                          0x000002cd   Thumb Code     2  freemaster_scope.o(.text)
+    FMSTR_SetUpScope                         0x000002cf   Thumb Code    84  freemaster_scope.o(.text)
+    FMSTR_ReadScope                          0x00000323   Thumb Code    54  freemaster_scope.o(.text)
+    stop                                     0x00000361   Thumb Code    14  arm_cm0.o(.text)
+    wait                                     0x0000036f   Thumb Code    14  arm_cm0.o(.text)
+    write_vtor                               0x0000037d   Thumb Code     6  arm_cm0.o(.text)
+    enable_irq                               0x00000383   Thumb Code    34  arm_cm0.o(.text)
+    disable_irq                              0x000003a5   Thumb Code    24  arm_cm0.o(.text)
+    set_irq_priority                         0x000003bd   Thumb Code     2  arm_cm0.o(.text)
     wdog_disable                             0x000003cd   Thumb Code     8  wdog_kl25.o(.text)
     TSS_IIRFilterEquation                    0x000003d9   Thumb Code    12  tss_systemsetupdata.o(.text)
-    setLEDColor                              0x000003e5   Thumb Code    12  leds.o(.text)
-    fadeWhite                                0x000003f1   Thumb Code     2  leds.o(.text)
-    __I$use$fp                               0x000003fd   Thumb Code     0  iusefp.o(.text)
-    __scatterload_null                       0x000003fd   Thumb Code     2  handlers.o(i.__scatterload_null)
-    TSS_C0_INPUTS_GROUP                      0x000003fe   Data           2  tss_systemsetupdata.o(.constdata)
+    Reset_Handler                            0x000003e5   Thumb Code     8  startup_mkl25z4.o(.text)
+    NMI_Handler                              0x000003ed   Thumb Code     2  startup_mkl25z4.o(.text)
+    HardFault_Handler                        0x000003ef   Thumb Code     2  startup_mkl25z4.o(.text)
+    SVC_Handler                              0x000003f1   Thumb Code     2  startup_mkl25z4.o(.text)
+    PendSV_Handler                           0x000003f3   Thumb Code     2  startup_mkl25z4.o(.text)
+    SysTick_Handler                          0x000003f5   Thumb Code     2  startup_mkl25z4.o(.text)
+    ADC0_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    CMP0_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    DAC0_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    DMA0_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    DMA1_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    DMA2_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    DMA3_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    DefaultISR                               0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    FTFA_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    I2C0_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    I2C1_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    LLW_IRQHandler                           0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    LPTimer_IRQHandler                       0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    LVD_LVW_IRQHandler                       0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    MCG_IRQHandler                           0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    PORTA_IRQHandler                         0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    PORTD_IRQHandler                         0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    RTC_IRQHandler                           0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    RTC_Seconds_IRQHandler                   0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    Reserved20_IRQHandler                    0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    Reserved39_IRQHandler                    0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    Reserved45_IRQHandler                    0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    SPI0_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    SPI1_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    TPM0_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    TPM1_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    TPM2_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    TSI0_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    UART0_IRQHandler                         0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    UART1_IRQHandler                         0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    UART2_IRQHandler                         0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
+    USB0_IRQHandler                          0x000003f7   Thumb Code     0  startup_mkl25z4.o(.text)
     FMSTR_Init                               0x00000411   Thumb Code    22  freemaster_protocol.o(.text)
     FMSTR_GetBoardInfo                       0x00000427   Thumb Code    28  freemaster_protocol.o(.text)
     FMSTR_WriteMemMask                       0x00000443   Thumb Code    34  freemaster_protocol.o(.text)
@@ -1138,287 +1165,260 @@ Image Symbol Table
     FMSTR_GetTsaInfo                         0x0000084f   Thumb Code    68  freemaster_tsa.o(.text)
     FMSTR_GetStringLen                       0x00000893   Thumb Code    32  freemaster_tsa.o(.text)
     FMSTR_CheckTsaSpace                      0x000008b3   Thumb Code   216  freemaster_tsa.o(.text)
-    stop                                     0x000009a5   Thumb Code    14  arm_cm0.o(.text)
-    wait                                     0x000009b3   Thumb Code    14  arm_cm0.o(.text)
-    write_vtor                               0x000009c1   Thumb Code     6  arm_cm0.o(.text)
-    enable_irq                               0x000009c7   Thumb Code    34  arm_cm0.o(.text)
-    disable_irq                              0x000009e9   Thumb Code    24  arm_cm0.o(.text)
-    set_irq_priority                         0x00000a01   Thumb Code     2  arm_cm0.o(.text)
-    clk_out_init                             0x00000a11   Thumb Code    20  sysinit_kl25.o(.text)
-    sysinit                                  0x00000a25   Thumb Code   110  sysinit_kl25.o(.text)
-    pll_init                                 0x00000ab5   Thumb Code   498  mcg_kl25.o(.text)
-    pee_pbe                                  0x00000ca7   Thumb Code    76  mcg_kl25.o(.text)
-    pbe_pee                                  0x00000cf3   Thumb Code   132  mcg_kl25.o(.text)
-    pbe_fbe                                  0x00000d77   Thumb Code    74  mcg_kl25.o(.text)
-    fbe_pbe                                  0x00000dc1   Thumb Code   186  mcg_kl25.o(.text)
-    pbe_blpe                                 0x00000e7b   Thumb Code   104  mcg_kl25.o(.text)
-    blpe_pbe                                 0x00000ee3   Thumb Code   172  mcg_kl25.o(.text)
-    blpe_fbe                                 0x00000f8f   Thumb Code    76  mcg_kl25.o(.text)
-    fbe_blpe                                 0x00000fdb   Thumb Code    44  mcg_kl25.o(.text)
-    fll_freq                                 0x00001007   Thumb Code   210  mcg_kl25.o(.text)
-    fbe_fei                                  0x000010d9   Thumb Code   138  mcg_kl25.o(.text)
-    fei_fbe                                  0x00001163   Thumb Code   298  mcg_kl25.o(.text)
-    fbe_fee                                  0x0000128d   Thumb Code   222  mcg_kl25.o(.text)
-    fee_fbe                                  0x0000136b   Thumb Code    74  mcg_kl25.o(.text)
-    fbe_fbi                                  0x000013b5   Thumb Code   246  mcg_kl25.o(.text)
-    fbi_fbe                                  0x000014ab   Thumb Code   306  mcg_kl25.o(.text)
-    fbi_blpi                                 0x000015dd   Thumb Code    66  mcg_kl25.o(.text)
-    blpi_fbi                                 0x0000161f   Thumb Code    66  mcg_kl25.o(.text)
-    fbi_fee                                  0x00001661   Thumb Code   400  mcg_kl25.o(.text)
-    fee_fbi                                  0x000017f1   Thumb Code   234  mcg_kl25.o(.text)
-    fbi_fei                                  0x000018db   Thumb Code   130  mcg_kl25.o(.text)
-    fei_fbi                                  0x0000195d   Thumb Code   204  mcg_kl25.o(.text)
-    fei_fee                                  0x00001a29   Thumb Code   290  mcg_kl25.o(.text)
-    fee_fei                                  0x00001b4b   Thumb Code    96  mcg_kl25.o(.text)
-    what_mcg_mode                            0x00001bab   Thumb Code   300  mcg_kl25.o(.text)
-    atc                                      0x00001cd7   Thumb Code   312  mcg_kl25.o(.text)
-    clk_monitor_0                            0x00001e0f   Thumb Code    22  mcg_kl25.o(.text)
-    uart_init                                0x00001e4d   Thumb Code    94  uart_kl25.o(.text)
-    uart_getchar                             0x00001eab   Thumb Code    10  uart_kl25.o(.text)
-    uart_putchar                             0x00001eb5   Thumb Code    10  uart_kl25.o(.text)
-    uart_getchar_present                     0x00001ebf   Thumb Code     8  uart_kl25.o(.text)
-    uart0_init                               0x00001ec7   Thumb Code    74  uart_kl25.o(.text)
-    uart0_getchar                            0x00001f11   Thumb Code    10  uart_kl25.o(.text)
-    uart0_putchar                            0x00001f1b   Thumb Code    10  uart_kl25.o(.text)
-    uart0_getchar_present                    0x00001f25   Thumb Code     8  uart_kl25.o(.text)
-    TSS_SampleElectrodeLowE0                 0x00001f3d   Thumb Code     4  tss_sensor.o(.text)
-    TSS_SampleElectrodeLowE1                 0x00001f41   Thumb Code     4  tss_sensor.o(.text)
-    TSS_SensorInitCallback                   0x00001f45   Thumb Code    12  tss_sensor.o(.text)
-    TSS_SensorInit                           0x00001f51   Thumb Code    14  tss_sensor.o(.text)
-    TSIL_InitModule                          0x00001f69   Thumb Code    20  tss_sensortsil.o(.text)
-    TSIL_SetNSamples                         0x00001f7d   Thumb Code    44  tss_sensortsil.o(.text)
-    TSIL_InitLowPower                        0x00001fa9   Thumb Code    52  tss_sensortsil.o(.text)
-    TSIL_InitPEN                             0x00001fdd   Thumb Code   198  tss_sensortsil.o(.text)
-    TSIL_Recalibrate                         0x000020a3   Thumb Code   628  tss_sensortsil.o(.text)
-    TSIL_InitThresholds                      0x00002317   Thumb Code   184  tss_sensortsil.o(.text)
-    TSIL_InitTrigger                         0x000023cf   Thumb Code   198  tss_sensortsil.o(.text)
-    TSIL_MethodControl                       0x00002495   Thumb Code   196  tss_sensortsil.o(.text)
-    TSIL_ReadCounter                         0x00002559   Thumb Code    76  tss_sensortsil.o(.text)
-    TSIL_HandleMeasurement                   0x000025a5   Thumb Code   112  tss_sensortsil.o(.text)
-    TSIL_SampleElectrode                     0x00002615   Thumb Code   260  tss_sensortsil.o(.text)
-    TSS_TSI0Isr                              0x00002719   Thumb Code   246  tss_sensortsil.o(.text)
-    FMSTR_TsaGetTable_UserAppTable           0x00002815   Thumb Code    12  main.o(.text)
-    FMSTR_TsaGetTable                        0x00002821   Thumb Code    12  main.o(.text)
-    main                                     0x0000282d   Thumb Code   188  main.o(.text)
-    i2c_init                                 0x00002901   Thumb Code    52  i2c.o(.text)
-    i2c_start                                0x00002935   Thumb Code    20  i2c.o(.text)
-    i2c_read_setup                           0x00002949   Thumb Code    70  i2c.o(.text)
-    i2c_repeated_read                        0x0000298f   Thumb Code    52  i2c.o(.text)
-    i2c_read_byte                            0x000029c3   Thumb Code   118  i2c.o(.text)
-    i2c_write_byte                           0x00002a39   Thumb Code    74  i2c.o(.text)
-    init_mma                                 0x00002a91   Thumb Code    38  mma8451.o(.text)
-    read_full_xyz                            0x00002ab7   Thumb Code   106  mma8451.o(.text)
-    read_xyz                                 0x00002b21   Thumb Code    54  mma8451.o(.text)
-    convert_xyz_to_roll_pitch                0x00002b57   Thumb Code   188  mma8451.o(.text)
-    PIT_init                                 0x00002c25   Thumb Code    68  timers.o(.text)
-    Start_PIT                                0x00002c69   Thumb Code    12  timers.o(.text)
-    Stop_PIT                                 0x00002c75   Thumb Code    12  timers.o(.text)
-    PIT_IRQHandler                           0x00002c81   Thumb Code    60  timers.o(.text)
-    Reset_Handler                            0x00002ccd   Thumb Code     8  startup_mkl25z4.o(.text)
-    NMI_Handler                              0x00002cd5   Thumb Code     2  startup_mkl25z4.o(.text)
-    HardFault_Handler                        0x00002cd7   Thumb Code     2  startup_mkl25z4.o(.text)
-    SVC_Handler                              0x00002cd9   Thumb Code     2  startup_mkl25z4.o(.text)
-    PendSV_Handler                           0x00002cdb   Thumb Code     2  startup_mkl25z4.o(.text)
-    SysTick_Handler                          0x00002cdd   Thumb Code     2  startup_mkl25z4.o(.text)
-    ADC0_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    CMP0_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    DAC0_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    DMA0_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    DMA1_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    DMA2_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    DMA3_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    DefaultISR                               0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    FTFA_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    I2C0_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    I2C1_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    LLW_IRQHandler                           0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    LPTimer_IRQHandler                       0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    LVD_LVW_IRQHandler                       0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    MCG_IRQHandler                           0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    PORTA_IRQHandler                         0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    PORTD_IRQHandler                         0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    RTC_IRQHandler                           0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    RTC_Seconds_IRQHandler                   0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    Reserved20_IRQHandler                    0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    Reserved39_IRQHandler                    0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    Reserved45_IRQHandler                    0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    SPI0_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    SPI1_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    TPM0_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    TPM1_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    TPM2_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    TSI0_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    UART0_IRQHandler                         0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    UART1_IRQHandler                         0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    UART2_IRQHandler                         0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    USB0_IRQHandler                          0x00002cdf   Thumb Code     0  startup_mkl25z4.o(.text)
-    SystemInit                               0x00002ce9   Thumb Code    12  system_mkl25z4.o(.text)
-    FreeMASTER_Init                          0x00002cf5   Thumb Code    48  board.o(.text)
-    PWM_init                                 0x00002d25   Thumb Code    84  board.o(.text)
-    LPTMRInit                                0x00002d79   Thumb Code    52  board.o(.text)
-    LPTMRStop                                0x00002dad   Thumb Code    30  board.o(.text)
-    LPTMRIsr                                 0x00002dcb   Thumb Code    94  board.o(.text)
-    GotoLowPower                             0x00002e29   Thumb Code   116  board.o(.text)
-    LowPowerControl                          0x00002e9d   Thumb Code    18  board.o(.text)
-    InitDevices                              0x00002eaf   Thumb Code    20  board.o(.text)
-    __aeabi_uidiv                            0x00002f11   Thumb Code     0  uidiv.o(.text)
-    __aeabi_uidivmod                         0x00002f11   Thumb Code    44  uidiv.o(.text)
-    __aeabi_idiv                             0x00002f3d   Thumb Code     0  idiv.o(.text)
-    __aeabi_idivmod                          0x00002f3d   Thumb Code    40  idiv.o(.text)
-    __aeabi_fadd                             0x00002f65   Thumb Code   162  fadd.o(.text)
-    __aeabi_fsub                             0x00003007   Thumb Code     8  fadd.o(.text)
-    __aeabi_frsub                            0x0000300f   Thumb Code     8  fadd.o(.text)
-    __aeabi_fmul                             0x00003017   Thumb Code   122  fmul.o(.text)
-    __aeabi_fdiv                             0x00003091   Thumb Code   124  fdiv.o(.text)
-    __ARM_scalbnf                            0x0000310d   Thumb Code    24  fscalb.o(.text)
-    scalbnf                                  0x0000310d   Thumb Code     0  fscalb.o(.text)
-    __aeabi_dmul                             0x00003125   Thumb Code   202  dmul.o(.text)
-    __aeabi_ddiv                             0x000031f5   Thumb Code   234  ddiv.o(.text)
-    __ARM_scalbn                             0x000032e5   Thumb Code    44  dscalb.o(.text)
-    scalbn                                   0x000032e5   Thumb Code     0  dscalb.o(.text)
-    __aeabi_i2f                              0x00003311   Thumb Code    22  fflti.o(.text)
-    __aeabi_i2d                              0x00003329   Thumb Code    34  dflti.o(.text)
-    __aeabi_f2uiz                            0x00003351   Thumb Code    40  ffixui.o(.text)
-    __aeabi_f2d                              0x00003379   Thumb Code    40  f2d.o(.text)
-    __aeabi_d2f                              0x000033a1   Thumb Code    56  d2f.o(.text)
-    __aeabi_cfrcmple                         0x000033d9   Thumb Code    20  cfrcmple.o(.text)
-    _float_round                             0x000033ed   Thumb Code    16  fepilogue.o(.text)
-    _float_epilogue                          0x000033fd   Thumb Code   114  fepilogue.o(.text)
-    _double_round                            0x0000346f   Thumb Code    26  depilogue.o(.text)
-    _double_epilogue                         0x00003489   Thumb Code   164  depilogue.o(.text)
-    __aeabi_dadd                             0x0000352d   Thumb Code   328  dadd.o(.text)
-    __aeabi_dsub                             0x00003675   Thumb Code    12  dadd.o(.text)
-    __aeabi_drsub                            0x00003681   Thumb Code    12  dadd.o(.text)
-    _dsqrt                                   0x00003691   Thumb Code   162  dsqrt.o(.text)
-    __scatterload                            0x00003735   Thumb Code    28  init.o(.text)
-    __scatterload_rt2                        0x00003735   Thumb Code     0  init.o(.text)
-    __aeabi_llsl                             0x00003759   Thumb Code    32  llshl.o(.text)
-    _ll_shift_l                              0x00003759   Thumb Code     0  llshl.o(.text)
-    __aeabi_llsr                             0x00003779   Thumb Code    34  llushr.o(.text)
-    _ll_ushift_r                             0x00003779   Thumb Code     0  llushr.o(.text)
-    __aeabi_lasr                             0x0000379b   Thumb Code    38  llsshr.o(.text)
-    _ll_sshift_r                             0x0000379b   Thumb Code     0  llsshr.o(.text)
-    TSS_ASliderCalculatePosIIRFilter         0x000037c1   Thumb Code    94  tss_asliderdecoder.o(i.TSS_ASliderCalculatePosIIRFilter)
-    TSS_ASliderDecoder                       0x0000382d   Thumb Code  1108  tss_asliderdecoder.o(i.TSS_ASliderDecoder)
-    TSS_ASliderTrendControl                  0x00003c85   Thumb Code   214  tss_asliderdecoder.o(i.TSS_ASliderTrendControl)
-    TSS_ASliderTrendThreshold                0x00003d71   Thumb Code    30  tss_asliderdecoder.o(i.TSS_ASliderTrendThreshold)
-    TSS_BrowseModules                        0x00003d99   Thumb Code   134  tss_main.o(i.TSS_BrowseModules)
-    TSS_CutSInt16ToSInt8                     0x00003e2d   Thumb Code    22  tss_filters.o(i.TSS_CutSInt16ToSInt8)
-    TSS_DataCorruptionCheck                  0x00003e45   Thumb Code   156  tss_main.o(i.TSS_DataCorruptionCheck)
-    TSS_DecodersControl                      0x00003f01   Thumb Code   102  tss_main.o(i.TSS_DecodersControl)
-    TSS_FaultEvaluation                      0x00003f79   Thumb Code   106  tss_main.o(i.TSS_FaultEvaluation)
-    TSS_GetSystemConfig                      0x00003ff5   Thumb Code   230  tss_main.o(i.TSS_GetSystemConfig)
-    TSS_Init                                 0x00004105   Thumb Code    92  tss_main.o(i.TSS_Init)
-    TSS_InitInternalArrays                   0x00004171   Thumb Code    66  tss_main.o(i.TSS_InitInternalArrays)
-    TSS_InitRegisterArrays                   0x000041c5   Thumb Code    60  tss_main.o(i.TSS_InitRegisterArrays)
-    TSS_KeyBasicDeltaNoiseAnalysisIIRControl 0x0000421d   Thumb Code   108  tss_keydetectornormal.o(i.TSS_KeyBasicDeltaNoiseAnalysisIIRControl)
-    TSS_KeyBasicDetect                       0x00004291   Thumb Code   378  tss_keydetectornormal.o(i.TSS_KeyBasicDetect)
-    TSS_KeyBasicElectrodeEval                0x00004429   Thumb Code   578  tss_keydetectornormal.o(i.TSS_KeyBasicElectrodeEval)
-    TSS_KeyBasicNegativeBaselineDrop         0x0000472d   Thumb Code   114  tss_keydetectornormal.o(i.TSS_KeyBasicNegativeBaselineDrop)
-    TSS_KeyBasicSensAutoCalibration          0x000047bd   Thumb Code   536  tss_keydetectornormal.o(i.TSS_KeyBasicSensAutoCalibration)
-    TSS_KeyBasicStuckKeyControl              0x000049fd   Thumb Code    58  tss_keydetectornormal.o(i.TSS_KeyBasicStuckKeyControl)
-    TSS_KeyDetectorCalculateDelta            0x00004a49   Thumb Code    22  tss_keydetector.o(i.TSS_KeyDetectorCalculateDelta)
-    TSS_KeyDetectorCalculateIIRFilter        0x00004a69   Thumb Code    20  tss_filters.o(i.TSS_KeyDetectorCalculateIIRFilter)
-    TSS_KeyDetectorCalibrate                 0x00004a85   Thumb Code    26  tss_keydetector.o(i.TSS_KeyDetectorCalibrate)
-    TSS_KeyDetectorElectrodeStatusUpdate     0x00004ae1   Thumb Code    44  tss_keydetector.o(i.TSS_KeyDetectorElectrodeStatusUpdate)
-    TSS_KeyDetectorFillDeltaLogBuffer        0x00004b39   Thumb Code    12  tss_keydetector.o(i.TSS_KeyDetectorFillDeltaLogBuffer)
-    TSS_KeyDetectorFillSignalLogBuffer       0x00004b49   Thumb Code    12  tss_keydetector.o(i.TSS_KeyDetectorFillSignalLogBuffer)
-    TSS_KeyDetectorGetDCTrackerCounter       0x00004b5d   Thumb Code     6  tss_keydetector.o(i.TSS_KeyDetectorGetDCTrackerCounter)
-    TSS_KeyDetectorGetElectrodeEnablerStatus 0x00004b69   Thumb Code    50  tss_keydetector.o(i.TSS_KeyDetectorGetElectrodeEnablerStatus)
-    TSS_KeyDetectorGetElectrodeGroupStatus   0x00004ba9   Thumb Code    60  tss_keydetector.o(i.TSS_KeyDetectorGetElectrodeGroupStatus)
-    TSS_KeyDetectorGetShieldElectrodeReleaseStatus 0x00004be9   Thumb Code    52  tss_keydetector.o(i.TSS_KeyDetectorGetShieldElectrodeReleaseStatus)
-    TSS_KeyDetectorGetSlowDCTrackerCounter   0x00004c29   Thumb Code     6  tss_keydetector.o(i.TSS_KeyDetectorGetSlowDCTrackerCounter)
-    TSS_KeyDetectorInit                      0x00004c35   Thumb Code    50  tss_keydetector.o(i.TSS_KeyDetectorInit)
-    TSS_KeyDetectorInitPrevCapSample         0x00004c75   Thumb Code    12  tss_filters.o(i.TSS_KeyDetectorInitPrevCapSample)
-    TSS_KeyDetectorMain                      0x00004c89   Thumb Code   364  tss_keydetector.o(i.TSS_KeyDetectorMain)
-    TSS_KeyDetectorRecalibrateModules        0x00004ea9   Thumb Code    14  tss_keydetector.o(i.TSS_KeyDetectorRecalibrateModules)
-    TSS_KeyDetectorRecalibrationRequest      0x00004ebd   Thumb Code    16  tss_keydetector.o(i.TSS_KeyDetectorRecalibrationRequest)
-    TSS_KeyDetectorReleaseElectrode          0x00004ecd   Thumb Code    30  tss_keydetector.o(i.TSS_KeyDetectorReleaseElectrode)
-    TSS_KeyDetectorResetElectrode            0x00004ef1   Thumb Code    16  tss_keydetector.o(i.TSS_KeyDetectorResetElectrode)
-    TSS_KeyDetectorResetElectrodeDebouncing  0x00004f05   Thumb Code    16  tss_keydetector.o(i.TSS_KeyDetectorResetElectrodeDebouncing)
-    TSS_KeyDetectorResetElectrodeMeasured    0x00004f21   Thumb Code    24  tss_keydetector.o(i.TSS_KeyDetectorResetElectrodeMeasured)
-    TSS_KeyDetectorResetStuckKeyCounter      0x00004f45   Thumb Code     8  tss_keydetector.o(i.TSS_KeyDetectorResetStuckKeyCounter)
-    TSS_KeyDetectorRestartElectrode          0x00004f51   Thumb Code    44  tss_keydetector.o(i.TSS_KeyDetectorRestartElectrode)
-    TSS_KeyDetectorSignalDivider             0x00004f95   Thumb Code    18  tss_filters.o(i.TSS_KeyDetectorSignalDivider)
-    TSS_LowPowerConfig                       0x00004fb1   Thumb Code   150  tss_main.o(i.TSS_LowPowerConfig)
-    TSS_SetASliderConfig                     0x00005051   Thumb Code   240  tss_asliderdecoder.o(i.TSS_SetASliderConfig)
-    TSS_SetControlElectrodesEnablers         0x0000514d   Thumb Code   130  tss_main.o(i.TSS_SetControlElectrodesEnablers)
-    TSS_SetSystemConfig                      0x000051ed   Thumb Code   742  tss_main.o(i.TSS_SetSystemConfig)
-    TSS_SubUInt16WithUInt16ToSInt16          0x00005515   Thumb Code    40  tss_filters.o(i.TSS_SubUInt16WithUInt16ToSInt16)
-    TSS_Task                                 0x00005541   Thumb Code   182  tss_main.o(i.TSS_Task)
-    TSS_TriggerConfig                        0x00005611   Thumb Code    98  tss_main.o(i.TSS_TriggerConfig)
-    TSS_TriggerControl                       0x0000567d   Thumb Code    60  tss_main.o(i.TSS_TriggerControl)
-    __ARM_clz                                0x000056c1   Thumb Code    46  depilogue.o(i.__ARM_clz)
-    __ARM_common_switch8                     0x000056ef   Thumb Code    26  tss_sensortsil.o(i.__ARM_common_switch8)
-    __ARM_fpclassify                         0x00005709   Thumb Code    40  fpclassify.o(i.__ARM_fpclassify)
-    __kernel_poly                            0x00005735   Thumb Code   172  poly.o(i.__kernel_poly)
-    __mathlib_dbl_infnan                     0x000057e1   Thumb Code    10  dunder.o(i.__mathlib_dbl_infnan)
-    __mathlib_dbl_infnan2                    0x000057eb   Thumb Code     8  dunder.o(i.__mathlib_dbl_infnan2)
-    __mathlib_dbl_underflow                  0x000057f5   Thumb Code    14  dunder.o(i.__mathlib_dbl_underflow)
-    __scatterload_copy                       0x00005809   Thumb Code    14  handlers.o(i.__scatterload_copy)
-    __scatterload_zeroinit                   0x00005817   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
-    __set_errno                              0x00005825   Thumb Code     6  errno.o(i.__set_errno)
-    atan                                     0x00005831   Thumb Code   472  atan.o(i.atan)
-    atan2                                    0x00005a4d   Thumb Code   334  atan2.o(i.atan2)
-    sqrt                                     0x00005bc5   Thumb Code    66  sqrt.o(i.sqrt)
-    tss_faSampleElectrode                    0x00005c0c   Data           8  tss_sensor.o(.constdata)
-    tss_acp8ElectrodeROMData                 0x00005c14   Data           8  tss_sensor.o(.constdata)
-    TSS_TSIL0_METHOD_ROMDATA_CONTEXT         0x00005c1c   Data          16  tss_sensortsil.o(.constdata)
-    TSS_E0_ROMDATA_CONTEXT                   0x00005c2c   Data          12  tss_sensortsil.o(.constdata)
-    TSS_E1_ROMDATA_CONTEXT                   0x00005c38   Data          12  tss_sensortsil.o(.constdata)
-    TSS_C0_STRUCTURE_ROM_CONTEXT             0x00005c48   Data          28  tss_systemsetupdata.o(.constdata)
-    tss_faCallback                           0x00005c64   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_acpsDecRAMContext                    0x00005c68   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_acpsDecROMContext                    0x00005c6c   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_acpsCSStructs                        0x00005c70   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_faDecoders                           0x00005c74   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_cau8ShieldPairs                      0x00005c78   Data           1  tss_systemsetupdata.o(.constdata)
-    tss_cau8SignalDivider                    0x00005c79   Data           2  tss_systemsetupdata.o(.constdata)
-    tss_fDecodersControl                     0x00005c7c   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_cu8NumElecs                          0x00005c80   Data           1  tss_systemsetupdata.o(.constdata)
-    tss_cu8NumCtrls                          0x00005c81   Data           1  tss_systemsetupdata.o(.constdata)
-    tss_cu8ElecBitFldLn                      0x00005c82   Data           1  tss_systemsetupdata.o(.constdata)
-    tss_fCalculateIIRFilter                  0x00005c84   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fCalculateShielding                  0x00005c88   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fInitPrevCapSample                   0x00005c8c   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fFillDeltaLogBuffer                  0x00005c90   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fFillSignalLogBuffer                 0x00005c94   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fDataCorruptionCheck                 0x00005c98   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fFmstrCall                           0x00005c9c   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fTriggerConfig                       0x00005ca0   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fTriggerControl                      0x00005ca4   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fLowPowerConfig                      0x00005ca8   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fOnFault                             0x00005cac   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fOnInit                              0x00005cb0   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_cu8APosFilterWeight                  0x00005cb4   Data           1  tss_systemsetupdata.o(.constdata)
-    tss_fASliderCalculatePosIIRFilter        0x00005cb8   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fASliderDelayControl                 0x00005cbc   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_cu8ASliderTrendBufferLength          0x00005cc0   Data           1  tss_systemsetupdata.o(.constdata)
-    tss_i8ASliderTrendThreshold              0x00005cc1   Data           1  tss_systemsetupdata.o(.constdata)
-    tss_fASliderTrendThreshold               0x00005cc4   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fASliderTrendControl                 0x00005cc8   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fOnProximity                         0x00005ccc   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fProximityConfig                     0x00005cd0   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fStuckKeyControl                     0x00005cd4   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fResetStuckKeyCounter                0x00005cd8   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fNegativeBaselineDrop                0x00005cdc   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fKeyDetectorRecalibrationRequest     0x00005ce0   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fSignalDivider                       0x00005ce4   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fSignalMultiplier                    0x00005ce8   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fAutoCalibration                     0x00005cec   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fSensitivityLowLimitControl          0x00005cf0   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fDeltaNoiseAnalysisIIRControl        0x00005cf4   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_cu8BaselineInitLength                0x00005cf8   Data           1  tss_systemsetupdata.o(.constdata)
-    tss_cu8AutoCalibInitLength               0x00005cf9   Data           1  tss_systemsetupdata.o(.constdata)
-    tss_ci8DeltaNoiseAnalysisIIRWeights      0x00005cfa   Data           2  tss_systemsetupdata.o(.constdata)
-    tss_csKeyBasicASCContext                 0x00005cfc   Data           6  tss_systemsetupdata.o(.constdata)
-    tss_fKeyDetectorElectrodeEval            0x00005d04   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fKeyDetectorIntegrationResetEval     0x00005d08   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fKeyNoiseSchedulerInit               0x00005d0c   Data           4  tss_systemsetupdata.o(.constdata)
-    tss_fKeyNoiseSchedulerRun                0x00005d10   Data           4  tss_systemsetupdata.o(.constdata)
-    __mathlib_zero                           0x00005db0   Data           8  qnan.o(.constdata)
-    Region$$Table$$Base                      0x00005dcc   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x00005dec   Number         0  anon$$obj.o(Region$$Table)
+    FMSTR_Isr                                0x000009a5   Thumb Code    12  freemaster_kxx.o(.text)
+    FMSTR_CopyMemory                         0x000009b1   Thumb Code    22  freemaster_kxx.o(.text)
+    FMSTR_CopyToBuffer                       0x000009c7   Thumb Code    22  freemaster_kxx.o(.text)
+    FMSTR_CopyFromBuffer                     0x000009dd   Thumb Code    26  freemaster_kxx.o(.text)
+    FMSTR_ValueFromBuffer16                  0x000009f7   Thumb Code     4  freemaster_kxx.o(.text)
+    FMSTR_ValueFromBuffer32                  0x000009fb   Thumb Code     4  freemaster_kxx.o(.text)
+    FMSTR_ValueToBuffer16                    0x000009ff   Thumb Code    12  freemaster_kxx.o(.text)
+    FMSTR_ValueToBuffer32                    0x00000a0b   Thumb Code    12  freemaster_kxx.o(.text)
+    FMSTR_CopyFromBufferWithMask             0x00000a17   Thumb Code    38  freemaster_kxx.o(.text)
+    FMSTR_SetExAddr                          0x00000a3d   Thumb Code     6  freemaster_kxx.o(.text)
+    FMSTR_AddressToBuffer                    0x00000a43   Thumb Code    24  freemaster_kxx.o(.text)
+    FMSTR_AddressFromBuffer                  0x00000a5b   Thumb Code    16  freemaster_kxx.o(.text)
+    clk_out_init                             0x00000a71   Thumb Code    20  sysinit_kl25.o(.text)
+    sysinit                                  0x00000a85   Thumb Code   110  sysinit_kl25.o(.text)
+    pll_init                                 0x00000b15   Thumb Code   498  mcg_kl25.o(.text)
+    pee_pbe                                  0x00000d07   Thumb Code    76  mcg_kl25.o(.text)
+    pbe_pee                                  0x00000d53   Thumb Code   132  mcg_kl25.o(.text)
+    pbe_fbe                                  0x00000dd7   Thumb Code    74  mcg_kl25.o(.text)
+    fbe_pbe                                  0x00000e21   Thumb Code   186  mcg_kl25.o(.text)
+    pbe_blpe                                 0x00000edb   Thumb Code   104  mcg_kl25.o(.text)
+    blpe_pbe                                 0x00000f43   Thumb Code   172  mcg_kl25.o(.text)
+    blpe_fbe                                 0x00000fef   Thumb Code    76  mcg_kl25.o(.text)
+    fbe_blpe                                 0x0000103b   Thumb Code    44  mcg_kl25.o(.text)
+    fll_freq                                 0x00001067   Thumb Code   210  mcg_kl25.o(.text)
+    fbe_fei                                  0x00001139   Thumb Code   138  mcg_kl25.o(.text)
+    fei_fbe                                  0x000011c3   Thumb Code   298  mcg_kl25.o(.text)
+    fbe_fee                                  0x000012ed   Thumb Code   222  mcg_kl25.o(.text)
+    fee_fbe                                  0x000013cb   Thumb Code    74  mcg_kl25.o(.text)
+    fbe_fbi                                  0x00001415   Thumb Code   246  mcg_kl25.o(.text)
+    fbi_fbe                                  0x0000150b   Thumb Code   306  mcg_kl25.o(.text)
+    fbi_blpi                                 0x0000163d   Thumb Code    66  mcg_kl25.o(.text)
+    blpi_fbi                                 0x0000167f   Thumb Code    66  mcg_kl25.o(.text)
+    fbi_fee                                  0x000016c1   Thumb Code   400  mcg_kl25.o(.text)
+    fee_fbi                                  0x00001851   Thumb Code   234  mcg_kl25.o(.text)
+    fbi_fei                                  0x0000193b   Thumb Code   130  mcg_kl25.o(.text)
+    fei_fbi                                  0x000019bd   Thumb Code   204  mcg_kl25.o(.text)
+    fei_fee                                  0x00001a89   Thumb Code   290  mcg_kl25.o(.text)
+    fee_fei                                  0x00001bab   Thumb Code    96  mcg_kl25.o(.text)
+    what_mcg_mode                            0x00001c0b   Thumb Code   300  mcg_kl25.o(.text)
+    atc                                      0x00001d37   Thumb Code   312  mcg_kl25.o(.text)
+    clk_monitor_0                            0x00001e6f   Thumb Code    22  mcg_kl25.o(.text)
+    uart_init                                0x00001ead   Thumb Code    94  uart_kl25.o(.text)
+    uart_getchar                             0x00001f0b   Thumb Code    10  uart_kl25.o(.text)
+    uart_putchar                             0x00001f15   Thumb Code    10  uart_kl25.o(.text)
+    uart_getchar_present                     0x00001f1f   Thumb Code     8  uart_kl25.o(.text)
+    uart0_init                               0x00001f27   Thumb Code    74  uart_kl25.o(.text)
+    uart0_getchar                            0x00001f71   Thumb Code    10  uart_kl25.o(.text)
+    uart0_putchar                            0x00001f7b   Thumb Code    10  uart_kl25.o(.text)
+    uart0_getchar_present                    0x00001f85   Thumb Code     8  uart_kl25.o(.text)
+    TSS_SampleElectrodeLowE0                 0x00001f9d   Thumb Code     4  tss_sensor.o(.text)
+    TSS_SampleElectrodeLowE1                 0x00001fa1   Thumb Code     4  tss_sensor.o(.text)
+    TSS_SensorInitCallback                   0x00001fa5   Thumb Code    12  tss_sensor.o(.text)
+    TSS_SensorInit                           0x00001fb1   Thumb Code    14  tss_sensor.o(.text)
+    TSIL_InitModule                          0x00001fc9   Thumb Code    20  tss_sensortsil.o(.text)
+    TSIL_SetNSamples                         0x00001fdd   Thumb Code    44  tss_sensortsil.o(.text)
+    TSIL_InitLowPower                        0x00002009   Thumb Code    52  tss_sensortsil.o(.text)
+    TSIL_InitPEN                             0x0000203d   Thumb Code   198  tss_sensortsil.o(.text)
+    TSIL_Recalibrate                         0x00002103   Thumb Code   628  tss_sensortsil.o(.text)
+    TSIL_InitThresholds                      0x00002377   Thumb Code   184  tss_sensortsil.o(.text)
+    TSIL_InitTrigger                         0x0000242f   Thumb Code   198  tss_sensortsil.o(.text)
+    TSIL_MethodControl                       0x000024f5   Thumb Code   196  tss_sensortsil.o(.text)
+    TSIL_ReadCounter                         0x000025b9   Thumb Code    76  tss_sensortsil.o(.text)
+    TSIL_HandleMeasurement                   0x00002605   Thumb Code   112  tss_sensortsil.o(.text)
+    TSIL_SampleElectrode                     0x00002675   Thumb Code   260  tss_sensortsil.o(.text)
+    TSS_TSI0Isr                              0x00002779   Thumb Code   246  tss_sensortsil.o(.text)
+    FMSTR_TsaGetTable_UserAppTable           0x00002875   Thumb Code    12  main.o(.text)
+    FMSTR_TsaGetTable                        0x00002881   Thumb Code    12  main.o(.text)
+    main                                     0x0000288d   Thumb Code   146  main.o(.text)
+    i2c_init                                 0x0000292d   Thumb Code    52  i2c.o(.text)
+    i2c_start                                0x00002961   Thumb Code    20  i2c.o(.text)
+    i2c_read_setup                           0x00002975   Thumb Code    70  i2c.o(.text)
+    i2c_repeated_read                        0x000029bb   Thumb Code    52  i2c.o(.text)
+    i2c_read_byte                            0x000029ef   Thumb Code   118  i2c.o(.text)
+    i2c_write_byte                           0x00002a65   Thumb Code    74  i2c.o(.text)
+    init_mma                                 0x00002abd   Thumb Code    38  mma8451.o(.text)
+    read_full_xyz                            0x00002ae3   Thumb Code   106  mma8451.o(.text)
+    read_xyz                                 0x00002b4d   Thumb Code    54  mma8451.o(.text)
+    convert_xyz_to_roll_pitch                0x00002b83   Thumb Code   188  mma8451.o(.text)
+    setLEDColor                              0x00002c51   Thumb Code    12  leds.o(.text)
+    fadeWhite                                0x00002c5d   Thumb Code   102  leds.o(.text)
+    fadeOutWhite                             0x00002cc3   Thumb Code   100  leds.o(.text)
+    PIT_init                                 0x00002d35   Thumb Code    68  timers.o(.text)
+    Start_PIT                                0x00002d79   Thumb Code    12  timers.o(.text)
+    Stop_PIT                                 0x00002d85   Thumb Code    12  timers.o(.text)
+    PIT_IRQHandler                           0x00002d91   Thumb Code    60  timers.o(.text)
+    SystemInit                               0x00002ddd   Thumb Code    12  system_mkl25z4.o(.text)
+    FreeMASTER_Init                          0x00002de9   Thumb Code    48  board.o(.text)
+    PWM_init                                 0x00002e19   Thumb Code    84  board.o(.text)
+    LPTMRInit                                0x00002e6d   Thumb Code    52  board.o(.text)
+    LPTMRStop                                0x00002ea1   Thumb Code    30  board.o(.text)
+    LPTMRIsr                                 0x00002ebf   Thumb Code    94  board.o(.text)
+    GotoLowPower                             0x00002f1d   Thumb Code   116  board.o(.text)
+    LowPowerControl                          0x00002f91   Thumb Code    18  board.o(.text)
+    InitDevices                              0x00002fa3   Thumb Code    20  board.o(.text)
+    __aeabi_uidiv                            0x00003005   Thumb Code     0  uidiv.o(.text)
+    __aeabi_uidivmod                         0x00003005   Thumb Code    44  uidiv.o(.text)
+    __aeabi_idiv                             0x00003031   Thumb Code     0  idiv.o(.text)
+    __aeabi_idivmod                          0x00003031   Thumb Code    40  idiv.o(.text)
+    __aeabi_fadd                             0x00003059   Thumb Code   162  fadd.o(.text)
+    __aeabi_fsub                             0x000030fb   Thumb Code     8  fadd.o(.text)
+    __aeabi_frsub                            0x00003103   Thumb Code     8  fadd.o(.text)
+    __aeabi_fmul                             0x0000310b   Thumb Code   122  fmul.o(.text)
+    __aeabi_fdiv                             0x00003185   Thumb Code   124  fdiv.o(.text)
+    __ARM_scalbnf                            0x00003201   Thumb Code    24  fscalb.o(.text)
+    scalbnf                                  0x00003201   Thumb Code     0  fscalb.o(.text)
+    __aeabi_dmul                             0x00003219   Thumb Code   202  dmul.o(.text)
+    __aeabi_ddiv                             0x000032e9   Thumb Code   234  ddiv.o(.text)
+    __ARM_scalbn                             0x000033d9   Thumb Code    44  dscalb.o(.text)
+    scalbn                                   0x000033d9   Thumb Code     0  dscalb.o(.text)
+    __aeabi_i2f                              0x00003405   Thumb Code    22  fflti.o(.text)
+    __aeabi_i2d                              0x0000341d   Thumb Code    34  dflti.o(.text)
+    __aeabi_f2uiz                            0x00003445   Thumb Code    40  ffixui.o(.text)
+    __aeabi_f2d                              0x0000346d   Thumb Code    40  f2d.o(.text)
+    __aeabi_d2f                              0x00003495   Thumb Code    56  d2f.o(.text)
+    __I$use$fp                               0x000034cd   Thumb Code     0  iusefp.o(.text)
+    _float_round                             0x000034cd   Thumb Code    16  fepilogue.o(.text)
+    _float_epilogue                          0x000034dd   Thumb Code   114  fepilogue.o(.text)
+    _double_round                            0x0000354f   Thumb Code    26  depilogue.o(.text)
+    _double_epilogue                         0x00003569   Thumb Code   164  depilogue.o(.text)
+    __aeabi_dadd                             0x0000360d   Thumb Code   328  dadd.o(.text)
+    __aeabi_dsub                             0x00003755   Thumb Code    12  dadd.o(.text)
+    __aeabi_drsub                            0x00003761   Thumb Code    12  dadd.o(.text)
+    _dsqrt                                   0x00003771   Thumb Code   162  dsqrt.o(.text)
+    __scatterload                            0x00003815   Thumb Code    28  init.o(.text)
+    __scatterload_rt2                        0x00003815   Thumb Code     0  init.o(.text)
+    __aeabi_llsl                             0x00003839   Thumb Code    32  llshl.o(.text)
+    _ll_shift_l                              0x00003839   Thumb Code     0  llshl.o(.text)
+    __aeabi_llsr                             0x00003859   Thumb Code    34  llushr.o(.text)
+    _ll_ushift_r                             0x00003859   Thumb Code     0  llushr.o(.text)
+    __aeabi_lasr                             0x0000387b   Thumb Code    38  llsshr.o(.text)
+    _ll_sshift_r                             0x0000387b   Thumb Code     0  llsshr.o(.text)
+    TSS_ASliderCalculatePosIIRFilter         0x000038a1   Thumb Code    94  tss_asliderdecoder.o(i.TSS_ASliderCalculatePosIIRFilter)
+    TSS_ASliderDecoder                       0x0000390d   Thumb Code  1108  tss_asliderdecoder.o(i.TSS_ASliderDecoder)
+    TSS_ASliderTrendControl                  0x00003d65   Thumb Code   214  tss_asliderdecoder.o(i.TSS_ASliderTrendControl)
+    TSS_ASliderTrendThreshold                0x00003e51   Thumb Code    30  tss_asliderdecoder.o(i.TSS_ASliderTrendThreshold)
+    TSS_BrowseModules                        0x00003e79   Thumb Code   134  tss_main.o(i.TSS_BrowseModules)
+    TSS_CutSInt16ToSInt8                     0x00003f0d   Thumb Code    22  tss_filters.o(i.TSS_CutSInt16ToSInt8)
+    TSS_DataCorruptionCheck                  0x00003f25   Thumb Code   156  tss_main.o(i.TSS_DataCorruptionCheck)
+    TSS_DecodersControl                      0x00003fe1   Thumb Code   102  tss_main.o(i.TSS_DecodersControl)
+    TSS_FaultEvaluation                      0x00004059   Thumb Code   106  tss_main.o(i.TSS_FaultEvaluation)
+    TSS_GetSystemConfig                      0x000040d5   Thumb Code   230  tss_main.o(i.TSS_GetSystemConfig)
+    TSS_Init                                 0x000041e5   Thumb Code    92  tss_main.o(i.TSS_Init)
+    TSS_InitInternalArrays                   0x00004251   Thumb Code    66  tss_main.o(i.TSS_InitInternalArrays)
+    TSS_InitRegisterArrays                   0x000042a5   Thumb Code    60  tss_main.o(i.TSS_InitRegisterArrays)
+    TSS_KeyBasicDeltaNoiseAnalysisIIRControl 0x000042fd   Thumb Code   108  tss_keydetectornormal.o(i.TSS_KeyBasicDeltaNoiseAnalysisIIRControl)
+    TSS_KeyBasicDetect                       0x00004371   Thumb Code   378  tss_keydetectornormal.o(i.TSS_KeyBasicDetect)
+    TSS_KeyBasicElectrodeEval                0x00004509   Thumb Code   578  tss_keydetectornormal.o(i.TSS_KeyBasicElectrodeEval)
+    TSS_KeyBasicNegativeBaselineDrop         0x0000480d   Thumb Code   114  tss_keydetectornormal.o(i.TSS_KeyBasicNegativeBaselineDrop)
+    TSS_KeyBasicSensAutoCalibration          0x0000489d   Thumb Code   536  tss_keydetectornormal.o(i.TSS_KeyBasicSensAutoCalibration)
+    TSS_KeyBasicStuckKeyControl              0x00004add   Thumb Code    58  tss_keydetectornormal.o(i.TSS_KeyBasicStuckKeyControl)
+    TSS_KeyDetectorCalculateDelta            0x00004b29   Thumb Code    22  tss_keydetector.o(i.TSS_KeyDetectorCalculateDelta)
+    TSS_KeyDetectorCalculateIIRFilter        0x00004b49   Thumb Code    20  tss_filters.o(i.TSS_KeyDetectorCalculateIIRFilter)
+    TSS_KeyDetectorCalibrate                 0x00004b65   Thumb Code    26  tss_keydetector.o(i.TSS_KeyDetectorCalibrate)
+    TSS_KeyDetectorElectrodeStatusUpdate     0x00004bc1   Thumb Code    44  tss_keydetector.o(i.TSS_KeyDetectorElectrodeStatusUpdate)
+    TSS_KeyDetectorFillDeltaLogBuffer        0x00004c19   Thumb Code    12  tss_keydetector.o(i.TSS_KeyDetectorFillDeltaLogBuffer)
+    TSS_KeyDetectorFillSignalLogBuffer       0x00004c29   Thumb Code    12  tss_keydetector.o(i.TSS_KeyDetectorFillSignalLogBuffer)
+    TSS_KeyDetectorGetDCTrackerCounter       0x00004c3d   Thumb Code     6  tss_keydetector.o(i.TSS_KeyDetectorGetDCTrackerCounter)
+    TSS_KeyDetectorGetElectrodeEnablerStatus 0x00004c49   Thumb Code    50  tss_keydetector.o(i.TSS_KeyDetectorGetElectrodeEnablerStatus)
+    TSS_KeyDetectorGetElectrodeGroupStatus   0x00004c89   Thumb Code    60  tss_keydetector.o(i.TSS_KeyDetectorGetElectrodeGroupStatus)
+    TSS_KeyDetectorGetShieldElectrodeReleaseStatus 0x00004cc9   Thumb Code    52  tss_keydetector.o(i.TSS_KeyDetectorGetShieldElectrodeReleaseStatus)
+    TSS_KeyDetectorGetSlowDCTrackerCounter   0x00004d09   Thumb Code     6  tss_keydetector.o(i.TSS_KeyDetectorGetSlowDCTrackerCounter)
+    TSS_KeyDetectorInit                      0x00004d15   Thumb Code    50  tss_keydetector.o(i.TSS_KeyDetectorInit)
+    TSS_KeyDetectorInitPrevCapSample         0x00004d55   Thumb Code    12  tss_filters.o(i.TSS_KeyDetectorInitPrevCapSample)
+    TSS_KeyDetectorMain                      0x00004d69   Thumb Code   364  tss_keydetector.o(i.TSS_KeyDetectorMain)
+    TSS_KeyDetectorRecalibrateModules        0x00004f89   Thumb Code    14  tss_keydetector.o(i.TSS_KeyDetectorRecalibrateModules)
+    TSS_KeyDetectorRecalibrationRequest      0x00004f9d   Thumb Code    16  tss_keydetector.o(i.TSS_KeyDetectorRecalibrationRequest)
+    TSS_KeyDetectorReleaseElectrode          0x00004fad   Thumb Code    30  tss_keydetector.o(i.TSS_KeyDetectorReleaseElectrode)
+    TSS_KeyDetectorResetElectrode            0x00004fd1   Thumb Code    16  tss_keydetector.o(i.TSS_KeyDetectorResetElectrode)
+    TSS_KeyDetectorResetElectrodeDebouncing  0x00004fe5   Thumb Code    16  tss_keydetector.o(i.TSS_KeyDetectorResetElectrodeDebouncing)
+    TSS_KeyDetectorResetElectrodeMeasured    0x00005001   Thumb Code    24  tss_keydetector.o(i.TSS_KeyDetectorResetElectrodeMeasured)
+    TSS_KeyDetectorResetStuckKeyCounter      0x00005025   Thumb Code     8  tss_keydetector.o(i.TSS_KeyDetectorResetStuckKeyCounter)
+    TSS_KeyDetectorRestartElectrode          0x00005031   Thumb Code    44  tss_keydetector.o(i.TSS_KeyDetectorRestartElectrode)
+    TSS_KeyDetectorSignalDivider             0x00005075   Thumb Code    18  tss_filters.o(i.TSS_KeyDetectorSignalDivider)
+    TSS_LowPowerConfig                       0x00005091   Thumb Code   150  tss_main.o(i.TSS_LowPowerConfig)
+    TSS_SetASliderConfig                     0x00005131   Thumb Code   240  tss_asliderdecoder.o(i.TSS_SetASliderConfig)
+    TSS_SetControlElectrodesEnablers         0x0000522d   Thumb Code   130  tss_main.o(i.TSS_SetControlElectrodesEnablers)
+    TSS_SetSystemConfig                      0x000052cd   Thumb Code   742  tss_main.o(i.TSS_SetSystemConfig)
+    TSS_SubUInt16WithUInt16ToSInt16          0x000055f5   Thumb Code    40  tss_filters.o(i.TSS_SubUInt16WithUInt16ToSInt16)
+    TSS_Task                                 0x00005621   Thumb Code   182  tss_main.o(i.TSS_Task)
+    TSS_TriggerConfig                        0x000056f1   Thumb Code    98  tss_main.o(i.TSS_TriggerConfig)
+    TSS_TriggerControl                       0x0000575d   Thumb Code    60  tss_main.o(i.TSS_TriggerControl)
+    __ARM_clz                                0x000057a1   Thumb Code    46  depilogue.o(i.__ARM_clz)
+    __ARM_common_switch8                     0x000057cf   Thumb Code    26  tss_sensortsil.o(i.__ARM_common_switch8)
+    __ARM_fpclassify                         0x000057e9   Thumb Code    40  fpclassify.o(i.__ARM_fpclassify)
+    __kernel_poly                            0x00005815   Thumb Code   172  poly.o(i.__kernel_poly)
+    __mathlib_dbl_infnan                     0x000058c1   Thumb Code    10  dunder.o(i.__mathlib_dbl_infnan)
+    __mathlib_dbl_infnan2                    0x000058cb   Thumb Code     8  dunder.o(i.__mathlib_dbl_infnan2)
+    __mathlib_dbl_underflow                  0x000058d5   Thumb Code    14  dunder.o(i.__mathlib_dbl_underflow)
+    __scatterload_copy                       0x000058e9   Thumb Code    14  handlers.o(i.__scatterload_copy)
+    __scatterload_null                       0x000058f7   Thumb Code     2  handlers.o(i.__scatterload_null)
+    __scatterload_zeroinit                   0x000058f9   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
+    __set_errno                              0x00005909   Thumb Code     6  errno.o(i.__set_errno)
+    atan                                     0x00005915   Thumb Code   472  atan.o(i.atan)
+    atan2                                    0x00005b31   Thumb Code   334  atan2.o(i.atan2)
+    sqrt                                     0x00005ca9   Thumb Code    66  sqrt.o(i.sqrt)
+    tss_faSampleElectrode                    0x00005cf0   Data           8  tss_sensor.o(.constdata)
+    tss_acp8ElectrodeROMData                 0x00005cf8   Data           8  tss_sensor.o(.constdata)
+    TSS_TSIL0_METHOD_ROMDATA_CONTEXT         0x00005d00   Data          16  tss_sensortsil.o(.constdata)
+    TSS_E0_ROMDATA_CONTEXT                   0x00005d10   Data          12  tss_sensortsil.o(.constdata)
+    TSS_E1_ROMDATA_CONTEXT                   0x00005d1c   Data          12  tss_sensortsil.o(.constdata)
+    TSS_C0_INPUTS_GROUP                      0x00005d2c   Data           2  tss_systemsetupdata.o(.constdata)
+    TSS_C0_STRUCTURE_ROM_CONTEXT             0x00005d30   Data          28  tss_systemsetupdata.o(.constdata)
+    tss_faCallback                           0x00005d4c   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_acpsDecRAMContext                    0x00005d50   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_acpsDecROMContext                    0x00005d54   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_acpsCSStructs                        0x00005d58   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_faDecoders                           0x00005d5c   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_cau8ShieldPairs                      0x00005d60   Data           1  tss_systemsetupdata.o(.constdata)
+    tss_cau8SignalDivider                    0x00005d61   Data           2  tss_systemsetupdata.o(.constdata)
+    tss_fDecodersControl                     0x00005d64   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_cu8NumElecs                          0x00005d68   Data           1  tss_systemsetupdata.o(.constdata)
+    tss_cu8NumCtrls                          0x00005d69   Data           1  tss_systemsetupdata.o(.constdata)
+    tss_cu8ElecBitFldLn                      0x00005d6a   Data           1  tss_systemsetupdata.o(.constdata)
+    tss_fCalculateIIRFilter                  0x00005d6c   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fCalculateShielding                  0x00005d70   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fInitPrevCapSample                   0x00005d74   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fFillDeltaLogBuffer                  0x00005d78   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fFillSignalLogBuffer                 0x00005d7c   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fDataCorruptionCheck                 0x00005d80   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fFmstrCall                           0x00005d84   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fTriggerConfig                       0x00005d88   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fTriggerControl                      0x00005d8c   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fLowPowerConfig                      0x00005d90   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fOnFault                             0x00005d94   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fOnInit                              0x00005d98   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_cu8APosFilterWeight                  0x00005d9c   Data           1  tss_systemsetupdata.o(.constdata)
+    tss_fASliderCalculatePosIIRFilter        0x00005da0   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fASliderDelayControl                 0x00005da4   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_cu8ASliderTrendBufferLength          0x00005da8   Data           1  tss_systemsetupdata.o(.constdata)
+    tss_i8ASliderTrendThreshold              0x00005da9   Data           1  tss_systemsetupdata.o(.constdata)
+    tss_fASliderTrendThreshold               0x00005dac   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fASliderTrendControl                 0x00005db0   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fOnProximity                         0x00005db4   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fProximityConfig                     0x00005db8   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fStuckKeyControl                     0x00005dbc   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fResetStuckKeyCounter                0x00005dc0   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fNegativeBaselineDrop                0x00005dc4   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fKeyDetectorRecalibrationRequest     0x00005dc8   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fSignalDivider                       0x00005dcc   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fSignalMultiplier                    0x00005dd0   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fAutoCalibration                     0x00005dd4   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fSensitivityLowLimitControl          0x00005dd8   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fDeltaNoiseAnalysisIIRControl        0x00005ddc   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_cu8BaselineInitLength                0x00005de0   Data           1  tss_systemsetupdata.o(.constdata)
+    tss_cu8AutoCalibInitLength               0x00005de1   Data           1  tss_systemsetupdata.o(.constdata)
+    tss_ci8DeltaNoiseAnalysisIIRWeights      0x00005de2   Data           2  tss_systemsetupdata.o(.constdata)
+    tss_csKeyBasicASCContext                 0x00005de4   Data           6  tss_systemsetupdata.o(.constdata)
+    tss_fKeyDetectorElectrodeEval            0x00005dec   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fKeyDetectorIntegrationResetEval     0x00005df0   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fKeyNoiseSchedulerInit               0x00005df4   Data           4  tss_systemsetupdata.o(.constdata)
+    tss_fKeyNoiseSchedulerRun                0x00005df8   Data           4  tss_systemsetupdata.o(.constdata)
+    __mathlib_zero                           0x00005e98   Data           8  qnan.o(.constdata)
+    Region$$Table$$Base                      0x00005eb4   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x00005ed4   Number         0  anon$$obj.o(Region$$Table)
     mcg_clk_hz                               0x20000028   Data           4  sysinit_kl25.o(.data)
     tss_u8SampleIntFlag                      0x2000002c   Data           1  tss_sensor.o(.data)
     cASlider1                                0x2000002d   Data           8  tss_systemsetupdata.o(.data)
@@ -1449,8 +1449,8 @@ Image Symbol Table
     tss_ai8NoiseAmplitude                    0x2000006b   Data           2  tss_systemsetupdata.o(.data)
     tss_ai8SensitivityLowLimit               0x2000006d   Data           1  tss_systemsetupdata.o(.data)
     u16LPcounter                             0x20000070   Data           2  main.o(.data)
-    lastBrightness                           0x20000074   Data           4  main.o(.data)
-    state                                    0x20000078   Data           4  main.o(.data)
+    state                                    0x20000074   Data           4  main.o(.data)
+    lastBrightness                           0x20000088   Data           4  main.o(.data)
     acc_X                                    0x2000008c   Data           2  mma8451.o(.data)
     acc_Y                                    0x2000008e   Data           2  mma8451.o(.data)
     acc_Z                                    0x20000090   Data           2  mma8451.o(.data)
@@ -1474,211 +1474,212 @@ Memory Map of the image
 
   Image Entry point : 0x000000c1
 
-  Load Region LR_IROM1 (Base: 0x00000000, Size: 0x00005ea4, Max: 0x00020000, ABSOLUTE)
+  Load Region LR_IROM1 (Base: 0x00000000, Size: 0x00005f8c, Max: 0x00020000, ABSOLUTE)
 
-    Execution Region ER_IROM1 (Base: 0x00000000, Size: 0x00005dec, Max: 0x00020000, ABSOLUTE)
+    Execution Region ER_IROM1 (Base: 0x00000000, Size: 0x00005ed4, Max: 0x00020000, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x00000000   0x000000c0   Data   RO          641    RESET               startup_mkl25z4.o
-    0x000000c0   0x00000000   Code   RO          866  * .ARM.Collect$$$$00000000  mc_p.l(entry.o)
-    0x000000c0   0x00000004   Code   RO          924    .ARM.Collect$$$$00000001  mc_p.l(entry2.o)
-    0x000000c4   0x00000004   Code   RO          927    .ARM.Collect$$$$00000004  mc_p.l(entry5.o)
-    0x000000c8   0x00000000   Code   RO          929    .ARM.Collect$$$$00000008  mc_p.l(entry7b.o)
-    0x000000c8   0x00000000   Code   RO          931    .ARM.Collect$$$$0000000A  mc_p.l(entry8b.o)
-    0x000000c8   0x00000008   Code   RO          932    .ARM.Collect$$$$0000000B  mc_p.l(entry9a.o)
-    0x000000d0   0x00000000   Code   RO          934    .ARM.Collect$$$$0000000D  mc_p.l(entry10a.o)
-    0x000000d0   0x00000000   Code   RO          936    .ARM.Collect$$$$0000000F  mc_p.l(entry11a.o)
-    0x000000d0   0x00000004   Code   RO          925    .ARM.Collect$$$$00002712  mc_p.l(entry2.o)
+    0x00000000   0x000000c0   Data   RO          642    RESET               startup_mkl25z4.o
+    0x000000c0   0x00000000   Code   RO          867  * .ARM.Collect$$$$00000000  mc_p.l(entry.o)
+    0x000000c0   0x00000004   Code   RO          923    .ARM.Collect$$$$00000001  mc_p.l(entry2.o)
+    0x000000c4   0x00000004   Code   RO          926    .ARM.Collect$$$$00000004  mc_p.l(entry5.o)
+    0x000000c8   0x00000000   Code   RO          928    .ARM.Collect$$$$00000008  mc_p.l(entry7b.o)
+    0x000000c8   0x00000000   Code   RO          930    .ARM.Collect$$$$0000000A  mc_p.l(entry8b.o)
+    0x000000c8   0x00000008   Code   RO          931    .ARM.Collect$$$$0000000B  mc_p.l(entry9a.o)
+    0x000000d0   0x00000000   Code   RO          933    .ARM.Collect$$$$0000000D  mc_p.l(entry10a.o)
+    0x000000d0   0x00000000   Code   RO          935    .ARM.Collect$$$$0000000F  mc_p.l(entry11a.o)
+    0x000000d0   0x00000004   Code   RO          924    .ARM.Collect$$$$00002712  mc_p.l(entry2.o)
     0x000000d4   0x000000d8   Code   RO            1    .text               app_init.o
-    0x000001ac   0x000000c0   Code   RO           59    .text               events.o
-    0x0000026c   0x00000094   Code   RO          163    .text               freemaster_scope.o
-    0x00000300   0x000000cc   Code   RO          205    .text               freemaster_kxx.o
+    0x000001ac   0x00000120   Code   RO           59    .text               events.o
+    0x000002cc   0x00000094   Code   RO          163    .text               freemaster_scope.o
+    0x00000360   0x0000006c   Code   RO          220    .text               arm_cm0.o
     0x000003cc   0x0000000c   Code   RO          285    .text               wdog_kl25.o
     0x000003d8   0x0000000c   Code   RO          431    .text               tss_systemsetupdata.o
-    0x000003e4   0x00000018   Code   RO          611    .text               leds.o
-    0x000003fc   0x00000000   Code   RO          945    .text               mc_p.l(iusefp.o)
-    0x000003fc   0x00000002   Code   RO          973    i.__scatterload_null  mc_p.l(handlers.o)
-    0x000003fe   0x00000002   Data   RO          435    .constdata          tss_systemsetupdata.o
-    0x00000400   0x00000010   Code   RO          642    .ARM.__at_0x400     startup_mkl25z4.o
+    0x000003e4   0x0000001c   Code   RO          644    .text               startup_mkl25z4.o
+    0x00000400   0x00000010   Code   RO          643    .ARM.__at_0x400     startup_mkl25z4.o
     0x00000410   0x000001c4   Code   RO          138    .text               freemaster_protocol.o
     0x000005d4   0x00000278   Code   RO          178    .text               freemaster_serial.o
     0x0000084c   0x00000158   Code   RO          193    .text               freemaster_tsa.o
-    0x000009a4   0x0000006c   Code   RO          220    .text               arm_cm0.o
-    0x00000a10   0x000000a4   Code   RO          232    .text               sysinit_kl25.o
-    0x00000ab4   0x00001398   Code   RO          266    .text               mcg_kl25.o
-    0x00001e4c   0x000000f0   Code   RO          297    .text               uart_kl25.o
-    0x00001f3c   0x0000002c   Code   RO          324    .text               tss_sensor.o
-    0x00001f68   0x000008ac   Code   RO          401    .text               tss_sensortsil.o
-    0x00002814   0x000000ec   Code   RO          546    .text               main.o
-    0x00002900   0x00000190   Code   RO          577    .text               i2c.o
-    0x00002a90   0x00000194   Code   RO          592    .text               mma8451.o
-    0x00002c24   0x000000a8   Code   RO          624    .text               timers.o
-    0x00002ccc   0x0000001c   Code   RO          643    .text               startup_mkl25z4.o
-    0x00002ce8   0x0000000c   Code   RO          650    .text               system_mkl25z4.o
-    0x00002cf4   0x0000021c   Code   RO          662    .text               board.o
-    0x00002f10   0x0000002c   Code   RO          869    .text               mc_p.l(uidiv.o)
-    0x00002f3c   0x00000028   Code   RO          871    .text               mc_p.l(idiv.o)
-    0x00002f64   0x000000b2   Code   RO          873    .text               mf_p.l(fadd.o)
-    0x00003016   0x0000007a   Code   RO          875    .text               mf_p.l(fmul.o)
-    0x00003090   0x0000007c   Code   RO          877    .text               mf_p.l(fdiv.o)
-    0x0000310c   0x00000018   Code   RO          879    .text               mf_p.l(fscalb.o)
-    0x00003124   0x000000d0   Code   RO          881    .text               mf_p.l(dmul.o)
-    0x000031f4   0x000000f0   Code   RO          883    .text               mf_p.l(ddiv.o)
-    0x000032e4   0x0000002c   Code   RO          885    .text               mf_p.l(dscalb.o)
-    0x00003310   0x00000016   Code   RO          887    .text               mf_p.l(fflti.o)
-    0x00003326   0x00000002   PAD
-    0x00003328   0x00000028   Code   RO          889    .text               mf_p.l(dflti.o)
-    0x00003350   0x00000028   Code   RO          891    .text               mf_p.l(ffixui.o)
-    0x00003378   0x00000028   Code   RO          893    .text               mf_p.l(f2d.o)
-    0x000033a0   0x00000038   Code   RO          895    .text               mf_p.l(d2f.o)
-    0x000033d8   0x00000014   Code   RO          897    .text               mf_p.l(cfrcmple.o)
-    0x000033ec   0x00000082   Code   RO          946    .text               mf_p.l(fepilogue.o)
-    0x0000346e   0x000000be   Code   RO          948    .text               mf_p.l(depilogue.o)
-    0x0000352c   0x00000164   Code   RO          952    .text               mf_p.l(dadd.o)
-    0x00003690   0x000000a2   Code   RO          954    .text               mf_p.l(dsqrt.o)
-    0x00003732   0x00000002   PAD
-    0x00003734   0x00000024   Code   RO          962    .text               mc_p.l(init.o)
-    0x00003758   0x00000020   Code   RO          964    .text               mc_p.l(llshl.o)
-    0x00003778   0x00000022   Code   RO          966    .text               mc_p.l(llushr.o)
-    0x0000379a   0x00000026   Code   RO          968    .text               mc_p.l(llsshr.o)
-    0x000037c0   0x0000006c   Code   RO          678    i.TSS_ASliderCalculatePosIIRFilter  TSS_KXX_M0.lib(tss_asliderdecoder.o)
-    0x0000382c   0x00000458   Code   RO          679    i.TSS_ASliderDecoder  TSS_KXX_M0.lib(tss_asliderdecoder.o)
-    0x00003c84   0x000000ec   Code   RO          681    i.TSS_ASliderTrendControl  TSS_KXX_M0.lib(tss_asliderdecoder.o)
-    0x00003d70   0x00000028   Code   RO          682    i.TSS_ASliderTrendThreshold  TSS_KXX_M0.lib(tss_asliderdecoder.o)
-    0x00003d98   0x00000094   Code   RO          781    i.TSS_BrowseModules  TSS_KXX_M0.lib(tss_main.o)
-    0x00003e2c   0x00000016   Code   RO          692    i.TSS_CutSInt16ToSInt8  TSS_KXX_M0.lib(tss_filters.o)
-    0x00003e42   0x00000002   PAD
-    0x00003e44   0x000000bc   Code   RO          782    i.TSS_DataCorruptionCheck  TSS_KXX_M0.lib(tss_main.o)
-    0x00003f00   0x00000078   Code   RO          783    i.TSS_DecodersControl  TSS_KXX_M0.lib(tss_main.o)
-    0x00003f78   0x0000007c   Code   RO          784    i.TSS_FaultEvaluation  TSS_KXX_M0.lib(tss_main.o)
-    0x00003ff4   0x00000110   Code   RO          793    i.TSS_GetSystemConfig  TSS_KXX_M0.lib(tss_main.o)
-    0x00004104   0x0000006c   Code   RO          794    i.TSS_Init          TSS_KXX_M0.lib(tss_main.o)
-    0x00004170   0x00000054   Code   RO          795    i.TSS_InitInternalArrays  TSS_KXX_M0.lib(tss_main.o)
-    0x000041c4   0x00000058   Code   RO          796    i.TSS_InitRegisterArrays  TSS_KXX_M0.lib(tss_main.o)
-    0x0000421c   0x00000074   Code   RO          765    i.TSS_KeyBasicDeltaNoiseAnalysisIIRControl  TSS_KXX_M0.lib(tss_keydetectornormal.o)
-    0x00004290   0x00000198   Code   RO          766    i.TSS_KeyBasicDetect  TSS_KXX_M0.lib(tss_keydetectornormal.o)
-    0x00004428   0x00000290   Code   RO          767    i.TSS_KeyBasicElectrodeEval  TSS_KXX_M0.lib(tss_keydetectornormal.o)
-    0x000046b8   0x00000074   Code   RO          768    i.TSS_KeyBasicEvaluateNoiseData  TSS_KXX_M0.lib(tss_keydetectornormal.o)
-    0x0000472c   0x00000090   Code   RO          770    i.TSS_KeyBasicNegativeBaselineDrop  TSS_KXX_M0.lib(tss_keydetectornormal.o)
-    0x000047bc   0x00000240   Code   RO          771    i.TSS_KeyBasicSensAutoCalibration  TSS_KXX_M0.lib(tss_keydetectornormal.o)
-    0x000049fc   0x0000004c   Code   RO          772    i.TSS_KeyBasicStuckKeyControl  TSS_KXX_M0.lib(tss_keydetectornormal.o)
-    0x00004a48   0x00000020   Code   RO          716    i.TSS_KeyDetectorCalculateDelta  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004a68   0x0000001c   Code   RO          693    i.TSS_KeyDetectorCalculateIIRFilter  TSS_KXX_M0.lib(tss_filters.o)
-    0x00004a84   0x00000020   Code   RO          717    i.TSS_KeyDetectorCalibrate  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004aa4   0x0000003c   Code   RO          718    i.TSS_KeyDetectorDCTrackerEvalExecution  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004ae0   0x00000030   Code   RO          719    i.TSS_KeyDetectorElectrodeStatusUpdate  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004b10   0x00000026   Code   RO          720    i.TSS_KeyDetectorFaultDecoder  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004b36   0x00000002   PAD
-    0x00004b38   0x00000010   Code   RO          721    i.TSS_KeyDetectorFillDeltaLogBuffer  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004b48   0x00000014   Code   RO          722    i.TSS_KeyDetectorFillSignalLogBuffer  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004b5c   0x0000000c   Code   RO          723    i.TSS_KeyDetectorGetDCTrackerCounter  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004b68   0x00000040   Code   RO          724    i.TSS_KeyDetectorGetElectrodeEnablerStatus  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004ba8   0x00000040   Code   RO          725    i.TSS_KeyDetectorGetElectrodeGroupStatus  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004be8   0x00000040   Code   RO          726    i.TSS_KeyDetectorGetShieldElectrodeReleaseStatus  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004c28   0x0000000c   Code   RO          727    i.TSS_KeyDetectorGetSlowDCTrackerCounter  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004c34   0x00000040   Code   RO          728    i.TSS_KeyDetectorInit  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004c74   0x00000014   Code   RO          695    i.TSS_KeyDetectorInitPrevCapSample  TSS_KXX_M0.lib(tss_filters.o)
-    0x00004c88   0x00000198   Code   RO          729    i.TSS_KeyDetectorMain  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004e20   0x00000088   Code   RO          731    i.TSS_KeyDetectorRecalibrateElectrode  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004ea8   0x00000014   Code   RO          732    i.TSS_KeyDetectorRecalibrateModules  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004ebc   0x00000010   Code   RO          733    i.TSS_KeyDetectorRecalibrationRequest  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004ecc   0x00000024   Code   RO          734    i.TSS_KeyDetectorReleaseElectrode  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004ef0   0x00000014   Code   RO          735    i.TSS_KeyDetectorResetElectrode  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004f04   0x0000001c   Code   RO          736    i.TSS_KeyDetectorResetElectrodeDebouncing  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004f20   0x00000024   Code   RO          737    i.TSS_KeyDetectorResetElectrodeMeasured  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004f44   0x0000000c   Code   RO          738    i.TSS_KeyDetectorResetStuckKeyCounter  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004f50   0x00000044   Code   RO          739    i.TSS_KeyDetectorRestartElectrode  TSS_KXX_M0.lib(tss_keydetector.o)
-    0x00004f94   0x0000001c   Code   RO          696    i.TSS_KeyDetectorSignalDivider  TSS_KXX_M0.lib(tss_filters.o)
-    0x00004fb0   0x000000a0   Code   RO          802    i.TSS_LowPowerConfig  TSS_KXX_M0.lib(tss_main.o)
-    0x00005050   0x000000fc   Code   RO          684    i.TSS_SetASliderConfig  TSS_KXX_M0.lib(tss_asliderdecoder.o)
-    0x0000514c   0x000000a0   Code   RO          804    i.TSS_SetControlElectrodesEnablers  TSS_KXX_M0.lib(tss_main.o)
-    0x000051ec   0x00000328   Code   RO          806    i.TSS_SetSystemConfig  TSS_KXX_M0.lib(tss_main.o)
-    0x00005514   0x0000002c   Code   RO          701    i.TSS_SubUInt16WithUInt16ToSInt16  TSS_KXX_M0.lib(tss_filters.o)
-    0x00005540   0x000000d0   Code   RO          811    i.TSS_Task          TSS_KXX_M0.lib(tss_main.o)
-    0x00005610   0x0000006c   Code   RO          813    i.TSS_TriggerConfig  TSS_KXX_M0.lib(tss_main.o)
-    0x0000567c   0x00000044   Code   RO          814    i.TSS_TriggerControl  TSS_KXX_M0.lib(tss_main.o)
-    0x000056c0   0x0000002e   Code   RO          950    i.__ARM_clz         mf_p.l(depilogue.o)
-    0x000056ee   0x0000001a   Code   RO          419    i.__ARM_common_switch8  tss_sensortsil.o
-    0x00005708   0x0000002c   Code   RO          958    i.__ARM_fpclassify  m_ps.l(fpclassify.o)
-    0x00005734   0x000000ac   Code   RO          960    i.__kernel_poly     m_ps.l(poly.o)
-    0x000057e0   0x0000000a   Code   RO          910    i.__mathlib_dbl_infnan  m_ps.l(dunder.o)
-    0x000057ea   0x00000008   Code   RO          911    i.__mathlib_dbl_infnan2  m_ps.l(dunder.o)
-    0x000057f2   0x00000002   PAD
-    0x000057f4   0x00000014   Code   RO          915    i.__mathlib_dbl_underflow  m_ps.l(dunder.o)
-    0x00005808   0x0000000e   Code   RO          972    i.__scatterload_copy  mc_p.l(handlers.o)
-    0x00005816   0x0000000e   Code   RO          974    i.__scatterload_zeroinit  mc_p.l(handlers.o)
-    0x00005824   0x0000000c   Code   RO          940    i.__set_errno       mc_p.l(errno.o)
-    0x00005830   0x0000021c   Code   RO          900    i.atan              m_ps.l(atan.o)
-    0x00005a4c   0x00000178   Code   RO          851    i.atan2             m_ps.l(atan2.o)
-    0x00005bc4   0x00000048   Code   RO          859    i.sqrt              m_ps.l(sqrt.o)
-    0x00005c0c   0x00000008   Data   RO          325    .constdata          tss_sensor.o
-    0x00005c14   0x00000008   Data   RO          327    .constdata          tss_sensor.o
-    0x00005c1c   0x00000010   Data   RO          403    .constdata          tss_sensortsil.o
-    0x00005c2c   0x0000000c   Data   RO          404    .constdata          tss_sensortsil.o
-    0x00005c38   0x0000000c   Data   RO          405    .constdata          tss_sensortsil.o
-    0x00005c44   0x00000004   Data   RO          406    .constdata          tss_sensortsil.o
-    0x00005c48   0x0000001c   Data   RO          436    .constdata          tss_systemsetupdata.o
-    0x00005c64   0x00000004   Data   RO          437    .constdata          tss_systemsetupdata.o
-    0x00005c68   0x00000004   Data   RO          438    .constdata          tss_systemsetupdata.o
-    0x00005c6c   0x00000004   Data   RO          439    .constdata          tss_systemsetupdata.o
-    0x00005c70   0x00000004   Data   RO          440    .constdata          tss_systemsetupdata.o
-    0x00005c74   0x00000004   Data   RO          441    .constdata          tss_systemsetupdata.o
-    0x00005c78   0x00000001   Data   RO          442    .constdata          tss_systemsetupdata.o
-    0x00005c79   0x00000002   Data   RO          443    .constdata          tss_systemsetupdata.o
-    0x00005c7b   0x00000001   PAD
-    0x00005c7c   0x00000004   Data   RO          446    .constdata          tss_systemsetupdata.o
-    0x00005c80   0x00000001   Data   RO          447    .constdata          tss_systemsetupdata.o
-    0x00005c81   0x00000001   Data   RO          448    .constdata          tss_systemsetupdata.o
-    0x00005c82   0x00000001   Data   RO          449    .constdata          tss_systemsetupdata.o
-    0x00005c83   0x00000001   PAD
-    0x00005c84   0x00000004   Data   RO          451    .constdata          tss_systemsetupdata.o
-    0x00005c88   0x00000004   Data   RO          452    .constdata          tss_systemsetupdata.o
-    0x00005c8c   0x00000004   Data   RO          453    .constdata          tss_systemsetupdata.o
-    0x00005c90   0x00000004   Data   RO          454    .constdata          tss_systemsetupdata.o
-    0x00005c94   0x00000004   Data   RO          456    .constdata          tss_systemsetupdata.o
-    0x00005c98   0x00000004   Data   RO          457    .constdata          tss_systemsetupdata.o
-    0x00005c9c   0x00000004   Data   RO          458    .constdata          tss_systemsetupdata.o
-    0x00005ca0   0x00000004   Data   RO          459    .constdata          tss_systemsetupdata.o
-    0x00005ca4   0x00000004   Data   RO          460    .constdata          tss_systemsetupdata.o
-    0x00005ca8   0x00000004   Data   RO          461    .constdata          tss_systemsetupdata.o
-    0x00005cac   0x00000004   Data   RO          462    .constdata          tss_systemsetupdata.o
-    0x00005cb0   0x00000004   Data   RO          463    .constdata          tss_systemsetupdata.o
-    0x00005cb4   0x00000001   Data   RO          464    .constdata          tss_systemsetupdata.o
-    0x00005cb5   0x00000003   PAD
-    0x00005cb8   0x00000004   Data   RO          465    .constdata          tss_systemsetupdata.o
-    0x00005cbc   0x00000004   Data   RO          467    .constdata          tss_systemsetupdata.o
-    0x00005cc0   0x00000001   Data   RO          468    .constdata          tss_systemsetupdata.o
-    0x00005cc1   0x00000001   Data   RO          469    .constdata          tss_systemsetupdata.o
-    0x00005cc2   0x00000002   PAD
-    0x00005cc4   0x00000004   Data   RO          470    .constdata          tss_systemsetupdata.o
-    0x00005cc8   0x00000004   Data   RO          471    .constdata          tss_systemsetupdata.o
-    0x00005ccc   0x00000004   Data   RO          474    .constdata          tss_systemsetupdata.o
-    0x00005cd0   0x00000004   Data   RO          475    .constdata          tss_systemsetupdata.o
-    0x00005cd4   0x00000004   Data   RO          476    .constdata          tss_systemsetupdata.o
-    0x00005cd8   0x00000004   Data   RO          477    .constdata          tss_systemsetupdata.o
-    0x00005cdc   0x00000004   Data   RO          478    .constdata          tss_systemsetupdata.o
-    0x00005ce0   0x00000004   Data   RO          479    .constdata          tss_systemsetupdata.o
-    0x00005ce4   0x00000004   Data   RO          480    .constdata          tss_systemsetupdata.o
-    0x00005ce8   0x00000004   Data   RO          481    .constdata          tss_systemsetupdata.o
-    0x00005cec   0x00000004   Data   RO          482    .constdata          tss_systemsetupdata.o
-    0x00005cf0   0x00000004   Data   RO          483    .constdata          tss_systemsetupdata.o
-    0x00005cf4   0x00000004   Data   RO          484    .constdata          tss_systemsetupdata.o
-    0x00005cf8   0x00000001   Data   RO          485    .constdata          tss_systemsetupdata.o
-    0x00005cf9   0x00000001   Data   RO          486    .constdata          tss_systemsetupdata.o
-    0x00005cfa   0x00000002   Data   RO          487    .constdata          tss_systemsetupdata.o
-    0x00005cfc   0x00000006   Data   RO          488    .constdata          tss_systemsetupdata.o
-    0x00005d02   0x00000002   PAD
-    0x00005d04   0x00000004   Data   RO          490    .constdata          tss_systemsetupdata.o
-    0x00005d08   0x00000004   Data   RO          491    .constdata          tss_systemsetupdata.o
-    0x00005d0c   0x00000004   Data   RO          492    .constdata          tss_systemsetupdata.o
-    0x00005d10   0x00000004   Data   RO          493    .constdata          tss_systemsetupdata.o
-    0x00005d14   0x00000004   PAD
-    0x00005d18   0x00000098   Data   RO          901    .constdata          m_ps.l(atan.o)
-    0x00005db0   0x00000008   Data   RO          923    .constdata          m_ps.l(qnan.o)
-    0x00005db8   0x00000012   Data   RO          547    .conststring        main.o
-    0x00005dca   0x00000002   PAD
-    0x00005dcc   0x00000020   Data   RO          970    Region$$Table       anon$$obj.o
+    0x000009a4   0x000000cc   Code   RO          205    .text               freemaster_kxx.o
+    0x00000a70   0x000000a4   Code   RO          232    .text               sysinit_kl25.o
+    0x00000b14   0x00001398   Code   RO          266    .text               mcg_kl25.o
+    0x00001eac   0x000000f0   Code   RO          297    .text               uart_kl25.o
+    0x00001f9c   0x0000002c   Code   RO          324    .text               tss_sensor.o
+    0x00001fc8   0x000008ac   Code   RO          401    .text               tss_sensortsil.o
+    0x00002874   0x000000b8   Code   RO          546    .text               main.o
+    0x0000292c   0x00000190   Code   RO          578    .text               i2c.o
+    0x00002abc   0x00000194   Code   RO          593    .text               mma8451.o
+    0x00002c50   0x000000e4   Code   RO          612    .text               leds.o
+    0x00002d34   0x000000a8   Code   RO          625    .text               timers.o
+    0x00002ddc   0x0000000c   Code   RO          651    .text               system_mkl25z4.o
+    0x00002de8   0x0000021c   Code   RO          663    .text               board.o
+    0x00003004   0x0000002c   Code   RO          870    .text               mc_p.l(uidiv.o)
+    0x00003030   0x00000028   Code   RO          872    .text               mc_p.l(idiv.o)
+    0x00003058   0x000000b2   Code   RO          874    .text               mf_p.l(fadd.o)
+    0x0000310a   0x0000007a   Code   RO          876    .text               mf_p.l(fmul.o)
+    0x00003184   0x0000007c   Code   RO          878    .text               mf_p.l(fdiv.o)
+    0x00003200   0x00000018   Code   RO          880    .text               mf_p.l(fscalb.o)
+    0x00003218   0x000000d0   Code   RO          882    .text               mf_p.l(dmul.o)
+    0x000032e8   0x000000f0   Code   RO          884    .text               mf_p.l(ddiv.o)
+    0x000033d8   0x0000002c   Code   RO          886    .text               mf_p.l(dscalb.o)
+    0x00003404   0x00000016   Code   RO          888    .text               mf_p.l(fflti.o)
+    0x0000341a   0x00000002   PAD
+    0x0000341c   0x00000028   Code   RO          890    .text               mf_p.l(dflti.o)
+    0x00003444   0x00000028   Code   RO          892    .text               mf_p.l(ffixui.o)
+    0x0000346c   0x00000028   Code   RO          894    .text               mf_p.l(f2d.o)
+    0x00003494   0x00000038   Code   RO          896    .text               mf_p.l(d2f.o)
+    0x000034cc   0x00000000   Code   RO          944    .text               mc_p.l(iusefp.o)
+    0x000034cc   0x00000082   Code   RO          945    .text               mf_p.l(fepilogue.o)
+    0x0000354e   0x000000be   Code   RO          947    .text               mf_p.l(depilogue.o)
+    0x0000360c   0x00000164   Code   RO          951    .text               mf_p.l(dadd.o)
+    0x00003770   0x000000a2   Code   RO          953    .text               mf_p.l(dsqrt.o)
+    0x00003812   0x00000002   PAD
+    0x00003814   0x00000024   Code   RO          961    .text               mc_p.l(init.o)
+    0x00003838   0x00000020   Code   RO          963    .text               mc_p.l(llshl.o)
+    0x00003858   0x00000022   Code   RO          965    .text               mc_p.l(llushr.o)
+    0x0000387a   0x00000026   Code   RO          967    .text               mc_p.l(llsshr.o)
+    0x000038a0   0x0000006c   Code   RO          679    i.TSS_ASliderCalculatePosIIRFilter  TSS_KXX_M0.lib(tss_asliderdecoder.o)
+    0x0000390c   0x00000458   Code   RO          680    i.TSS_ASliderDecoder  TSS_KXX_M0.lib(tss_asliderdecoder.o)
+    0x00003d64   0x000000ec   Code   RO          682    i.TSS_ASliderTrendControl  TSS_KXX_M0.lib(tss_asliderdecoder.o)
+    0x00003e50   0x00000028   Code   RO          683    i.TSS_ASliderTrendThreshold  TSS_KXX_M0.lib(tss_asliderdecoder.o)
+    0x00003e78   0x00000094   Code   RO          782    i.TSS_BrowseModules  TSS_KXX_M0.lib(tss_main.o)
+    0x00003f0c   0x00000016   Code   RO          693    i.TSS_CutSInt16ToSInt8  TSS_KXX_M0.lib(tss_filters.o)
+    0x00003f22   0x00000002   PAD
+    0x00003f24   0x000000bc   Code   RO          783    i.TSS_DataCorruptionCheck  TSS_KXX_M0.lib(tss_main.o)
+    0x00003fe0   0x00000078   Code   RO          784    i.TSS_DecodersControl  TSS_KXX_M0.lib(tss_main.o)
+    0x00004058   0x0000007c   Code   RO          785    i.TSS_FaultEvaluation  TSS_KXX_M0.lib(tss_main.o)
+    0x000040d4   0x00000110   Code   RO          794    i.TSS_GetSystemConfig  TSS_KXX_M0.lib(tss_main.o)
+    0x000041e4   0x0000006c   Code   RO          795    i.TSS_Init          TSS_KXX_M0.lib(tss_main.o)
+    0x00004250   0x00000054   Code   RO          796    i.TSS_InitInternalArrays  TSS_KXX_M0.lib(tss_main.o)
+    0x000042a4   0x00000058   Code   RO          797    i.TSS_InitRegisterArrays  TSS_KXX_M0.lib(tss_main.o)
+    0x000042fc   0x00000074   Code   RO          766    i.TSS_KeyBasicDeltaNoiseAnalysisIIRControl  TSS_KXX_M0.lib(tss_keydetectornormal.o)
+    0x00004370   0x00000198   Code   RO          767    i.TSS_KeyBasicDetect  TSS_KXX_M0.lib(tss_keydetectornormal.o)
+    0x00004508   0x00000290   Code   RO          768    i.TSS_KeyBasicElectrodeEval  TSS_KXX_M0.lib(tss_keydetectornormal.o)
+    0x00004798   0x00000074   Code   RO          769    i.TSS_KeyBasicEvaluateNoiseData  TSS_KXX_M0.lib(tss_keydetectornormal.o)
+    0x0000480c   0x00000090   Code   RO          771    i.TSS_KeyBasicNegativeBaselineDrop  TSS_KXX_M0.lib(tss_keydetectornormal.o)
+    0x0000489c   0x00000240   Code   RO          772    i.TSS_KeyBasicSensAutoCalibration  TSS_KXX_M0.lib(tss_keydetectornormal.o)
+    0x00004adc   0x0000004c   Code   RO          773    i.TSS_KeyBasicStuckKeyControl  TSS_KXX_M0.lib(tss_keydetectornormal.o)
+    0x00004b28   0x00000020   Code   RO          717    i.TSS_KeyDetectorCalculateDelta  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004b48   0x0000001c   Code   RO          694    i.TSS_KeyDetectorCalculateIIRFilter  TSS_KXX_M0.lib(tss_filters.o)
+    0x00004b64   0x00000020   Code   RO          718    i.TSS_KeyDetectorCalibrate  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004b84   0x0000003c   Code   RO          719    i.TSS_KeyDetectorDCTrackerEvalExecution  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004bc0   0x00000030   Code   RO          720    i.TSS_KeyDetectorElectrodeStatusUpdate  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004bf0   0x00000026   Code   RO          721    i.TSS_KeyDetectorFaultDecoder  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004c16   0x00000002   PAD
+    0x00004c18   0x00000010   Code   RO          722    i.TSS_KeyDetectorFillDeltaLogBuffer  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004c28   0x00000014   Code   RO          723    i.TSS_KeyDetectorFillSignalLogBuffer  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004c3c   0x0000000c   Code   RO          724    i.TSS_KeyDetectorGetDCTrackerCounter  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004c48   0x00000040   Code   RO          725    i.TSS_KeyDetectorGetElectrodeEnablerStatus  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004c88   0x00000040   Code   RO          726    i.TSS_KeyDetectorGetElectrodeGroupStatus  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004cc8   0x00000040   Code   RO          727    i.TSS_KeyDetectorGetShieldElectrodeReleaseStatus  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004d08   0x0000000c   Code   RO          728    i.TSS_KeyDetectorGetSlowDCTrackerCounter  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004d14   0x00000040   Code   RO          729    i.TSS_KeyDetectorInit  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004d54   0x00000014   Code   RO          696    i.TSS_KeyDetectorInitPrevCapSample  TSS_KXX_M0.lib(tss_filters.o)
+    0x00004d68   0x00000198   Code   RO          730    i.TSS_KeyDetectorMain  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004f00   0x00000088   Code   RO          732    i.TSS_KeyDetectorRecalibrateElectrode  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004f88   0x00000014   Code   RO          733    i.TSS_KeyDetectorRecalibrateModules  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004f9c   0x00000010   Code   RO          734    i.TSS_KeyDetectorRecalibrationRequest  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004fac   0x00000024   Code   RO          735    i.TSS_KeyDetectorReleaseElectrode  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004fd0   0x00000014   Code   RO          736    i.TSS_KeyDetectorResetElectrode  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00004fe4   0x0000001c   Code   RO          737    i.TSS_KeyDetectorResetElectrodeDebouncing  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00005000   0x00000024   Code   RO          738    i.TSS_KeyDetectorResetElectrodeMeasured  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00005024   0x0000000c   Code   RO          739    i.TSS_KeyDetectorResetStuckKeyCounter  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00005030   0x00000044   Code   RO          740    i.TSS_KeyDetectorRestartElectrode  TSS_KXX_M0.lib(tss_keydetector.o)
+    0x00005074   0x0000001c   Code   RO          697    i.TSS_KeyDetectorSignalDivider  TSS_KXX_M0.lib(tss_filters.o)
+    0x00005090   0x000000a0   Code   RO          803    i.TSS_LowPowerConfig  TSS_KXX_M0.lib(tss_main.o)
+    0x00005130   0x000000fc   Code   RO          685    i.TSS_SetASliderConfig  TSS_KXX_M0.lib(tss_asliderdecoder.o)
+    0x0000522c   0x000000a0   Code   RO          805    i.TSS_SetControlElectrodesEnablers  TSS_KXX_M0.lib(tss_main.o)
+    0x000052cc   0x00000328   Code   RO          807    i.TSS_SetSystemConfig  TSS_KXX_M0.lib(tss_main.o)
+    0x000055f4   0x0000002c   Code   RO          702    i.TSS_SubUInt16WithUInt16ToSInt16  TSS_KXX_M0.lib(tss_filters.o)
+    0x00005620   0x000000d0   Code   RO          812    i.TSS_Task          TSS_KXX_M0.lib(tss_main.o)
+    0x000056f0   0x0000006c   Code   RO          814    i.TSS_TriggerConfig  TSS_KXX_M0.lib(tss_main.o)
+    0x0000575c   0x00000044   Code   RO          815    i.TSS_TriggerControl  TSS_KXX_M0.lib(tss_main.o)
+    0x000057a0   0x0000002e   Code   RO          949    i.__ARM_clz         mf_p.l(depilogue.o)
+    0x000057ce   0x0000001a   Code   RO          419    i.__ARM_common_switch8  tss_sensortsil.o
+    0x000057e8   0x0000002c   Code   RO          957    i.__ARM_fpclassify  m_ps.l(fpclassify.o)
+    0x00005814   0x000000ac   Code   RO          959    i.__kernel_poly     m_ps.l(poly.o)
+    0x000058c0   0x0000000a   Code   RO          909    i.__mathlib_dbl_infnan  m_ps.l(dunder.o)
+    0x000058ca   0x00000008   Code   RO          910    i.__mathlib_dbl_infnan2  m_ps.l(dunder.o)
+    0x000058d2   0x00000002   PAD
+    0x000058d4   0x00000014   Code   RO          914    i.__mathlib_dbl_underflow  m_ps.l(dunder.o)
+    0x000058e8   0x0000000e   Code   RO          971    i.__scatterload_copy  mc_p.l(handlers.o)
+    0x000058f6   0x00000002   Code   RO          972    i.__scatterload_null  mc_p.l(handlers.o)
+    0x000058f8   0x0000000e   Code   RO          973    i.__scatterload_zeroinit  mc_p.l(handlers.o)
+    0x00005906   0x00000002   PAD
+    0x00005908   0x0000000c   Code   RO          939    i.__set_errno       mc_p.l(errno.o)
+    0x00005914   0x0000021c   Code   RO          899    i.atan              m_ps.l(atan.o)
+    0x00005b30   0x00000178   Code   RO          852    i.atan2             m_ps.l(atan2.o)
+    0x00005ca8   0x00000048   Code   RO          860    i.sqrt              m_ps.l(sqrt.o)
+    0x00005cf0   0x00000008   Data   RO          325    .constdata          tss_sensor.o
+    0x00005cf8   0x00000008   Data   RO          327    .constdata          tss_sensor.o
+    0x00005d00   0x00000010   Data   RO          403    .constdata          tss_sensortsil.o
+    0x00005d10   0x0000000c   Data   RO          404    .constdata          tss_sensortsil.o
+    0x00005d1c   0x0000000c   Data   RO          405    .constdata          tss_sensortsil.o
+    0x00005d28   0x00000004   Data   RO          406    .constdata          tss_sensortsil.o
+    0x00005d2c   0x00000002   Data   RO          435    .constdata          tss_systemsetupdata.o
+    0x00005d2e   0x00000002   PAD
+    0x00005d30   0x0000001c   Data   RO          436    .constdata          tss_systemsetupdata.o
+    0x00005d4c   0x00000004   Data   RO          437    .constdata          tss_systemsetupdata.o
+    0x00005d50   0x00000004   Data   RO          438    .constdata          tss_systemsetupdata.o
+    0x00005d54   0x00000004   Data   RO          439    .constdata          tss_systemsetupdata.o
+    0x00005d58   0x00000004   Data   RO          440    .constdata          tss_systemsetupdata.o
+    0x00005d5c   0x00000004   Data   RO          441    .constdata          tss_systemsetupdata.o
+    0x00005d60   0x00000001   Data   RO          442    .constdata          tss_systemsetupdata.o
+    0x00005d61   0x00000002   Data   RO          443    .constdata          tss_systemsetupdata.o
+    0x00005d63   0x00000001   PAD
+    0x00005d64   0x00000004   Data   RO          446    .constdata          tss_systemsetupdata.o
+    0x00005d68   0x00000001   Data   RO          447    .constdata          tss_systemsetupdata.o
+    0x00005d69   0x00000001   Data   RO          448    .constdata          tss_systemsetupdata.o
+    0x00005d6a   0x00000001   Data   RO          449    .constdata          tss_systemsetupdata.o
+    0x00005d6b   0x00000001   PAD
+    0x00005d6c   0x00000004   Data   RO          451    .constdata          tss_systemsetupdata.o
+    0x00005d70   0x00000004   Data   RO          452    .constdata          tss_systemsetupdata.o
+    0x00005d74   0x00000004   Data   RO          453    .constdata          tss_systemsetupdata.o
+    0x00005d78   0x00000004   Data   RO          454    .constdata          tss_systemsetupdata.o
+    0x00005d7c   0x00000004   Data   RO          456    .constdata          tss_systemsetupdata.o
+    0x00005d80   0x00000004   Data   RO          457    .constdata          tss_systemsetupdata.o
+    0x00005d84   0x00000004   Data   RO          458    .constdata          tss_systemsetupdata.o
+    0x00005d88   0x00000004   Data   RO          459    .constdata          tss_systemsetupdata.o
+    0x00005d8c   0x00000004   Data   RO          460    .constdata          tss_systemsetupdata.o
+    0x00005d90   0x00000004   Data   RO          461    .constdata          tss_systemsetupdata.o
+    0x00005d94   0x00000004   Data   RO          462    .constdata          tss_systemsetupdata.o
+    0x00005d98   0x00000004   Data   RO          463    .constdata          tss_systemsetupdata.o
+    0x00005d9c   0x00000001   Data   RO          464    .constdata          tss_systemsetupdata.o
+    0x00005d9d   0x00000003   PAD
+    0x00005da0   0x00000004   Data   RO          465    .constdata          tss_systemsetupdata.o
+    0x00005da4   0x00000004   Data   RO          467    .constdata          tss_systemsetupdata.o
+    0x00005da8   0x00000001   Data   RO          468    .constdata          tss_systemsetupdata.o
+    0x00005da9   0x00000001   Data   RO          469    .constdata          tss_systemsetupdata.o
+    0x00005daa   0x00000002   PAD
+    0x00005dac   0x00000004   Data   RO          470    .constdata          tss_systemsetupdata.o
+    0x00005db0   0x00000004   Data   RO          471    .constdata          tss_systemsetupdata.o
+    0x00005db4   0x00000004   Data   RO          474    .constdata          tss_systemsetupdata.o
+    0x00005db8   0x00000004   Data   RO          475    .constdata          tss_systemsetupdata.o
+    0x00005dbc   0x00000004   Data   RO          476    .constdata          tss_systemsetupdata.o
+    0x00005dc0   0x00000004   Data   RO          477    .constdata          tss_systemsetupdata.o
+    0x00005dc4   0x00000004   Data   RO          478    .constdata          tss_systemsetupdata.o
+    0x00005dc8   0x00000004   Data   RO          479    .constdata          tss_systemsetupdata.o
+    0x00005dcc   0x00000004   Data   RO          480    .constdata          tss_systemsetupdata.o
+    0x00005dd0   0x00000004   Data   RO          481    .constdata          tss_systemsetupdata.o
+    0x00005dd4   0x00000004   Data   RO          482    .constdata          tss_systemsetupdata.o
+    0x00005dd8   0x00000004   Data   RO          483    .constdata          tss_systemsetupdata.o
+    0x00005ddc   0x00000004   Data   RO          484    .constdata          tss_systemsetupdata.o
+    0x00005de0   0x00000001   Data   RO          485    .constdata          tss_systemsetupdata.o
+    0x00005de1   0x00000001   Data   RO          486    .constdata          tss_systemsetupdata.o
+    0x00005de2   0x00000002   Data   RO          487    .constdata          tss_systemsetupdata.o
+    0x00005de4   0x00000006   Data   RO          488    .constdata          tss_systemsetupdata.o
+    0x00005dea   0x00000002   PAD
+    0x00005dec   0x00000004   Data   RO          490    .constdata          tss_systemsetupdata.o
+    0x00005df0   0x00000004   Data   RO          491    .constdata          tss_systemsetupdata.o
+    0x00005df4   0x00000004   Data   RO          492    .constdata          tss_systemsetupdata.o
+    0x00005df8   0x00000004   Data   RO          493    .constdata          tss_systemsetupdata.o
+    0x00005dfc   0x00000004   PAD
+    0x00005e00   0x00000098   Data   RO          900    .constdata          m_ps.l(atan.o)
+    0x00005e98   0x00000008   Data   RO          922    .constdata          m_ps.l(qnan.o)
+    0x00005ea0   0x00000012   Data   RO          547    .conststring        main.o
+    0x00005eb2   0x00000002   PAD
+    0x00005eb4   0x00000020   Data   RO          969    Region$$Table       anon$$obj.o
 
 
     Execution Region RW_IRAM1 (Base: 0x1ffff000, Size: 0x00000000, Max: 0x00001000, ABSOLUTE)
@@ -1728,12 +1729,13 @@ Memory Map of the image
     0x2000006b   0x00000002   Data   RW          525    .data               tss_systemsetupdata.o
     0x2000006d   0x00000001   Data   RW          526    .data               tss_systemsetupdata.o
     0x2000006e   0x00000002   PAD
-    0x20000070   0x0000001c   Data   RW          548    .data               main.o
-    0x2000008c   0x00000010   Data   RW          593    .data               mma8451.o
-    0x2000009c   0x00000008   Data   RW          625    .data               timers.o
-    0x200000a4   0x00000008   Data   RW          740    .data               TSS_KXX_M0.lib(tss_keydetector.o)
-    0x200000ac   0x00000008   Data   RW          815    .data               TSS_KXX_M0.lib(tss_main.o)
-    0x200000b4   0x00000004   Data   RW          941    .data               mc_p.l(errno.o)
+    0x20000070   0x00000018   Data   RW          548    .data               main.o
+    0x20000088   0x00000004   Data   RW          549    .data               main.o
+    0x2000008c   0x00000010   Data   RW          594    .data               mma8451.o
+    0x2000009c   0x00000008   Data   RW          626    .data               timers.o
+    0x200000a4   0x00000008   Data   RW          741    .data               TSS_KXX_M0.lib(tss_keydetector.o)
+    0x200000ac   0x00000008   Data   RW          816    .data               TSS_KXX_M0.lib(tss_main.o)
+    0x200000b4   0x00000004   Data   RW          940    .data               mc_p.l(errno.o)
     0x200000b8   0x00000020   Zero   RW          164    .bss                freemaster_scope.o
     0x200000d8   0x0000004c   Zero   RW          179    .bss                freemaster_serial.o
     0x20000124   0x0000002a   Zero   RW          402    .bss                tss_sensortsil.o
@@ -1741,7 +1743,7 @@ Memory Map of the image
     0x2000016e   0x0000000c   Zero   RW          433    .bss                tss_systemsetupdata.o
     0x2000017a   0x0000000c   Zero   RW          434    .bss                tss_systemsetupdata.o
     0x20000186   0x00000002   PAD
-    0x20000188   0x00000400   Zero   RW          639    STACK               startup_mkl25z4.o
+    0x20000188   0x00000400   Zero   RW          640    STACK               startup_mkl25z4.o
 
 
 ==============================================================================
@@ -1754,7 +1756,7 @@ Image component sizes
        216         16          0          0          0     155181   app_init.o
        108         14          0          0          0       1091   arm_cm0.o
        540         78          0          0          0       1729   board.o
-       192         42          0          0          0       1090   events.o
+       288         38          0          0          0       1274   events.o
          0          0          0          0          0     160004   freemaster_appcmd.o
        204          6          0          1          0       3734   freemaster_kxx.o
        452          0          0          0          0       3641   freemaster_protocol.o
@@ -1762,8 +1764,8 @@ Image component sizes
        632         14          0         24         76       3824   freemaster_serial.o
        344          0          0          0          0       2572   freemaster_tsa.o
        400         14          0          0          0       1439   i2c.o
-        24         10          0          0          0        672   leds.o
-       236         24         18         28          0       2261   main.o
+       228         14          0          0          0       1584   leds.o
+       184         14         18         28          0       2241   main.o
       5016        334          0          0          0      12854   mcg_kl25.o
        404         18          0         16          0       1535   mma8451.o
         44         24        192          0       1024        944   startup_mkl25z4.o
@@ -1778,9 +1780,9 @@ Image component sizes
         12          4          0          0          0        519   wdog_kl25.o
 
     ----------------------------------------------------------------------
-     11858        782        514        164       1232     613251   Object Totals
+     12106        772        516        164       1232     614327   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-         0          0         15         11          2          0   (incl. Padding)
+         0          0         17         11          2          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -1815,7 +1817,6 @@ Image component sizes
         38          0          0          0          0         68   llsshr.o
         34          0          0          0          0         68   llushr.o
         44          0          0          0          0         72   uidiv.o
-        20          0          0          0          0         68   cfrcmple.o
         56          0          0          0          0         68   d2f.o
        356          4          0          0          0        140   dadd.o
        240          6          0          0          0         84   ddiv.o
@@ -1834,8 +1835,8 @@ Image component sizes
         24          0          0          0          0         60   fscalb.o
 
     ----------------------------------------------------------------------
-     11512       1112        160         20          0       6436   Library Totals
-        10          0          0          0          0          0   (incl. Padding)
+     11494       1112        160         20          0       6368   Library Totals
+        12          0          0          0          0          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -1844,10 +1845,10 @@ Image component sizes
       7932        942          0         16          0       3760   TSS_KXX_M0.lib
       1242        126        160          0          0        672   m_ps.l
        286         22          0          4          0        476   mc_p.l
-      2042         22          0          0          0       1528   mf_p.l
+      2022         22          0          0          0       1460   mf_p.l
 
     ----------------------------------------------------------------------
-     11512       1112        160         20          0       6436   Library Totals
+     11494       1112        160         20          0       6368   Library Totals
 
     ----------------------------------------------------------------------
 
@@ -1856,15 +1857,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     23370       1894        674        184       1232     614111   Grand Totals
-     23370       1894        674        184       1232     614111   ELF Image Totals
-     23370       1894        674        184          0          0   ROM Totals
+     23600       1884        676        184       1232     615171   Grand Totals
+     23600       1884        676        184       1232     615171   ELF Image Totals
+     23600       1884        676        184          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                24044 (  23.48kB)
+    Total RO  Size (Code + RO Data)                24276 (  23.71kB)
     Total RW  Size (RW Data + ZI Data)              1416 (   1.38kB)
-    Total ROM Size (Code + RO Data + RW Data)      24228 (  23.66kB)
+    Total ROM Size (Code + RO Data + RW Data)      24460 (  23.89kB)
 
 ==============================================================================
 

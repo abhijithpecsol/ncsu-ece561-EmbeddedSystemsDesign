@@ -1,3 +1,5 @@
 #define OFF_STATE		(0x01)
 #define ON_STATE 		(0x02)
 #define TIMEOUT_COUNTING	(0x04)
+#define FADING_IN		(0x08)
+#define FADING_OUT	(0x10)

@@ -34,6 +34,7 @@
 extern uint16_t u16LPcounter;
 extern unsigned int lastBrightness;
 extern unsigned int state;			
+extern volatile unsigned int timer1ms;
 
 /**
  * \brief TSS callback for control 0
@@ -57,27 +58,67 @@ void TSS1_fCallBack1(TSS_CONTROL_ID u8ControlId)
   /* Set LED brightness */
 	// achieving full brightness requires mapping 8 bit value to 16 bit. need some mapping because larger difference in brightness at low levels than high levels
 	unsigned int adjPosition = cASlider1.Position;
-	if (adjPosition > 170) {
-		if (adjPosition > 250){
-			adjPosition = 0xFFFF;			// full brightness (0xFFFF) is indistinguishable from ~1000
-		}
-		else {
-			adjPosition = adjPosition + (adjPosition - 170)*9;
-		}
-	}
+//	if (adjPosition > 170) {
+//		if (adjPosition > 250){
+//			adjPosition = 0xFFFF;			// full brightness (0xFFFF) is indistinguishable from ~1000
+//		}
+//		else {
+//			adjPosition = adjPosition + (adjPosition - 170)*9;
+//		}
+//	}
 	
-	// if previously the light was off, transition into the on state
-	if (state & OFF_STATE){
-		state &= ~OFF_STATE;
-		state |= ON_STATE;
-		fadeWhite(adjPosition);
+	unsigned int lastTime = timer1ms;
+	unsigned int subTimer = 0;
+	unsigned int fade = 0;
+	unsigned int fadeFrequency = 0;
+	
+	// only handle touch if we are not fading out after time out
+	if (!(state & FADING_OUT)){
+		// if the light was previously off fade into brightness
+		if ((adjPosition != 0) && (state & OFF_STATE) && !(state & FADING_IN)){
+			state |= FADING_IN;							// separate fading flag
+			
+			SET_LED_RED(0);
+			SET_LED_GREEN(0);
+			SET_LED_BLUE(0);
+			
+			if (adjPosition < 1000){
+				fadeFrequency = 1000 / adjPosition;
+				if (1000 % adjPosition != 0){
+					fadeFrequency++;
+				}
+			}
+			else {
+				fadeFrequency = 1;
+			}
+			
+			lastTime = timer1ms;
+			while (subTimer < 1000){
+				if (lastTime != timer1ms){
+					subTimer++;
+					lastTime = timer1ms;
+					
+					if (subTimer % fadeFrequency == 0){
+						fade++;
+						SET_LED_RED(fade);
+						SET_LED_GREEN(fade);
+						SET_LED_BLUE(fade);
+					}
+				}
+			}
+			
+			state &= ~OFF_STATE;			// switch state into off state
+			state |= ON_STATE;				// still "fading" for another 250ms to prevent undesired behavior
+		}
+		// if in the on state, simply change brightness as appropriate
+		else if (state & ON_STATE && !(state & FADING_IN)){
+			SET_LED_RED(adjPosition);
+			SET_LED_GREEN(adjPosition);
+			SET_LED_BLUE(adjPosition);
+		}
+		
+		lastBrightness = adjPosition;
 	}
-	else {
-		SET_LED_RED(adjPosition);
-		SET_LED_GREEN(adjPosition);
-		SET_LED_BLUE(adjPosition);
-	}
-	lastBrightness = adjPosition;
 	
   (void)u8ControlId;
 }

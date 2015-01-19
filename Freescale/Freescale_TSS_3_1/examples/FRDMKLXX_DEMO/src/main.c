@@ -41,6 +41,7 @@ uint16_t u16LPcounter = 0u;
 unsigned int lastBrightness = 200;	// the last brightness value, used to turn on light by accelerometer, starts to a nice moderate value
 unsigned int state = OFF_STATE;			// variable to hold state information
 extern volatile unsigned int timer250ms;
+extern float roll, pitch;
 
 /*********************** GUI - FreeMASTER TSA table ************************/
 
@@ -100,6 +101,7 @@ int main (void)
 	
 	Start_PIT();
 	
+	state = OFF_STATE;
   for(;;)
   {
     #if TSS_USE_FREEMASTER_GUI
@@ -116,19 +118,19 @@ int main (void)
 		
 		// While in OFF state, check for accelerometer position > 33 degrees from horizontal
 		if (state & OFF_STATE){
-			// check accelerometer position
-			read_full_xyz();								// take a reading
-			convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
-			
-			// perform action based on position more than 33 degrees from horizontal
-			if (fabs(roll) > 33 || fabs(pitch) > 33){				
-				// adjust state to on
-				state &= ~OFF_STATE;
-				state |= ON_STATE;
-				
-				// fade into white
-				fadeWhite(lastBrightness);
-			}
+//			// check accelerometer position
+//			read_full_xyz();								// take a reading
+//			convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
+//			
+//			// perform action based on position more than 33 degrees from horizontal
+//			if (fabs(roll) > 33 || fabs(pitch) > 33){				
+//				// adjust state to on
+//				state &= ~OFF_STATE;
+//				state |= ON_STATE;
+//				
+//				// fade into white
+//				fadeWhite(lastBrightness);
+//			}
 		}
 		
 		// While in ON state, check for 10 second timeout
@@ -138,13 +140,21 @@ int main (void)
 				state |= TIMEOUT_COUNTING;
 			}
 			
+			// Give 250ms delay after fading in to prevent undesired behavior 
+			if (timer250ms == timeoutPeriodStart + 1){
+				state &= ~FADING_IN;
+			}
+			
 			// Timeout condition
-			if (timer250ms == timeoutPeriodStart + 40){
+			if (timer250ms == timeoutPeriodStart + 8){
 				state &= ~ON_STATE;
 				state &= ~TIMEOUT_COUNTING;
-				state |= OFF_STATE;
+				state |= FADING_OUT;						// switch into fading out state
 				
-				setLEDColor(0,0,0);
+				fadeOutWhite();
+				
+				state &= ~FADING_OUT;						// switch out of fading out state
+				state |= OFF_STATE;							// switch into off state
 			}
 		}
   }
