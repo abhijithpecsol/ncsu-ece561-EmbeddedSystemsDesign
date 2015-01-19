@@ -3,3 +3,4 @@
 #define TIMEOUT_COUNTING	(0x04)
 #define FADING_IN		(0x08)
 #define FADING_OUT	(0x10)
+#define TIMEOUT_RESET	(0x20)

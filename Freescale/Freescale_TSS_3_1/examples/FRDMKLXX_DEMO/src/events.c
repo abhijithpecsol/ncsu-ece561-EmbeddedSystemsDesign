@@ -112,6 +112,7 @@ void TSS1_fCallBack1(TSS_CONTROL_ID u8ControlId)
 		}
 		// if in the on state, simply change brightness as appropriate
 		else if (state & ON_STATE && !(state & FADING_IN)){
+			state |= TIMEOUT_RESET;		// reset timeout flag
 			SET_LED_RED(adjPosition);
 			SET_LED_GREEN(adjPosition);
 			SET_LED_BLUE(adjPosition);

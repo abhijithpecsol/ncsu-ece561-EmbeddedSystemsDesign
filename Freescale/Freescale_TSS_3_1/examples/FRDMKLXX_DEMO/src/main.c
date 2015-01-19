@@ -135,9 +135,10 @@ int main (void)
 		
 		// While in ON state, check for 10 second timeout
 		if (state & ON_STATE){
-			if (!(state & TIMEOUT_COUNTING)){
+			if (!(state & TIMEOUT_COUNTING) || (state & TIMEOUT_RESET)){
 				timeoutPeriodStart = timer250ms;			// initalize timeout period start
 				state |= TIMEOUT_COUNTING;
+				state &= ~TIMEOUT_RESET;
 			}
 			
 			// Give 250ms delay after fading in to prevent undesired behavior 
@@ -151,7 +152,7 @@ int main (void)
 				state &= ~TIMEOUT_COUNTING;
 				state |= FADING_OUT;						// switch into fading out state
 				
-				fadeOutWhite();
+				fadeOutWhite();									// fade out to white
 				
 				state &= ~FADING_OUT;						// switch out of fading out state
 				state |= OFF_STATE;							// switch into off state

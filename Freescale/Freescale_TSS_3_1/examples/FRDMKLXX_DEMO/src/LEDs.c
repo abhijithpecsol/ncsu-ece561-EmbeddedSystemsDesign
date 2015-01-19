@@ -92,9 +92,16 @@ void fadeOutWhite(){
 	}
 	
 	// make sure we are at the right brightness at 1 sec (we will be very close, if not exact)
-	if (fadeBrightness > 0) {
-		SET_LED_RED(0);
-		SET_LED_GREEN(0);
-		SET_LED_BLUE(0);
+	fadeBrightness = TPM2_C0V;
+	while (fadeBrightness > 0){
+		if (fadeBrightness < 5){
+			fadeBrightness = 0;
+		}
+		else {
+			fadeBrightness -= 5;
+		}
+		SET_LED_RED(fadeBrightness);
+		SET_LED_GREEN(fadeBrightness);
+		SET_LED_BLUE(fadeBrightness);
 	}
 }
