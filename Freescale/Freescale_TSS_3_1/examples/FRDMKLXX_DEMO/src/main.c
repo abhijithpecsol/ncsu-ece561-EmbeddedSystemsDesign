@@ -72,7 +72,8 @@ extern float roll, pitch;
 int main (void)
 {	
 	unsigned int timeoutPeriodStart;
-	unsigned int redTimeoutPeriodStart;
+	unsigned int redFlashPeriodStart;
+	unsigned int lastRedFlash = 0;
 	
   InitPorts();
 	
@@ -130,14 +131,16 @@ int main (void)
 		
 		// Check for low voltage
 		batteryVoltage = Measure_VRail();
-		if (batteryVoltage < 3.4){
+		if (batteryVoltage < 3.2){
 			if (!(state & LOW_VOLTAGE)){
 				state |= LOW_VOLTAGE;
-				redTimeoutPeriodStart = timer250ms;
+				redFlashPeriodStart = timer250ms;
 			}
 		}
 		else {
-			state &= ~LOW_VOLTAGE;
+			if (state & LOW_VOLTAGE){
+				state &= ~LOW_VOLTAGE;
+			}
 		}
 		
 		
@@ -145,9 +148,8 @@ int main (void)
 		// ***** OFF STATE *****
 		// *********************
 		// While in OFF state
-		// 		Check for accelerometer position > 33 degrees from horizontal
 		if (state & OFF_STATE){
-			// check accelerometer position
+			// Check for accelerometer position > 33 degrees from horizontal
 			read_full_xyz();								// take a reading
 			convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
 			
@@ -155,7 +157,7 @@ int main (void)
 			if (!(state & ACCEL_RESET)){
 				// perform action based on position more than 33 degrees from horizontal
 				if (fabs(roll) > 33 || fabs(pitch) > 33){				
-					DelayMS(10);				// delay and check again to eliminate erroneous flucuations 
+					DelayMS(10);								// delay and check again to eliminate erroneous flucuations 
 					
 					// check accelerometer position
 					read_full_xyz();								// take a reading
@@ -182,9 +184,9 @@ int main (void)
 			}
 			
 			// If voltage is low, flash red LED for 100 ms every 5 seconds
-			if ((state & LOW_VOLTAGE) && (timer250ms > redTimeoutPeriodStart + 20)){
+			if ((state & LOW_VOLTAGE) && (timer250ms > redFlashPeriodStart + 20)){
 				flashRedLED(100);
-				redTimeoutPeriodStart = timer250ms;
+				redFlashPeriodStart = timer250ms;
 			}
 		}
 		
@@ -205,6 +207,12 @@ int main (void)
 				state &= ~FADING_IN;
 			}
 			
+			// If low voltage, turn LED red for 250 ms after 2 seconds of white
+			if ((state & LOW_VOLTAGE) && ((timer250ms - lastRedFlash == 8) || (lastRedFlash == 0))){
+				flashRedLED(250);
+				lastRedFlash = timer250ms;
+			}
+			
 			// Timeout condition
 			if (timer250ms == timeoutPeriodStart + 40){
 				state &= ~ON_STATE;
@@ -216,6 +224,8 @@ int main (void)
 				state &= ~FADING_OUT;						// switch out of fading out state
 				state |= OFF_STATE;							// switch into off state
 				state |= ACCEL_RESET;						// wait for accelerometer to go back into a flatter position
+				
+				redFlashPeriodStart = timer250ms;				// reset red flash period start, applicable for low voltage
 				
 				DelayMS(100);
 			}

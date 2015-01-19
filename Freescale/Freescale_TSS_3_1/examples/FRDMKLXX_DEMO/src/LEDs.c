@@ -111,6 +111,9 @@ void fadeOutWhite(){
 void flashRedLED(unsigned int periodMS){
 	unsigned int subTimer = 0;
 	unsigned int lastTime = timer1ms;
+	unsigned int previousRed = TPM2_C0V;
+	unsigned int previousGreen = TPM2_C1V;
+	unsigned int previousBlue = TPM0_C1V;
 	
 	// make sure red LED is n
 	SET_LED_RED(200);
@@ -126,5 +129,7 @@ void flashRedLED(unsigned int periodMS){
 	}
 	
 	// turn the LED off
-	SET_LED_RED(0);
+	SET_LED_RED(previousRed);
+	SET_LED_GREEN(previousGreen);
+	SET_LED_BLUE(previousBlue);
 }
