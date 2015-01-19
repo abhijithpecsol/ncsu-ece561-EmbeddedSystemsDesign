@@ -118,19 +118,31 @@ int main (void)
 		
 		// While in OFF state, check for accelerometer position > 33 degrees from horizontal
 		if (state & OFF_STATE){
-//			// check accelerometer position
-//			read_full_xyz();								// take a reading
-//			convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
-//			
-//			// perform action based on position more than 33 degrees from horizontal
-//			if (fabs(roll) > 33 || fabs(pitch) > 33){				
-//				// adjust state to on
-//				state &= ~OFF_STATE;
-//				state |= ON_STATE;
-//				
-//				// fade into white
-//				fadeWhite(lastBrightness);
-//			}
+			// check accelerometer position
+			read_full_xyz();								// take a reading
+			convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
+			
+			// perform action based on position more than 33 degrees from horizontal
+			if (fabs(roll) > 33 || fabs(pitch) > 33){				
+				DelayMS(10);				// delay and check again to eliminate erroneous flucuations 
+				
+				// check accelerometer position
+				read_full_xyz();								// take a reading
+				convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
+				
+				// if we really are at this angle
+				if (fabs(roll) > 33 || fabs(pitch) > 33){		
+					state |= FADING_IN;							// separate fading flag					
+					
+					// fade into white
+					fadeWhite(lastBrightness);
+					
+					// adjust state to on
+					state &= ~OFF_STATE;
+					state &= ~FADING_IN;
+					state |= ON_STATE;
+				}
+			}
 		}
 		
 		// While in ON state, check for 10 second timeout
