@@ -92,7 +92,7 @@ void TSS_Init_ASlider(void)
   #endif
 
   /* Configure the range */
-  (void)TSS_SetASliderConfig(cASlider1.ControlId, ASlider_Range_Register, 200);		
+  (void)TSS_SetASliderConfig(cASlider1.ControlId, ASlider_Range_Register, 250);			// 250 of max 255, indistinguishable brightness but allows for easier math for fading in/out
   /* Configure the TSS to report the touch, release and movement events */
   (void)TSS_SetASliderConfig(cASlider1.ControlId, ASlider_Events_Register, (TSS_ASLIDER_MOVEMENT_EVENT_EN_MASK | TSS_ASLIDER_INITIAL_TOUCH_EVENT_EN_MASK));
   /* Enables Callback function. Enables the control */
