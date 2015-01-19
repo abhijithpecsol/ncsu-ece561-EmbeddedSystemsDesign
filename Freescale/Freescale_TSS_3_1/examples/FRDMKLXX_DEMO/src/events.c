@@ -110,8 +110,15 @@ void TSS1_fCallBack1(TSS_CONTROL_ID u8ControlId)
 			state &= ~OFF_STATE;			// switch state into off state
 			state |= ON_STATE;				// still "fading" for another 250ms to prevent undesired behavior
 		}
-		// if in the on state, simply change brightness as appropriate
+		// if in the on state, simply change brightness as appropriate, unless position is 0
 		else if (state & ON_STATE && !(state & FADING_IN)){
+			// if position 0, we go into the off state
+			if (adjPosition == 0){
+				state &= ~ON_STATE;
+				state |= OFF_STATE;
+				state |= ACCEL_RESET;
+			}
+			
 			state |= TIMEOUT_RESET;		// reset timeout flag
 			SET_LED_RED(adjPosition);
 			SET_LED_GREEN(adjPosition);

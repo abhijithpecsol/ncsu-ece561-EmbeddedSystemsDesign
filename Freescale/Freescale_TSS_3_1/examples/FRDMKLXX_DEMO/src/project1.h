@@ -4,3 +4,4 @@
 #define FADING_IN		(0x08)
 #define FADING_OUT	(0x10)
 #define TIMEOUT_RESET	(0x20)
+#define ACCEL_RESET		(0x40)

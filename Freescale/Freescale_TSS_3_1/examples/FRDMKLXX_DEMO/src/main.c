@@ -122,25 +122,33 @@ int main (void)
 			read_full_xyz();								// take a reading
 			convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
 			
-			// perform action based on position more than 33 degrees from horizontal
-			if (fabs(roll) > 33 || fabs(pitch) > 33){				
-				DelayMS(10);				// delay and check again to eliminate erroneous flucuations 
-				
-				// check accelerometer position
-				read_full_xyz();								// take a reading
-				convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
-				
-				// if we really are at this angle
-				if (fabs(roll) > 33 || fabs(pitch) > 33){		
-					state |= FADING_IN;							// separate fading flag					
+			// if we timed out, we need to wait for accelerometer to go below 33 degrees before allowing the accelerometer to turn the light back on
+			if (!(state & ACCEL_RESET)){
+				// perform action based on position more than 33 degrees from horizontal
+				if (fabs(roll) > 33 || fabs(pitch) > 33){				
+					DelayMS(10);				// delay and check again to eliminate erroneous flucuations 
 					
-					// fade into white
-					fadeWhite(lastBrightness);
+					// check accelerometer position
+					read_full_xyz();								// take a reading
+					convert_xyz_to_roll_pitch();		// determine roll and pitch from horizontal
 					
-					// adjust state to on
-					state &= ~OFF_STATE;
-					state &= ~FADING_IN;
-					state |= ON_STATE;
+					// if we really are at this angle
+					if (fabs(roll) > 33 || fabs(pitch) > 33){		
+						state |= FADING_IN;							// separate fading flag					
+						
+						// fade into white
+						fadeWhite(lastBrightness);
+						
+						// adjust state to on
+						state &= ~OFF_STATE;
+						state &= ~FADING_IN;
+						state |= ON_STATE;
+					}
+				}
+			}
+			else {
+				if (fabs(roll) < 30 && fabs(pitch) < 30){	
+					state &= ~ACCEL_RESET;
 				}
 			}
 		}
@@ -159,7 +167,7 @@ int main (void)
 			}
 			
 			// Timeout condition
-			if (timer250ms == timeoutPeriodStart + 8){
+			if (timer250ms == timeoutPeriodStart + 40){
 				state &= ~ON_STATE;
 				state &= ~TIMEOUT_COUNTING;
 				state |= FADING_OUT;						// switch into fading out state
@@ -168,6 +176,7 @@ int main (void)
 				
 				state &= ~FADING_OUT;						// switch out of fading out state
 				state |= OFF_STATE;							// switch into off state
+				state |= ACCEL_RESET;						// wait for accelerometer to go back into a flatter position
 			}
 		}
   }
