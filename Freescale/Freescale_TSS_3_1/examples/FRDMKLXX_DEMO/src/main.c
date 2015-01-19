@@ -177,6 +177,8 @@ int main (void)
 				state &= ~FADING_OUT;						// switch out of fading out state
 				state |= OFF_STATE;							// switch into off state
 				state |= ACCEL_RESET;						// wait for accelerometer to go back into a flatter position
+				
+				DelayMS(100);
 			}
 		}
   }

@@ -560,11 +560,13 @@ ARM Macro Assembler    Page 9
               00000000 
               00000000 
 Command Line: --debug --xref --cpu=Cortex-M0+ --apcs=interwork --depend=.\frdmk
-l25z48m_demo\startup_mkl25z4.d -o.\frdmkl25z48m_demo\startup_mkl25z4.o -IC:\Kei
-l_v5\ARM\RV31\INC -IC:\Keil_v5\ARM\CMSIS\Include -IC:\Keil_v5\ARM\Inc\Freescale
-\Kinetis --predefine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefin
-e="__UVISION_VERSION SETA 513" --list=.\frdmkl25z48m_demo\startup_mkl25z4.lst s
-tartup_MKL25Z4.s
+l25z48m_demo\startup_mkl25z4.d -o.\frdmkl25z48m_demo\startup_mkl25z4.o -IC:\Use
+rs\Michael\Documents\GitHub\ECE561\Freescale\Freescale_TSS_3_1\examples\FRDMKLX
+X_DEMO\build\uv4\FRDMKL25Z_DEMO\RTE -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS
+\Include -IC:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.4.0\Device\Include --pre
+define="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_V
+ERSION SETA 513" --predefine="_RTE_ SETA 1" --predefine="MKL25Z128xxx4 SETA 1" 
+--list=.\frdmkl25z48m_demo\startup_mkl25z4.lst startup_MKL25Z4.s
 
 
 
@@ -1324,4 +1326,4 @@ Symbol: __main
       At line 253 in file startup_MKL25Z4.s
 Comment: __main used once
 5 symbols
-415 symbols in table
+417 symbols in table

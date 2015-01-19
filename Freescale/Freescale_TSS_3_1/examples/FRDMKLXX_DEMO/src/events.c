@@ -57,7 +57,7 @@ void TSS1_fCallBack1(TSS_CONTROL_ID u8ControlId)
 {
   /* Set LED brightness */
 	// achieving full brightness requires mapping 8 bit value to 16 bit. need some mapping because larger difference in brightness at low levels than high levels
-	unsigned int adjPosition = cASlider1.Position;
+	unsigned int adjPosition = cASlider1.Position*4;
 //	if (adjPosition > 170) {
 //		if (adjPosition > 250){
 //			adjPosition = 0xFFFF;			// full brightness (0xFFFF) is indistinguishable from ~1000
@@ -113,11 +113,11 @@ void TSS1_fCallBack1(TSS_CONTROL_ID u8ControlId)
 		// if in the on state, simply change brightness as appropriate, unless position is 0
 		else if (state & ON_STATE && !(state & FADING_IN)){
 			// if position 0, we go into the off state
-			if (adjPosition == 0){
-				state &= ~ON_STATE;
-				state |= OFF_STATE;
-				state |= ACCEL_RESET;
-			}
+//			if (adjPosition == 0){
+//				state &= ~ON_STATE;
+//				state |= OFF_STATE;
+//				state |= ACCEL_RESET;
+//			}
 			
 			state |= TIMEOUT_RESET;		// reset timeout flag
 			SET_LED_RED(adjPosition);

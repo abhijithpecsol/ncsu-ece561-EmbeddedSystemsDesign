@@ -59,10 +59,11 @@ void fadeWhite(unsigned int brightness){
 
 // Over a period of 1 second, fade out from the specified brightness
 void fadeOutWhite(){
-	unsigned int fadeFrequency = 0;
-	unsigned int subTimer = 0;
-	unsigned int lastTime = 0;
-	unsigned int fadeBrightness = TPM2_C0V;
+	static unsigned int fadeFrequency = 0;
+	static unsigned int subTimer = 0;
+	static unsigned int lastTime = 0;
+	static unsigned int fadeBrightness = 0;
+	fadeBrightness = TPM2_C0V;
 	
 	// determine fade frequency
 	if (fadeBrightness < 1000){
