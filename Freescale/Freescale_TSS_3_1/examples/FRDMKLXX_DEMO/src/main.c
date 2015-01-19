@@ -128,7 +128,7 @@ int main (void)
 		
 		// Check for low voltage
 		batteryVoltage = Measure_VRail();
-		if (batteryVoltage < 3.0){
+		if (batteryVoltage < 3.2){
 			state |= LOW_VOLTAGE;
 		}
 		else {
