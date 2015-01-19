@@ -36,6 +36,7 @@
 #include "timers.h"
 #include <math.h>
 #include "project1.h"
+#include "ADC.h"
 
 uint16_t u16LPcounter = 0u;
 unsigned int lastBrightness = 200;	// the last brightness value, used to turn on light by accelerometer, starts to a nice moderate value
@@ -94,6 +95,9 @@ int main (void)
 		while (1);												// hold execution
 	}
 	
+	// Init ADC
+	Init_ADC();
+	
 	DelayMS(100);
 	
 	// init PIT
@@ -104,10 +108,16 @@ int main (void)
 	state = OFF_STATE;
   for(;;)
   {
+		float batteryVoltage = 0;
+		
     #if TSS_USE_FREEMASTER_GUI
       FMSTR_Poll();
     #endif
-
+		
+		
+		// *********************
+		// ***** ANY STATE *****
+		// *********************
 		// Check for touch and adjust the LED brightness
 		if (TSS_Task() == TSS_STATUS_OK)
 		{
@@ -116,6 +126,19 @@ int main (void)
 			#endif
 		}
 		
+		// Check for low voltage
+		batteryVoltage = Measure_VRail();
+		if (batteryVoltage < 3.0){
+			state |= LOW_VOLTAGE;
+		}
+		else {
+			state &= ~LOW_VOLTAGE;
+		}
+		
+		
+		// *********************
+		// ***** OFF STATE *****
+		// *********************
 		// While in OFF state, check for accelerometer position > 33 degrees from horizontal
 		if (state & OFF_STATE){
 			// check accelerometer position
@@ -153,6 +176,10 @@ int main (void)
 			}
 		}
 		
+		
+		// ********************
+		// ***** ON STATE *****
+		// ********************
 		// While in ON state, check for 10 second timeout
 		if (state & ON_STATE){
 			if (!(state & TIMEOUT_COUNTING) || (state & TIMEOUT_RESET)){

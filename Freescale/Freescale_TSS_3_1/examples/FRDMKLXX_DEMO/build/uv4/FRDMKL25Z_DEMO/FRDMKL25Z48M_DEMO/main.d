@@ -29,3 +29,4 @@
 .\frdmkl25z48m_demo\main.o: ..\..\..\src\timers.h
 .\frdmkl25z48m_demo\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\frdmkl25z48m_demo\main.o: ..\..\..\src\project1.h
+.\frdmkl25z48m_demo\main.o: ..\..\..\src\ADC.h
