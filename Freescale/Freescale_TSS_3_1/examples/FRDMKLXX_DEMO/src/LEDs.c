@@ -106,3 +106,25 @@ void fadeOutWhite(){
 		SET_LED_BLUE(fadeBrightness);
 	}
 }
+
+// Flash red LED for 100 ms
+void flashRedLED(unsigned int periodMS){
+	unsigned int subTimer = 0;
+	unsigned int lastTime = timer1ms;
+	
+	// make sure red LED is n
+	SET_LED_RED(200);
+	SET_LED_GREEN(0);
+	SET_LED_BLUE(0);
+	
+	// turn the red led on for 100 ms
+	while (subTimer < 100){
+		if (lastTime != timer1ms){
+			subTimer++;
+			lastTime = timer1ms;
+		}
+	}
+	
+	// turn the LED off
+	SET_LED_RED(0);
+}

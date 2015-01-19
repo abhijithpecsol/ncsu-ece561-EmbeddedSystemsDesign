@@ -42,6 +42,7 @@ uint16_t u16LPcounter = 0u;
 unsigned int lastBrightness = 200;	// the last brightness value, used to turn on light by accelerometer, starts to a nice moderate value
 unsigned int state = OFF_STATE;			// variable to hold state information
 extern volatile unsigned int timer250ms;
+extern volatile unsigned int timer1ms;
 extern float roll, pitch;
 
 /*********************** GUI - FreeMASTER TSA table ************************/
@@ -71,6 +72,7 @@ extern float roll, pitch;
 int main (void)
 {	
 	unsigned int timeoutPeriodStart;
+	unsigned int redTimeoutPeriodStart;
 	
   InitPorts();
 	
@@ -128,8 +130,11 @@ int main (void)
 		
 		// Check for low voltage
 		batteryVoltage = Measure_VRail();
-		if (batteryVoltage < 3.2){
-			state |= LOW_VOLTAGE;
+		if (batteryVoltage < 3.4){
+			if (!(state & LOW_VOLTAGE)){
+				state |= LOW_VOLTAGE;
+				redTimeoutPeriodStart = timer250ms;
+			}
 		}
 		else {
 			state &= ~LOW_VOLTAGE;
@@ -139,7 +144,8 @@ int main (void)
 		// *********************
 		// ***** OFF STATE *****
 		// *********************
-		// While in OFF state, check for accelerometer position > 33 degrees from horizontal
+		// While in OFF state
+		// 		Check for accelerometer position > 33 degrees from horizontal
 		if (state & OFF_STATE){
 			// check accelerometer position
 			read_full_xyz();								// take a reading
@@ -173,6 +179,12 @@ int main (void)
 				if (fabs(roll) < 30 && fabs(pitch) < 30){	
 					state &= ~ACCEL_RESET;
 				}
+			}
+			
+			// If voltage is low, flash red LED for 100 ms every 5 seconds
+			if ((state & LOW_VOLTAGE) && (timer250ms > redTimeoutPeriodStart + 20)){
+				flashRedLED(100);
+				redTimeoutPeriodStart = timer250ms;
 			}
 		}
 		
