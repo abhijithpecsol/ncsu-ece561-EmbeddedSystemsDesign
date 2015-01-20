@@ -163,7 +163,11 @@ int main (void)
 					
 					// if we really are at this angle
 					if (fabs(roll) > 33 || fabs(pitch) > 33){		
-						state |= FADING_IN;							// separate fading flag					
+						state |= FADING_IN;						// separate fading flag				
+
+						if (lastBrightness == 0){
+							lastBrightness = 100;				// reset default brightness if it was turned off previously
+						}
 						
 						// fade into white
 						fadeWhite(lastBrightness);

@@ -117,8 +117,13 @@ void flashRedLED(unsigned int periodMS){
 	unsigned int previousGreen = TPM2_C1V;
 	unsigned int previousBlue = TPM0_C1V;
 	
-	// make sure red LED is n
-	SET_LED_RED(200);
+	// make sure red LED is on
+	if (previousRed != 0){
+		SET_LED_RED(previousRed);
+	}
+	else {
+		SET_LED_RED(200);
+	}
 	SET_LED_GREEN(0);
 	SET_LED_BLUE(0);
 	
