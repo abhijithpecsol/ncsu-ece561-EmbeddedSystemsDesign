@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\FRDMKL25Z48M_DEMO\TWRKL25Z48M_DEMO.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\FRDMKL25Z48M_DEMO\TWRKL25Z48M_DEMO.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Mon Jan 19 19:01:19 2015
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Mon Jan 19 21:42:32 2015
 <BR><P>
 <H3>Maximum Stack Usage =        280 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -150,7 +150,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[2d]"></a>TSS1_fCallBack1</STRONG> (Thumb, 188 bytes, Stack size 32 bytes, events.o(.text))
+<P><STRONG><a name="[2d]"></a>TSS1_fCallBack1</STRONG> (Thumb, 202 bytes, Stack size 32 bytes, events.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = TSS1_fCallBack1 &rArr; __aeabi_uidivmod
 </UL>
 <BR>[Calls]<UL><LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
@@ -217,14 +217,6 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitPorts
 <LI><a href="#[28]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemInit
 </UL>
-
-<P><STRONG><a name="[f1]"></a>TSS_IIRFilterEquation</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, tss_systemsetupdata.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TSS_KeyDetectorCalculateIIRFilter
-</UL>
-
-<P><STRONG><a name="[106]"></a>__I$use$fp</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, iusefp.o(.text), UNUSED)
-
-<P><STRONG><a name="[107]"></a>__scatterload_null</STRONG> (Thumb, 2 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_null), UNUSED)
 
 <P><STRONG><a name="[56]"></a>FMSTR_Init</STRONG> (Thumb, 22 bytes, Stack size 8 bytes, freemaster_protocol.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FMSTR_InitTsa
@@ -367,7 +359,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_mkl25z4.o(RESET)
 </UL>
-<P><STRONG><a name="[108]"></a>FMSTR_CopyMemory</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, freemaster_kxx.o(.text), UNUSED)
+<P><STRONG><a name="[106]"></a>FMSTR_CopyMemory</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, freemaster_kxx.o(.text), UNUSED)
 
 <P><STRONG><a name="[55]"></a>FMSTR_CopyToBuffer</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, freemaster_kxx.o(.text), UNUSED)
 <BR><BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FMSTR_ValueToBuffer32
@@ -456,27 +448,27 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[78]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sysinit
 </UL>
 
-<P><STRONG><a name="[109]"></a>pee_pbe</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, mcg_kl25.o(.text), UNUSED)
+<P><STRONG><a name="[107]"></a>pee_pbe</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, mcg_kl25.o(.text), UNUSED)
 
 <P><STRONG><a name="[7c]"></a>pbe_pee</STRONG> (Thumb, 132 bytes, Stack size 16 bytes, mcg_kl25.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_idivmod
 </UL>
 
-<P><STRONG><a name="[10a]"></a>pbe_fbe</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, mcg_kl25.o(.text), UNUSED)
+<P><STRONG><a name="[108]"></a>pbe_fbe</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, mcg_kl25.o(.text), UNUSED)
 
 <P><STRONG><a name="[7d]"></a>fbe_pbe</STRONG> (Thumb, 186 bytes, Stack size 32 bytes, mcg_kl25.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_idivmod
 </UL>
 
-<P><STRONG><a name="[10b]"></a>pbe_blpe</STRONG> (Thumb, 104 bytes, Stack size 0 bytes, mcg_kl25.o(.text), UNUSED)
+<P><STRONG><a name="[109]"></a>pbe_blpe</STRONG> (Thumb, 104 bytes, Stack size 0 bytes, mcg_kl25.o(.text), UNUSED)
 
 <P><STRONG><a name="[7e]"></a>blpe_pbe</STRONG> (Thumb, 172 bytes, Stack size 24 bytes, mcg_kl25.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_idivmod
 </UL>
 
-<P><STRONG><a name="[10c]"></a>blpe_fbe</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, mcg_kl25.o(.text), UNUSED)
+<P><STRONG><a name="[10a]"></a>blpe_fbe</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, mcg_kl25.o(.text), UNUSED)
 
-<P><STRONG><a name="[10d]"></a>fbe_blpe</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, mcg_kl25.o(.text), UNUSED)
+<P><STRONG><a name="[10b]"></a>fbe_blpe</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, mcg_kl25.o(.text), UNUSED)
 
 <P><STRONG><a name="[80]"></a>fll_freq</STRONG> (Thumb, 210 bytes, Stack size 20 bytes, mcg_kl25.o(.text), UNUSED)
 <BR><BR>[Called By]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fee_fei
@@ -491,20 +483,20 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fll_freq
 </UL>
 
-<P><STRONG><a name="[10e]"></a>fei_fbe</STRONG> (Thumb, 298 bytes, Stack size 20 bytes, mcg_kl25.o(.text), UNUSED)
+<P><STRONG><a name="[10c]"></a>fei_fbe</STRONG> (Thumb, 298 bytes, Stack size 20 bytes, mcg_kl25.o(.text), UNUSED)
 
 <P><STRONG><a name="[81]"></a>fbe_fee</STRONG> (Thumb, 222 bytes, Stack size 8 bytes, mcg_kl25.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fll_freq
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_idivmod
 </UL>
 
-<P><STRONG><a name="[10f]"></a>fee_fbe</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, mcg_kl25.o(.text), UNUSED)
+<P><STRONG><a name="[10d]"></a>fee_fbe</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, mcg_kl25.o(.text), UNUSED)
 
 <P><STRONG><a name="[82]"></a>fbe_fbi</STRONG> (Thumb, 246 bytes, Stack size 16 bytes, mcg_kl25.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_idivmod
 </UL>
 
-<P><STRONG><a name="[110]"></a>fbi_fbe</STRONG> (Thumb, 306 bytes, Stack size 20 bytes, mcg_kl25.o(.text), UNUSED)
+<P><STRONG><a name="[10e]"></a>fbi_fbe</STRONG> (Thumb, 306 bytes, Stack size 20 bytes, mcg_kl25.o(.text), UNUSED)
 
 <P><STRONG><a name="[83]"></a>fbi_blpi</STRONG> (Thumb, 66 bytes, Stack size 8 bytes, mcg_kl25.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_idivmod
@@ -555,7 +547,7 @@ Global Symbols
 <LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
 </UL>
 
-<P><STRONG><a name="[111]"></a>clk_monitor_0</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, mcg_kl25.o(.text), UNUSED)
+<P><STRONG><a name="[10f]"></a>clk_monitor_0</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, mcg_kl25.o(.text), UNUSED)
 
 <P><STRONG><a name="[92]"></a>uart_init</STRONG> (Thumb, 94 bytes, Stack size 16 bytes, uart_kl25.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_idivmod
@@ -573,7 +565,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_putchar
 </UL>
 
-<P><STRONG><a name="[112]"></a>uart_getchar_present</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, uart_kl25.o(.text), UNUSED)
+<P><STRONG><a name="[110]"></a>uart_getchar_present</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, uart_kl25.o(.text), UNUSED)
 
 <P><STRONG><a name="[95]"></a>uart0_init</STRONG> (Thumb, 74 bytes, Stack size 16 bytes, uart_kl25.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_idivmod
@@ -593,11 +585,11 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart0_putchar
 </UL>
 
-<P><STRONG><a name="[113]"></a>uart0_getchar_present</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, uart_kl25.o(.text), UNUSED)
+<P><STRONG><a name="[111]"></a>uart0_getchar_present</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, uart_kl25.o(.text), UNUSED)
 
-<P><STRONG><a name="[114]"></a>TSS_SampleElectrodeLowE0</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, tss_sensor.o(.text), UNUSED)
+<P><STRONG><a name="[112]"></a>TSS_SampleElectrodeLowE0</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, tss_sensor.o(.text), UNUSED)
 
-<P><STRONG><a name="[115]"></a>TSS_SampleElectrodeLowE1</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, tss_sensor.o(.text), UNUSED)
+<P><STRONG><a name="[113]"></a>TSS_SampleElectrodeLowE1</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, tss_sensor.o(.text), UNUSED)
 
 <P><STRONG><a name="[27]"></a>TSS_SensorInitCallback</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, tss_sensor.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> tss_sensor.o(.text)
@@ -701,6 +693,10 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_mkl25z4.o(RESET)
 </UL>
+<P><STRONG><a name="[f1]"></a>TSS_IIRFilterEquation</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, tss_systemsetupdata.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TSS_KeyDetectorCalculateIIRFilter
+</UL>
+
 <P><STRONG><a name="[a5]"></a>FMSTR_TsaGetTable_UserAppTable</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, main.o(.text), UNUSED)
 <BR><BR>[Called By]<UL><LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FMSTR_TsaGetTable
 </UL>
@@ -851,7 +847,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[116]"></a>Stop_PIT</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, timers.o(.text), UNUSED)
+<P><STRONG><a name="[114]"></a>Stop_PIT</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, timers.o(.text), UNUSED)
 
 <P><STRONG><a name="[1c]"></a>PIT_IRQHandler</STRONG> (Thumb, 60 bytes, Stack size 8 bytes, timers.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = PIT_IRQHandler &rArr; __aeabi_uidivmod
@@ -938,7 +934,7 @@ Global Symbols
 <P><STRONG><a name="[9]"></a>DMA3_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mkl25z4.o(RESET)
 </UL>
-<P><STRONG><a name="[117]"></a>DefaultISR</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text), UNUSED)
+<P><STRONG><a name="[115]"></a>DefaultISR</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text), UNUSED)
 
 <P><STRONG><a name="[b]"></a>FTFA_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mkl25z4.o(RESET)
@@ -952,7 +948,7 @@ Global Symbols
 <P><STRONG><a name="[d]"></a>LLW_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mkl25z4.o(RESET)
 </UL>
-<P><STRONG><a name="[118]"></a>LPTimer_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text), UNUSED)
+<P><STRONG><a name="[116]"></a>LPTimer_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text), UNUSED)
 
 <P><STRONG><a name="[c]"></a>LVD_LVW_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mkl25z4.o(RESET)
@@ -996,9 +992,9 @@ Global Symbols
 <P><STRONG><a name="[19]"></a>TPM2_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mkl25z4.o(RESET)
 </UL>
-<P><STRONG><a name="[119]"></a>TSI0_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text), UNUSED)
+<P><STRONG><a name="[117]"></a>TSI0_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text), UNUSED)
 
-<P><STRONG><a name="[11a]"></a>UART0_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text), UNUSED)
+<P><STRONG><a name="[118]"></a>UART0_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text), UNUSED)
 
 <P><STRONG><a name="[13]"></a>UART1_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_mkl25z4.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> startup_mkl25z4.o(RESET)
@@ -1069,7 +1065,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[39]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TSS_fOnInit
 </UL>
 
-<P><STRONG><a name="[11b]"></a>__aeabi_uidiv</STRONG> (Thumb, 0 bytes, Stack size 12 bytes, uidiv.o(.text), UNUSED)
+<P><STRONG><a name="[119]"></a>__aeabi_uidiv</STRONG> (Thumb, 0 bytes, Stack size 12 bytes, uidiv.o(.text), UNUSED)
 
 <P><STRONG><a name="[50]"></a>__aeabi_uidivmod</STRONG> (Thumb, 44 bytes, Stack size 12 bytes, uidiv.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = __aeabi_uidivmod
@@ -1086,7 +1082,7 @@ Global Symbols
 <LI><a href="#[1c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PIT_IRQHandler
 </UL>
 
-<P><STRONG><a name="[11c]"></a>__aeabi_idiv</STRONG> (Thumb, 0 bytes, Stack size 16 bytes, idiv.o(.text), UNUSED)
+<P><STRONG><a name="[11a]"></a>__aeabi_idiv</STRONG> (Thumb, 0 bytes, Stack size 16 bytes, idiv.o(.text), UNUSED)
 
 <P><STRONG><a name="[7b]"></a>__aeabi_idivmod</STRONG> (Thumb, 40 bytes, Stack size 16 bytes, idiv.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 28<LI>Call Chain = __aeabi_idivmod &rArr; __aeabi_uidivmod
@@ -1149,7 +1145,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;atc
 </UL>
 
-<P><STRONG><a name="[11d]"></a>scalbnf</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, fscalb.o(.text), UNUSED)
+<P><STRONG><a name="[11b]"></a>scalbnf</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, fscalb.o(.text), UNUSED)
 
 <P><STRONG><a name="[c1]"></a>__aeabi_dmul</STRONG> (Thumb, 202 bytes, Stack size 72 bytes, dmul.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 128<LI>Call Chain = __aeabi_dmul &rArr; _double_epilogue &rArr; __aeabi_llsr
@@ -1182,7 +1178,7 @@ Global Symbols
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;atan
 </UL>
 
-<P><STRONG><a name="[11e]"></a>scalbn</STRONG> (Thumb, 0 bytes, Stack size 16 bytes, dscalb.o(.text), UNUSED)
+<P><STRONG><a name="[11c]"></a>scalbn</STRONG> (Thumb, 0 bytes, Stack size 16 bytes, dscalb.o(.text), UNUSED)
 
 <P><STRONG><a name="[8d]"></a>__aeabi_i2f</STRONG> (Thumb, 22 bytes, Stack size 8 bytes, fflti.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_float_epilogue
@@ -1223,7 +1219,7 @@ Global Symbols
 <LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Measure_VRail
 </UL>
 
-<P><STRONG><a name="[11f]"></a>__aeabi_cfcmpeq</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, cfcmple.o(.text), UNUSED)
+<P><STRONG><a name="[11d]"></a>__aeabi_cfcmpeq</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, cfcmple.o(.text), UNUSED)
 
 <P><STRONG><a name="[b3]"></a>__aeabi_cfcmple</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, cfcmple.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1232,6 +1228,8 @@ Global Symbols
 <P><STRONG><a name="[b1]"></a>__aeabi_cfrcmple</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, cfrcmple.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
+
+<P><STRONG><a name="[11e]"></a>__I$use$fp</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, iusefp.o(.text), UNUSED)
 
 <P><STRONG><a name="[ce]"></a>_float_round</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, fepilogue.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fdiv
@@ -1317,7 +1315,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_main_scatterload
 </UL>
 
-<P><STRONG><a name="[120]"></a>__scatterload_rt2</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, init.o(.text), UNUSED)
+<P><STRONG><a name="[11f]"></a>__scatterload_rt2</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, init.o(.text), UNUSED)
 
 <P><STRONG><a name="[d4]"></a>__aeabi_llsl</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, llshl.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = __aeabi_llsl
@@ -1326,7 +1324,7 @@ Global Symbols
 <LI><a href="#[d1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
 </UL>
 
-<P><STRONG><a name="[121]"></a>_ll_shift_l</STRONG> (Thumb, 0 bytes, Stack size 8 bytes, llshl.o(.text), UNUSED)
+<P><STRONG><a name="[120]"></a>_ll_shift_l</STRONG> (Thumb, 0 bytes, Stack size 8 bytes, llshl.o(.text), UNUSED)
 
 <P><STRONG><a name="[d5]"></a>__aeabi_llsr</STRONG> (Thumb, 34 bytes, Stack size 8 bytes, llushr.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = __aeabi_llsr
@@ -1335,7 +1333,7 @@ Global Symbols
 <LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_dsqrt
 </UL>
 
-<P><STRONG><a name="[122]"></a>_ll_ushift_r</STRONG> (Thumb, 0 bytes, Stack size 8 bytes, llushr.o(.text), UNUSED)
+<P><STRONG><a name="[121]"></a>_ll_ushift_r</STRONG> (Thumb, 0 bytes, Stack size 8 bytes, llushr.o(.text), UNUSED)
 
 <P><STRONG><a name="[d7]"></a>__aeabi_lasr</STRONG> (Thumb, 38 bytes, Stack size 8 bytes, llsshr.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = __aeabi_lasr
@@ -1343,7 +1341,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 </UL>
 
-<P><STRONG><a name="[123]"></a>_ll_sshift_r</STRONG> (Thumb, 0 bytes, Stack size 8 bytes, llsshr.o(.text), UNUSED)
+<P><STRONG><a name="[122]"></a>_ll_sshift_r</STRONG> (Thumb, 0 bytes, Stack size 8 bytes, llsshr.o(.text), UNUSED)
 
 <P><STRONG><a name="[3a]"></a>TSS_ASliderCalculatePosIIRFilter</STRONG> (Thumb, 94 bytes, Stack size 24 bytes, tss_asliderdecoder.o(i.TSS_ASliderCalculatePosIIRFilter))
 <BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = TSS_ASliderCalculatePosIIRFilter &rArr; __aeabi_uidivmod
@@ -1752,7 +1750,9 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;atan
 </UL>
 
-<P><STRONG><a name="[124]"></a>__scatterload_copy</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_copy), UNUSED)
+<P><STRONG><a name="[123]"></a>__scatterload_copy</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_copy), UNUSED)
+
+<P><STRONG><a name="[124]"></a>__scatterload_null</STRONG> (Thumb, 2 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_null), UNUSED)
 
 <P><STRONG><a name="[125]"></a>__scatterload_zeroinit</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_zeroinit), UNUSED)
 
