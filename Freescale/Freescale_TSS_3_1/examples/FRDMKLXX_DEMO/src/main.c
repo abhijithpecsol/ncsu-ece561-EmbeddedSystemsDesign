@@ -131,7 +131,7 @@ int main (void)
 		
 		// Check for low voltage
 		batteryVoltage = Measure_VRail();
-		if (batteryVoltage < 3.4){
+		if (batteryVoltage < 3.2){
 			if (!(state & LOW_VOLTAGE)){
 				state |= LOW_VOLTAGE;
 				redFlashPeriodStart = timer250ms;
