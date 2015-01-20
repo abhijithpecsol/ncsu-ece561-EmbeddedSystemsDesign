@@ -35,6 +35,8 @@ extern uint16_t u16LPcounter;
 extern unsigned int lastBrightness;
 extern unsigned int state;			
 extern volatile unsigned int timer1ms;
+extern volatile unsigned int timer250ms;
+extern volatile unsigned int lastRedFlash;
 
 /**
  * \brief TSS callback for control 0
@@ -107,8 +109,10 @@ void TSS1_fCallBack1(TSS_CONTROL_ID u8ControlId)
 				}
 			}
 			
-			state &= ~OFF_STATE;			// switch state into off state
-			state |= ON_STATE;				// still "fading" for another 250ms to prevent undesired behavior
+			state &= ~OFF_STATE;				// switch state into off state
+			state |= ON_STATE;					// still "fading" for another 250ms to prevent undesired behavior
+			
+			lastRedFlash = timer250ms;	// reset last red flash
 		}
 		// if in the on state, simply change brightness as appropriate, unless position is 0
 		else if (state & ON_STATE && !(state & FADING_IN)){

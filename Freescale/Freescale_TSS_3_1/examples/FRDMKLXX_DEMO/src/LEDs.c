@@ -9,8 +9,10 @@
 
 #include <MKL25Z4.h>
 #include "board.h"
+#include "app_init.h"
 
 extern volatile unsigned int timer1ms;
+extern volatile unsigned int timer250ms;
 
 // Set the colors of the LEDs to whatever
 void setLEDColor(unsigned int red, unsigned int green, unsigned int blue){
@@ -59,9 +61,9 @@ void fadeWhite(unsigned int brightness){
 
 // Over a period of 1 second, fade out from the specified brightness
 void fadeOutWhite(){
-	static unsigned int fadeFrequency = 0;
-	static unsigned int subTimer = 0;
-	static unsigned int lastTime = 0;
+	unsigned int fadeFrequency = 0;
+	unsigned int subTimer = 0;
+	unsigned int lastTime = 0;
 	static unsigned int fadeBrightness = 0;
 	fadeBrightness = TPM2_C0V;
 	
@@ -79,7 +81,7 @@ void fadeOutWhite(){
 	// over a period of 1 second, fade to brightness every fadeFrequency ms
 	subTimer = 0;
 	lastTime = timer1ms;
-	while (subTimer <= 1000){
+	while (subTimer <= 1000 || TPM2_C0V != 0){
 		if ((timer1ms != lastTime)) {
 			subTimer++;
 			lastTime = timer1ms;

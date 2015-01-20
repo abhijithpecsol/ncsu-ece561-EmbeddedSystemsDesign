@@ -43,6 +43,7 @@ unsigned int lastBrightness = 200;	// the last brightness value, used to turn on
 unsigned int state = OFF_STATE;			// variable to hold state information
 extern volatile unsigned int timer250ms;
 extern volatile unsigned int timer1ms;
+unsigned int lastRedFlash = 0;
 extern float roll, pitch;
 
 /*********************** GUI - FreeMASTER TSA table ************************/
@@ -73,7 +74,6 @@ int main (void)
 {	
 	unsigned int timeoutPeriodStart;
 	unsigned int redFlashPeriodStart;
-	unsigned int lastRedFlash = 0;
 	
   InitPorts();
 	
@@ -131,16 +131,14 @@ int main (void)
 		
 		// Check for low voltage
 		batteryVoltage = Measure_VRail();
-		if (batteryVoltage < 3.2){
+		if (batteryVoltage < 3.4){
 			if (!(state & LOW_VOLTAGE)){
 				state |= LOW_VOLTAGE;
 				redFlashPeriodStart = timer250ms;
 			}
 		}
 		else {
-			if (state & LOW_VOLTAGE){
-				state &= ~LOW_VOLTAGE;
-			}
+			state &= ~LOW_VOLTAGE;
 		}
 		
 		
@@ -174,6 +172,8 @@ int main (void)
 						state &= ~OFF_STATE;
 						state &= ~FADING_IN;
 						state |= ON_STATE;
+						
+						lastRedFlash = timer250ms;
 					}
 				}
 			}
@@ -214,7 +214,7 @@ int main (void)
 			}
 			
 			// Timeout condition
-			if (timer250ms == timeoutPeriodStart + 40){
+			if (timer250ms >= timeoutPeriodStart + 40){
 				state &= ~ON_STATE;
 				state &= ~TIMEOUT_COUNTING;
 				state |= FADING_OUT;						// switch into fading out state
