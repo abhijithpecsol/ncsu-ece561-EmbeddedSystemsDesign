@@ -10,7 +10,7 @@ I (..\..\..\..\..\LIB\shared\TSS_Sensor.h)(0x520A6420)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (..\..\..\src\mcu_init\cpu\arm_cm0.h)(0x50F5FB3E)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\main.h)(0x521645DE)
 I (..\..\..\src\mcu_init\drivers\wdog\wdog.h)(0x50F5FB40)
 I (..\..\..\src\app_init.h)(0x518BEC48)
@@ -26,7 +26,7 @@ I (..\..\..\..\..\LIB\shared\TSS_Sensor.h)(0x520A6420)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (..\..\..\src\mcu_init\cpu\arm_cm0.h)(0x50F5FB3E)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\app_init.h)(0x518BEC48)
 I (..\..\..\src\events.h)(0x518BEC48)
 I (..\..\..\src\project1.h)(0x54C05CA8)
@@ -36,7 +36,7 @@ F (..\..\..\..\..\GUI\source\src_common\freemaster_appcmd.c)(0x50F5FC48)(-c --cp
 I (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster.h)(0x5182715C)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_defcfg.h)(0x50F5FC4A)
 I (..\..\..\src\freemaster_cfg.h)(0x518BEC48)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
@@ -49,7 +49,7 @@ F (..\..\..\..\..\GUI\source\src_common\freemaster_bdm.c)(0x50F5FC48)(-c --cpu C
 I (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster.h)(0x5182715C)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_defcfg.h)(0x50F5FC4A)
 I (..\..\..\src\freemaster_cfg.h)(0x518BEC48)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
@@ -62,7 +62,7 @@ F (..\..\..\..\..\GUI\source\src_common\freemaster_can.c)(0x50F5FC48)(-c --cpu C
 I (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster.h)(0x5182715C)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_defcfg.h)(0x50F5FC4A)
 I (..\..\..\src\freemaster_cfg.h)(0x518BEC48)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
@@ -76,7 +76,7 @@ F (..\..\..\..\..\GUI\source\src_common\freemaster_protocol.c)(0x51AF1A14)(-c --
 I (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster.h)(0x5182715C)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_defcfg.h)(0x50F5FC4A)
 I (..\..\..\src\freemaster_cfg.h)(0x518BEC48)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
@@ -90,7 +90,7 @@ F (..\..\..\..\..\GUI\source\src_common\freemaster_rec.c)(0x50F5FC48)(-c --cpu C
 I (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster.h)(0x5182715C)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_defcfg.h)(0x50F5FC4A)
 I (..\..\..\src\freemaster_cfg.h)(0x518BEC48)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
@@ -104,7 +104,7 @@ F (..\..\..\..\..\GUI\source\src_common\freemaster_scope.c)(0x50F5FC48)(-c --cpu
 I (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster.h)(0x5182715C)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_defcfg.h)(0x50F5FC4A)
 I (..\..\..\src\freemaster_cfg.h)(0x518BEC48)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
@@ -117,7 +117,7 @@ F (..\..\..\..\..\GUI\source\src_common\freemaster_serial.c)(0x50F5FC4A)(-c --cp
 I (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster.h)(0x5182715C)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_defcfg.h)(0x50F5FC4A)
 I (..\..\..\src\freemaster_cfg.h)(0x518BEC48)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
@@ -130,7 +130,7 @@ F (..\..\..\..\..\GUI\source\src_common\freemaster_tsa.c)(0x50F5FC4A)(-c --cpu C
 I (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster.h)(0x5182715C)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_defcfg.h)(0x50F5FC4A)
 I (..\..\..\src\freemaster_cfg.h)(0x518BEC48)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
@@ -144,7 +144,7 @@ F (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster_Kxx.c)(0x51961EDC)(-c 
 I (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster.h)(0x5182715C)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_defcfg.h)(0x50F5FC4A)
 I (..\..\..\src\freemaster_cfg.h)(0x518BEC48)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
@@ -168,7 +168,7 @@ I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
 I (..\..\..\src\mcu_init\cpu\arm_cm0.h)(0x50F5FB3E)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\mcu_init\drivers\mcg\mcg_kl25.h)(0x50F5FB40)
 I (..\..\..\src\mcu_init\common\startup.h)(0x50F5FB3E)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5476A9D0)
@@ -180,7 +180,7 @@ I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
 I (..\..\..\src\mcu_init\cpu\arm_cm0.h)(0x50F5FB3E)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\mcu_init\drivers\mcg\mcg_kl25.h)(0x50F5FB40)
 I (..\..\..\src\mcu_init\common\startup.h)(0x50F5FB3E)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5476A9D0)
@@ -284,7 +284,7 @@ F (..\..\..\..\..\LIB\shared\TSS_SystemSetupVal.h)(0x51F64E2E)()
 F (..\..\..\..\..\LIB\shared\TSS_Timer.h)(0x51F64E2E)()
 F (..\..\..\..\..\LIB\lib_uv4\TSS_KXX_M0.lib)(0x520E17C4)()
 F (..\..\..\src\freemaster_cfg.h)(0x518BEC48)()
-F (..\..\..\src\main.c)(0x54C083A4)(-c --cpu Cortex-M0+ -D__EVAL -D__MICROLIB -g -O2 --apcs=interwork -I..\..\..\src -I..\..\..\src\mcu_init\cpu -I..\..\..\src\mcu_init\drivers\uart -I..\..\..\src\mcu_init\drivers\wdog -I..\..\..\src\module_id -I..\..\..\src\frdmkl25z48m -I..\..\..\..\..\GUI\source\src_common -I..\..\..\..\..\GUI\source\src_platforms\Kxx -I..\..\..\..\..\LIB\shared -I..\..\..\..\..\LIB\lib_uv4 -I..\..\..\src\mcu_init\common -I..\..\..\src\mcu_init\cpu -I..\..\..\src\mcu_init\platforms -I..\..\..\src\mcu_init\drivers\mcg-I "C:\Users\Michael\Documents\GitHub\ECE561\Project 1\examples\FRDMKLXX_DEMO\build\uv4\FRDMKL25Z_DEMO\RTE"-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.4.0\Device\Include-D__UVISION_VERSION="513" -D_RTE_ -DMKL25Z128xxx4 -DFREEDOM -DFRDM_KL25Z48-o .\frdmkl25z48m_demo\main.o --omf_browse .\frdmkl25z48m_demo\main.crf --depend .\frdmkl25z48m_demo\main.d)
+F (..\..\..\src\main.c)(0x54C1645D)(-c --cpu Cortex-M0+ -D__EVAL -D__MICROLIB -g -O2 --apcs=interwork -I..\..\..\src -I..\..\..\src\mcu_init\cpu -I..\..\..\src\mcu_init\drivers\uart -I..\..\..\src\mcu_init\drivers\wdog -I..\..\..\src\module_id -I..\..\..\src\frdmkl25z48m -I..\..\..\..\..\GUI\source\src_common -I..\..\..\..\..\GUI\source\src_platforms\Kxx -I..\..\..\..\..\LIB\shared -I..\..\..\..\..\LIB\lib_uv4 -I..\..\..\src\mcu_init\common -I..\..\..\src\mcu_init\cpu -I..\..\..\src\mcu_init\platforms -I..\..\..\src\mcu_init\drivers\mcg-I "C:\Users\Michael\Documents\GitHub\ECE561\Project 1\examples\FRDMKLXX_DEMO\build\uv4\FRDMKL25Z_DEMO\RTE"-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.4.0\Device\Include-D__UVISION_VERSION="513" -D_RTE_ -DMKL25Z128xxx4 -DFREEDOM -DFRDM_KL25Z48-o .\frdmkl25z48m_demo\main.o --omf_browse .\frdmkl25z48m_demo\main.crf --depend .\frdmkl25z48m_demo\main.d)
 I (..\..\..\..\..\LIB\shared\TSS_API.h)(0x51F64E2C)
 I (..\..\..\src\frdmkl25z48m\TSS_SystemSetup.h)(0x51BF50A2)
 I (..\..\..\src\TSS_SystemSetupGlobal.h)(0x54B87351)
@@ -298,7 +298,7 @@ I (..\..\..\src\mcu_init\cpu\arm_cm0.h)(0x50F5FB3E)
 I (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster.h)(0x5182715C)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_defcfg.h)(0x50F5FC4A)
 I (..\..\..\src\freemaster_cfg.h)(0x518BEC48)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_tsa.h)(0x5182715C)
 I (..\..\..\src\app_init.h)(0x518BEC48)
 I (..\..\..\src\events.h)(0x518BEC48)
@@ -327,7 +327,7 @@ I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x5476A9CE)
 F (..\..\..\src\LEDs.c)(0x54C0660A)(-c --cpu Cortex-M0+ -D__EVAL -D__MICROLIB -g -O2 --apcs=interwork -I..\..\..\src -I..\..\..\src\mcu_init\cpu -I..\..\..\src\mcu_init\drivers\uart -I..\..\..\src\mcu_init\drivers\wdog -I..\..\..\src\module_id -I..\..\..\src\frdmkl25z48m -I..\..\..\..\..\GUI\source\src_common -I..\..\..\..\..\GUI\source\src_platforms\Kxx -I..\..\..\..\..\LIB\shared -I..\..\..\..\..\LIB\lib_uv4 -I..\..\..\src\mcu_init\common -I..\..\..\src\mcu_init\cpu -I..\..\..\src\mcu_init\platforms -I..\..\..\src\mcu_init\drivers\mcg-I "C:\Users\Michael\Documents\GitHub\ECE561\Project 1\examples\FRDMKLXX_DEMO\build\uv4\FRDMKL25Z_DEMO\RTE"-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.4.0\Device\Include-D__UVISION_VERSION="513" -D_RTE_ -DMKL25Z128xxx4 -DFREEDOM -DFRDM_KL25Z48-o .\frdmkl25z48m_demo\leds.o --omf_browse .\frdmkl25z48m_demo\leds.crf --depend .\frdmkl25z48m_demo\leds.d)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476A9D0)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\mcu_init\cpu\arm_cm0.h)(0x50F5FB3E)
 I (..\..\..\src\app_init.h)(0x518BEC48)
@@ -363,11 +363,11 @@ I (..\..\..\src\frdmkl25z48m\derivative.h)(0x518BEC48)
 I (..\..\..\src\frdmkl25z48m\MKL25Z4.h)(0x50F5FB42)
 I (..\..\..\src\mcu_init\cpu\arm_cm0.h)(0x50F5FB3E)
 I (..\..\..\src\mcu_init\drivers\uart\uart_kl25.h)(0x51953DFC)
-I (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)
+I (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)
 I (..\..\..\src\app_init.h)(0x518BEC48)
 I (..\..\..\..\..\GUI\source\src_platforms\Kxx\freemaster.h)(0x5182715C)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_defcfg.h)(0x50F5FC4A)
 I (..\..\..\src\freemaster_cfg.h)(0x518BEC48)
 I (..\..\..\..\..\GUI\source\src_common\freemaster_tsa.h)(0x5182715C)
 I (..\..\..\src\main.h)(0x521645DE)
-F (..\..\..\src\frdmkl25z48m\board.h)(0x54BC6E90)()
+F (..\..\..\src\frdmkl25z48m\board.h)(0x54C16632)()
