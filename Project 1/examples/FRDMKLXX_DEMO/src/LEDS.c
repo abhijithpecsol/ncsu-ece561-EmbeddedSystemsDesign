@@ -42,11 +42,11 @@ void fadeWhite(unsigned int brightness){
 	// over a period of 1 second, fade to brightness every fadeFrequency ms
 	subTimer = 0;
 	lastTime = timer1ms;
-	while (subTimer <= 1000){
+	while (subTimer <= 1000 || fadeBrightness < brightness){
 		if ((timer1ms != lastTime)) {
 			subTimer++;
 			lastTime = timer1ms;
-			if (subTimer % fadeFrequency == 0){
+			if (subTimer % fadeFrequency == 0 || subTimer > 1000){
 				fadeBrightness++;
 				setLEDColor(fadeBrightness, fadeBrightness, fadeBrightness);
 			}
