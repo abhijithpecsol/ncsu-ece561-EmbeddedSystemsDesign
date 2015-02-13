@@ -3,6 +3,7 @@
 #include "i2c.h"
 #include "delay.h"
 #include <math.h>
+#include "approximations.h"
 
 int16_t acc_X=0, acc_Y=0, acc_Z=0;
 float roll=0.0, pitch=0.0;
@@ -79,8 +80,8 @@ void convert_xyz_to_roll_pitch(void) {
 				ay = acc_Y/COUNTS_PER_G,
 				az = acc_Z/COUNTS_PER_G;
 	
-	roll = atan2(ay, az)*180/M_PI;
-	pitch = atan2(ax, sqrt(ay*ay + az*az))*180/M_PI;
+	roll = atan2_approx(ay, az)*(180/M_PI);
+	pitch = atan2_approx(ax, sqrt_approx(ay*ay + az*az))*(180/M_PI);
 	
 }
 

@@ -15,10 +15,27 @@ void i2c_init(void)
 	//set to 100k baud
 	//baud = bus freq/(scl_div+mul)
  	//~400k = 24M/(64); icr=0x12 sets scl_div to 64
- 	I2C0->F = (I2C_F_ICR(0x12) | I2C_F_MULT(0));
+	// changed to 0x0A = 36 --> 666k baud, can't go any faster
+ 	I2C0->F = (I2C_F_ICR(0x0A) | I2C_F_MULT(0));
 	
 	//enable i2c and set to master mode
 	I2C0->C1 |= (I2C_C1_IICEN_MASK );
+	
+	// enable i2c interrupts
+	//I2C0->C1 |= I2C_C1_IICIE_MASK;
+	
+	// enable i2c NVIC interrupt
+	//NVIC_SetPriority(I2C0_IRQn, 128);
+	//NVIC_ClearPendingIRQ(I2C0_IRQn);
+	//NVIC_EnableIRQ(I2C0_IRQn);
+}
+
+// i2c irq
+void I2C0_IRQHandler(){
+	// clear pending irq
+	NVIC_ClearPendingIRQ(I2C0_IRQn);
+	
+	
 }
 
 
@@ -119,4 +136,3 @@ void i2c_write_byte(uint8_t dev, uint8_t address, uint8_t data)
 	I2C_M_STOP;
 	
 }
-
