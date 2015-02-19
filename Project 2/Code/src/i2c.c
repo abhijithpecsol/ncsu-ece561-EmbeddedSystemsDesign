@@ -1,6 +1,12 @@
 #include <MKL25Z4.H>
 #include "i2c.h"
 
+uint8_t i2cCount = 0;
+uint8_t i2cState = 0;
+uint8_t devAddress;
+uint8_t readAddress;
+uint8_t data[6];
+
 //init i2c0
 void i2c_init(void)
 {
@@ -15,27 +21,85 @@ void i2c_init(void)
 	//set to 100k baud
 	//baud = bus freq/(scl_div+mul)
  	//~400k = 24M/(64); icr=0x12 sets scl_div to 64
-	// changed to 0x0A = 36 --> 666k baud, can't go any faster
- 	I2C0->F = (I2C_F_ICR(0x0A) | I2C_F_MULT(0));
+	// most stable constant seems to be 0B
+ 	I2C0->F = (I2C_F_ICR(0x0B) | I2C_F_MULT(0));
 	
 	//enable i2c and set to master mode
-	I2C0->C1 |= (I2C_C1_IICEN_MASK );
+	I2C0->C1 |= (I2C_C1_IICEN_MASK);
 	
 	// enable i2c interrupts
 	//I2C0->C1 |= I2C_C1_IICIE_MASK;
 	
 	// enable i2c NVIC interrupt
-	//NVIC_SetPriority(I2C0_IRQn, 128);
-	//NVIC_ClearPendingIRQ(I2C0_IRQn);
-	//NVIC_EnableIRQ(I2C0_IRQn);
+	NVIC_SetPriority(I2C0_IRQn, 128);
+	NVIC_ClearPendingIRQ(I2C0_IRQn);
+	NVIC_EnableIRQ(I2C0_IRQn);
 }
 
-// i2c irq
-void I2C0_IRQHandler(){
+void I2C0_IRQHandler(){	
 	// clear pending irq
 	NVIC_ClearPendingIRQ(I2C0_IRQn);
+	I2C0->S |= I2C_S_IICIF_MASK;
 	
+	// transmit
+	if (I2C0->C1 & I2C_C1_TX_MASK){
+		if (i2cState == READ_SETUP){
+			switch (i2cCount++){
+				case 0:
+					I2C0->D = readAddress;
+					break;
+				
+				case 1:
+					I2C_M_RSTART;		// repeated start
+					I2C0->D = (devAddress|0x1);
+					break;
+				
+				case 2:
+					ACK;					// acknowledge
+					I2C_REC;			// set to receive data
+					i2cState = REPEATED_READ;
+					i2cCount = 0;
+					break;
+			}
+		}
+	}
+	// receive
+//	else {
+//		if (i2cState == REPEATED_READ){
+//			data[i2cCount] = I2C0->D;			// read byte of data
+//			
+//			if (i2cCount < 5){
+//				ACK;				// acknowledge after every byte
+//			}
+//			else if (i2cCount == 5){
+//				NACK;				// no acknowledge after last byte
+//				I2C_M_STOP;	// stop
+//				i2cState = DATA_RECEIVED;				// update state to indicate data is ready for processing
+//				I2C0->C1 &= ~I2C_C1_IICIE_MASK;	// disable interrupt
+//			}
+//			else {		// error
+//				i2cState = 0;
+//				I2C0->C1 &= ~I2C_C1_IICIE_MASK;
+//			}
+//			i2cCount++;
+//		}
+//	}
+}
+
+// interrupt i2c process
+void i2c_int_start(uint8_t dev, uint8_t address){
+	// save dev and read address
+	devAddress = dev;
+	readAddress = address;
 	
+	// begin
+	I2C_TRAN;										/*set to transmit mode */
+	I2C_M_START;								/*send start	*/
+	I2C0->C1 |= I2C_C1_IICIE_MASK;		// enable interrupt
+	NVIC_EnableIRQ(I2C0_IRQn);
+	I2C0->D = devAddress;			  /*send dev address	*/
+	i2cState = READ_SETUP;
+	i2cCount = 0;
 }
 
 

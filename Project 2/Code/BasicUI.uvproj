@@ -78,7 +78,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>"C:\Users\Alex\Documents\Teaching\ESD\2015-Spring\Projects\Project 2\ProfilerProject - Base\ProfilerProject - Base\Scripts\update_regions_MDK.bat"</UserProg1Name>
+            <UserProg1Name>"C:\Users\Michael\Documents\GitHub\ECE561\Project 2\Code\Scripts\update_regions_MDK.bat"</UserProg1Name>
             <UserProg2Name>C:\Keil\ARM\ARMCC\bin\fromelf.exe -s  --output=symbols.txt --only=.symtab "obj\%L"</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -345,8 +345,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>0</Optim>
-            <oTime>0</oTime>
+            <Optim>4</Optim>
+            <oTime>1</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
             <Strict>0</Strict>
@@ -360,7 +360,7 @@
             <uC99>0</uC99>
             <useXO>0</useXO>
             <VariousControls>
-              <MiscControls>--interleave</MiscControls>
+              <MiscControls>--fpmode=fast</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
               <IncludePath>.\inc</IncludePath>
@@ -513,6 +513,26 @@
               <FileName>region.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\region.c</FilePath>
+            </File>
+            <File>
+              <FileName>approximations.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\approximations.c</FilePath>
+            </File>
+            <File>
+              <FileName>v2xe.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\v2xe.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>triggers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\triggers.c</FilePath>
             </File>
           </Files>
         </Group>

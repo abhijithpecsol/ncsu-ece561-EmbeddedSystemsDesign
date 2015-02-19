@@ -10,7 +10,7 @@ float roll=0.0, pitch=0.0;
 
 //mma data ready
 extern uint32_t DATA_READY;
-
+extern volatile uint8_t data[];
 
 
 //initializes mma8451 sensor
@@ -72,7 +72,6 @@ void read_xyz(void)
 	acc_Y = (int8_t) i2c_read_byte(MMA_ADDR, REG_YHI);
 	Delay(100);
 	acc_Z = (int8_t) i2c_read_byte(MMA_ADDR, REG_ZHI);
-
 }
 
 void convert_xyz_to_roll_pitch(void) {
@@ -82,7 +81,26 @@ void convert_xyz_to_roll_pitch(void) {
 	
 	roll = atan2_approx(ay, az)*(180/M_PI);
 	pitch = atan2_approx(ax, sqrt_approx(ay*ay + az*az))*(180/M_PI);
+	//pitch = asinf(-ax)*(180/M_PI);
+}
+
+void get_accel_from_data(){
+	int16_t temp[3];
+	int i;
 	
+	for( i=0;i<6;i++)	{
+		if(i==5)
+			data[i] = i2c_repeated_read(1);
+		else
+			data[i] = i2c_repeated_read(0);
+	}
+		
+	temp[0] = (int16_t)((data[0]<<8) | (data[1]<<2));
+	temp[1] = (int16_t)((data[2]<<8) | (data[3]<<2));
+	temp[2] = (int16_t)((data[4]<<8) | (data[5]<<2));
+	acc_X = temp[0];
+	acc_Y = temp[1];
+	acc_Z = temp[2];
 }
 
 

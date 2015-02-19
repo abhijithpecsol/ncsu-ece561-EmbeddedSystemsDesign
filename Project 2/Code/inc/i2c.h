@@ -14,11 +14,16 @@
 	
 #define NACK 	        I2C0->C1 |= I2C_C1_TXAK_MASK
 #define ACK           I2C0->C1 &= ~I2C_C1_TXAK_MASK
+	
+#define READ_SETUP		(0x01)
+#define REPEATED_READ (0x02)
+#define DATA_RECEIVED	(0x04)
 
 void i2c_init(void);
 void i2c_start(void);
 void i2c_read_setup(uint8_t dev, uint8_t address);
 uint8_t i2c_repeated_read(uint8_t);
+void i2c_int_start(uint8_t dev, uint8_t address);
 	
 uint8_t i2c_read_byte(uint8_t dev, uint8_t address);
 void i2c_write_byte(uint8_t dev, uint8_t address, uint8_t data);

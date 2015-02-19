@@ -16,13 +16,14 @@
 
 #define WHOAMI 0x1A
 
-#define COUNTS_PER_G (16384.0)
-#define M_PI (3.14159265)
+#define COUNTS_PER_G (16384.0f)
+#define M_PI (3.14159265f)
 
 int init_mma(void);
 void read_full_xyz(void);
 void read_xyz(void);
 void convert_xyz_to_roll_pitch(void);
+void get_accel_from_data(void);
 
 extern float roll, pitch;
 extern int16_t acc_X, acc_Y, acc_Z;
