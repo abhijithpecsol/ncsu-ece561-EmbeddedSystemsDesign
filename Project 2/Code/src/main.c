@@ -21,6 +21,8 @@
 
 extern volatile uint8_t i2cState;
 extern int32_t mag_X, mag_Y, mag_Z;
+extern uint8_t i2cLockedUp;
+int i2cLockedUpCount;
 
 /*----------------------------------------------------------------------------
   MAIN function
@@ -69,7 +71,7 @@ int main (void) {
 
 	Init_Profiling();
 	__enable_irq();
-	populate_atan_lut();
+	//populate_atan_lut();
 	
 #if PROFILING == 1
 	// Starting, so turn on magenta
@@ -77,8 +79,27 @@ int main (void) {
 	Control_RGB_LEDs(1,0,1);
 	Enable_Profiling();
 	for (i=0; i<NUM_TESTS; i++) {
+	#if POLLING == 1
 		read_full_xyz();
-		convert_xyz_to_roll_pitch();
+		if (i2cLockedUp == WORKING){
+			convert_xyz_to_roll_pitch();
+		}
+		else {
+			// reset i2c if locked up
+			i2cLockedUp = WORKING;
+			i2cLockedUpCount++;
+			i2c_reset();
+		}
+	
+	#else
+		i2c_int_start(MMA_ADDR, REG_XHI);
+		if (i != 0){
+			convert_xyz_to_roll_pitch();
+		}
+		while (!(i2cState == DATA_RECEIVED)){}
+		i2cState = 0;
+		get_accel_from_data();
+	#endif
 	}
 	Disable_Profiling();
 	// Done, turn on blue LED
@@ -122,22 +143,6 @@ int main (void) {
 		}
 	}
 #endif
-		
-	// Attempt at interrupt driven I2C code
-//	#if 0
-//		// begin interrupt handling to get new data in background
-//		i2c_int_start(MMA_ADDR, REG_XHI);
-//		
-//		// perform calculation
-//		if (i != 0){
-//			convert_xyz_to_roll_pitch();
-//		}
-//		
-//		while (!(i2cState == DATA_RECEIVED)){}			// wait for data to finish, if it hasn't yet
-//		i2cState = 0;				// reset state
-//			
-//		get_accel_from_data();
-//	#endif
 }
 
 // *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   

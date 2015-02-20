@@ -18,9 +18,20 @@
 #define READ_SETUP		(0x01)
 #define REPEATED_READ (0x02)
 #define DATA_RECEIVED	(0x04)
+	
+#define WORKING				(0x00)
+#define LOCKED_UP			(0x01)
+	
+#define CHECK_FOR_LOCKED_UP if (i2cLockedUp) return;
+#define CHECK_FOR_LOCKED_UP_NONVOID if (i2cLockedUp) return 0;
+	
+#define I2C_WAIT_LU_CHECK						i2c_wait();CHECK_FOR_LOCKED_UP;
+#define I2C_WAIT_LU_CHECK_NONVOID		i2c_wait();CHECK_FOR_LOCKED_UP_NONVOID;
 
 void i2c_init(void);
 void i2c_start(void);
+void i2c_reset(void);
+void i2c_wait(void);
 void i2c_read_setup(uint8_t dev, uint8_t address);
 uint8_t i2c_repeated_read(uint8_t);
 void i2c_int_start(uint8_t dev, uint8_t address);

@@ -11,7 +11,7 @@ float roll=0.0, pitch=0.0;
 //mma data ready
 extern uint32_t DATA_READY;
 extern volatile uint8_t data[];
-
+extern uint8_t i2cLockedUp;
 
 //initializes mma8451 sensor
 //i2c has to already be enabled
@@ -23,10 +23,12 @@ int init_mma()
 		  Delay(100);
 		  //turn on data ready irq; defaults to int2 (PTA15)
 		  i2c_write_byte(MMA_ADDR, REG_CTRL4, 0x01);
+			CHECK_FOR_LOCKED_UP_NONVOID;
 		  Delay(100);
-		  //set active 14bit mode and 100Hz (0x19)
+		  //set active 14bit mode and 800Hz (0x19)
 		  i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x01);
-				
+			CHECK_FOR_LOCKED_UP_NONVOID;
+			
 		  //enable the irq in the NVIC
 		  //NVIC_EnableIRQ(PORTA_IRQn);
 		  return 1;
@@ -44,13 +46,19 @@ void read_full_xyz()
 	int16_t temp[3];
 	
 	i2c_start();
+	CHECK_FOR_LOCKED_UP;
 	i2c_read_setup(MMA_ADDR , REG_XHI);
+	CHECK_FOR_LOCKED_UP;
 	
 	for( i=0;i<6;i++)	{
-		if(i==5)
+		if(i==5){
 			data[i] = i2c_repeated_read(1);
-		else
+			CHECK_FOR_LOCKED_UP;
+		}
+		else {
 			data[i] = i2c_repeated_read(0);
+			CHECK_FOR_LOCKED_UP;
+		}
 	}
 	
 	temp[0] = (int16_t)((data[0]<<8) | (data[1]<<2));
@@ -68,10 +76,13 @@ void read_xyz(void)
 	// sign extend byte to 16 bits - need to cast to signed since function
 	// returns uint8_t which is unsigned
 	acc_X = (int8_t) i2c_read_byte(MMA_ADDR, REG_XHI);
+	CHECK_FOR_LOCKED_UP;
 	Delay(100);
 	acc_Y = (int8_t) i2c_read_byte(MMA_ADDR, REG_YHI);
+	CHECK_FOR_LOCKED_UP;
 	Delay(100);
 	acc_Z = (int8_t) i2c_read_byte(MMA_ADDR, REG_ZHI);
+	CHECK_FOR_LOCKED_UP;
 }
 
 void convert_xyz_to_roll_pitch(void) {
