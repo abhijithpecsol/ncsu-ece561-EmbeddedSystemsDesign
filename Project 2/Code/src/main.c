@@ -52,10 +52,13 @@ int main (void) {
 	res = init_mma();													/* init mma peripheral */
 	if (res == 0) {
 		// Signal error condition
-		Control_RGB_LEDs(1, 0, 0);
-		while (1)
-			;
+		Control_RGB_LEDs(1, 1, 1);			// white
+		while(1);
 	}
+	// increse i2c baud rate
+	I2C_DISABLE;
+	I2C0->F = (I2C_F_ICR(0x00) | I2C_F_MULT(0));
+	I2C_ENABLE;
 	
 //	Control_RGB_LEDs(0, 0, 0);
 //	while (1) {
@@ -111,7 +114,15 @@ int main (void) {
 		if (TRIGGER_1_ASSERTED){				// test case with fixed mag values
 			Control_RGB_LEDs(1, 0, 0);		// red LED
 			read_full_xyz();							// read accelerometer
-			convert_xyz_to_roll_pitch();	// calculate roll and pitch
+			if (!i2cLockedUp){
+				convert_xyz_to_roll_pitch();
+			}
+			else {
+				// reset i2c if locked up
+				i2cLockedUp = WORKING;
+				i2cLockedUpCount++;
+				i2c_reset();
+			}
 			
 			// TODO
 			// 1 - set magnetometer readings to X_M_1, Y_M_1 and Z_M_1
@@ -133,7 +144,15 @@ int main (void) {
 		else {			// regular operation
 			Control_RGB_LEDs(0, 1, 0);		// green LED
 			read_full_xyz();							// read accelerometer
-			convert_xyz_to_roll_pitch();	// calculate roll and pitch
+			if (!i2cLockedUp){
+				convert_xyz_to_roll_pitch();	// calculate roll and pitch
+			}
+			else {
+				// reset i2c if locked up
+				i2cLockedUp = WORKING;
+				i2cLockedUpCount++;
+				i2c_reset();
+			}
 			
 			// TODO
 			// 1 - read magnetometer
