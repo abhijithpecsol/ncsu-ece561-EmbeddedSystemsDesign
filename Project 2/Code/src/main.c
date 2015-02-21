@@ -48,6 +48,7 @@ int main (void) {
 #endif
 	
 	i2c_init();																/* init i2c	*/
+	i2c_reset();															// reset, useful if entering debug mode from running condition
 	spi_init();																/* init spi */
 	res = init_mma();													/* init mma peripheral */
 	if (res == 0) {

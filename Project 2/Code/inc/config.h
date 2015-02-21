@@ -5,5 +5,5 @@
 
 #endif // CONFIG_H
 
-#define PROFILING 0
+#define PROFILING 1
 #define POLLING 1
