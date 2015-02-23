@@ -19,4 +19,5 @@
 .\obj\main.o: .\inc\triggers.h
 .\obj\main.o: .\inc\delay.h
 .\obj\main.o: .\inc\profile.h
+.\obj\main.o: .\inc\test_constants.h
 .\obj\main.o: .\inc\approximations.h

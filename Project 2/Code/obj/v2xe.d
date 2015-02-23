@@ -9,3 +9,7 @@
 .\obj\v2xe.o: .\inc\v2xe.h
 .\obj\v2xe.o: .\inc\delay.h
 .\obj\v2xe.o: .\inc\LEDs.h
+.\obj\v2xe.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+.\obj\v2xe.o: .\inc\approximations.h
+.\obj\v2xe.o: .\inc\triggers.h
+.\obj\v2xe.o: .\inc\gpio_defs.h

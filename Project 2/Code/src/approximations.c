@@ -11,7 +11,7 @@
  #include <stdint.h>
  #include <math.h>
  
- float atanLUT[101];
+ //float atanLUT[101];
  
  // Performs a square root approximation
  float sqrt_approx(float x){
@@ -59,81 +59,131 @@ float atan2_approx( float y, float x )
 	return atan;
 }
 
-// populate arctan table
-void populate_atan_lut(void){
-	float i = 0.0;
-	int index = 0;
-	for (i = 0.0, index = 0; index < 100; index++, i += 0.01){
-		atanLUT[index] = atanf(i);
+// cos approximation using taylor series
+float cos_approx(float x){
+	float x2 = x*x;
+	float absx = fabs(x);
+	
+	// this function is accurate only within -3pi/2 to 3pi/2
+	while (x < (-3.0f*PIBY2_FLOAT)){
+		x += (2.0f*PI_FLOAT);
+	}
+	while (x > (3.0f*PIBY2_FLOAT)){
+		x -= (2.0f*PI_FLOAT);
+	}
+	
+	// 4th degree polynomial accurate from -pi/2 to pi/2, so use symmetry to evaluate
+	if (absx > PIBY2_FLOAT && absx < (3.0f*PIBY2_FLOAT)){
+		//return -(1.0 - x2/2.0 + x2*x2/24.0);
+		return -(1.0f - x2/2.0f);
+	}
+	else {
+		//return 1.0 - x2/2.0 + x2*x2/24.0;
+		return 1.0f - x2/2.0f;
 	}
 }
 
-// perform atan approximation using lookup table
-float atan2_approx_lut(float y, float x){
-	float res;
-	float yabs = fabs(y), xabs = fabs(x);
+// sin approximation using taylor series
+float sin_approx(float x){
+	float x2 = x*x;
+	float x3 = x2*x;
+	//float x5 = x3*x2;
+	float absx = fabs(x);
 	
-	// atan2
-	// = arctan(y/x) 				if x > 0
-	// = pi + arctan(y/x)		if y >= 0 and x < 0
-	// = -pi + arctan(y/x)	if y < 0 and x < 0
-	// = pi/2								if y > 0 and x = 0 /
-	// = -pi/2							if y < 0 and x = 0 /
-	// = undefined					if y = 0 and x = 0
-	if (x == 0){
-		if (y == 0){
-			return 0;
-		}
-		else if (y > 0){
-			return PIBY2_FLOAT;
-		}
-		else {
-			return -PIBY2_FLOAT;
-		}
+	// this function is accurate only within -3pi/2 to 3pi/2
+	while (x < (-3.0f*PIBY2_FLOAT)){
+		x += (2.0f*PI_FLOAT);
+	}
+	while (x > (3.0f*PIBY2_FLOAT)){
+		x -= (2.0f*PI_FLOAT);
+	}
+	
+	// 5th degree polynomial accurate from -pi/2 to pi/2, so use symmetry to evaluate
+	if (absx > PIBY2_FLOAT && absx < (3*PIBY2_FLOAT)){
+		//return -(x - x3/6.0 + x5/120);
+		return -(x - x3/6.0f);
 	}
 	else {
-		if (res < 1.0){
-	#if LINEAR_APPROX == 1
-			// linear interprolation
-			// ensures greater accuracy, but may be too slow
-			float argLow, argHigh;
-			int indexLow, indexHigh;
-			res = yabs/xabs*100;
-			argLow = floorf(res);
-			indexLow = (int)argLow;
-			argHigh = ceilf(res);
-			indexHigh = (int)argHigh;
-			res = atanLUT[indexLow] + (res - argLow)*(atanLUT[indexHigh] - atanLUT[indexLow])/(argHigh - argLow);
-	#else
-			// no linear interprolation
-			// max error of 7 degrees
-			float fArg;
-			int lutIndex;
-			fArg = roundf(yabs/xabs*100);
-			lutIndex = (int)fArg;
-			res = atanLUT[lutIndex];		// intermediate result, apply above rules
-	#endif
-			
-			if (x > 0){			// x > 0
-				return res;
-			}
-			else {				
-				if (y >= 0){	// x < 0, y >= 0
-					return PI_FLOAT + res;
-				}
-				else {				// x < 0, y < 0
-					return -PI_FLOAT + res;
-				}
-			}
-		}
-		else {
-			res = PIBY2_FLOAT - res/(res*res + 0.28f);
-			if ( y < 0.0f ){
-				return res - PI_FLOAT;
-			}
-			else {
-				return res;
-			}
-		}
+		//return x - x3/6.0 + x5/120;
+		return x - x3/6.0f;
 	}
 }
+
+// populate arctan table
+//void populate_atan_lut(void){
+//	float i = 0.0;
+//	int index = 0;
+//	for (i = 0.0, index = 0; index < 100; index++, i += 0.01){
+//		atanLUT[index] = atanf(i);
+//	}
+//}
+
+// perform atan approximation using lookup table
+//float atan2_approx_lut(float y, float x){
+//	float res;
+//	float yabs = fabs(y), xabs = fabs(x);
+//	
+//	// atan2
+//	// = arctan(y/x) 				if x > 0
+//	// = pi + arctan(y/x)		if y >= 0 and x < 0
+//	// = -pi + arctan(y/x)	if y < 0 and x < 0
+//	// = pi/2								if y > 0 and x = 0 /
+//	// = -pi/2							if y < 0 and x = 0 /
+//	// = undefined					if y = 0 and x = 0
+//	if (x == 0){
+//		if (y == 0){
+//			return 0;
+//		}
+//		else if (y > 0){
+//			return PIBY2_FLOAT;
+//		}
+//		else {
+//			return -PIBY2_FLOAT;
+//		}
+//	}
+//	else {
+//		if (res < 1.0){
+//	#if LINEAR_APPROX == 1
+//			// linear interprolation
+//			// ensures greater accuracy, but may be too slow
+//			float argLow, argHigh;
+//			int indexLow, indexHigh;
+//			res = yabs/xabs*100;
+//			argLow = floorf(res);
+//			indexLow = (int)argLow;
+//			argHigh = ceilf(res);
+//			indexHigh = (int)argHigh;
+//			res = atanLUT[indexLow] + (res - argLow)*(atanLUT[indexHigh] - atanLUT[indexLow])/(argHigh - argLow);
+//	#else
+//			// no linear interprolation
+//			// max error of 7 degrees
+//			float fArg;
+//			int lutIndex;
+//			fArg = roundf(yabs/xabs*100);
+//			lutIndex = (int)fArg;
+//			res = atanLUT[lutIndex];		// intermediate result, apply above rules
+//	#endif
+//			
+//			if (x > 0){			// x > 0
+//				return res;
+//			}
+//			else {				
+//				if (y >= 0){	// x < 0, y >= 0
+//					return PI_FLOAT + res;
+//				}
+//				else {				// x < 0, y < 0
+//					return -PI_FLOAT + res;
+//				}
+//			}
+//		}
+//		else {
+//			res = PIBY2_FLOAT - res/(res*res + 0.28f);
+//			if ( y < 0.0f ){
+//				return res - PI_FLOAT;
+//			}
+//			else {
+//				return res;
+//			}
+//		}
+//	}
+//}

@@ -9,6 +9,7 @@
 
 #include <stdint.h>
  
+#define M_PI (3.14159265f)
 #define kSyncChar   0xAA
 #define kTerminator 0x00
 
@@ -68,4 +69,5 @@ typedef struct
 
 void get_v2xe_data(V2XEData * data);
 void calibrate_v2xe(void);
-void calculate_tilt_compensated_heading(void);
+void calc_tilt_comp_heading(void);
+void calc_raw_heading(void);

@@ -17,3 +17,6 @@
 
 void populate_atan_lut(void);
 float atan2_approx_lut(float x, float y);
+
+float cos_approx(float x);
+float sin_approx(float x);

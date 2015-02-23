@@ -16,13 +16,16 @@
 #include "triggers.h"
 #include "delay.h"
 #include "profile.h"
-
+#include "test_constants.h"
 #include "approximations.h"
 
 extern volatile uint8_t i2cState;
-extern int32_t mag_X, mag_Y, mag_Z;
+extern float mag_X, mag_Y, mag_Z;
+extern int16_t acc_X, acc_Y, acc_Z;
 extern uint8_t i2cLockedUp;
+extern float raw_direction, corrected_direction;
 int i2cLockedUpCount;
+uint8_t triggerState = 5;
 
 /*----------------------------------------------------------------------------
   MAIN function
@@ -56,7 +59,7 @@ int main (void) {
 		Control_RGB_LEDs(1, 1, 1);			// white
 		while(1);
 	}
-	// increse i2c baud rate
+	// increase i2c baud rate
 	I2C_DISABLE;
 	I2C0->F = (I2C_F_ICR(0x00) | I2C_F_MULT(0));
 	I2C_ENABLE;
@@ -80,10 +83,21 @@ int main (void) {
 #if PROFILING == 1
 	// Starting, so turn on magenta
 	uint32_t i;
+	#if PROFILE_ACCEL == 0
+	acc_X = X_ACC_2;						
+	acc_Y = Y_ACC_2;						
+	acc_Z = Z_ACC_2;
+	mag_X = X_M_2;
+	mag_Y = Y_M_2;
+	mag_Z = Z_M_2;
+	convert_xyz_to_roll_pitch();
+	calc_raw_heading();
+	#endif
 	Control_RGB_LEDs(1,0,1);
 	Enable_Profiling();
 	for (i=0; i<NUM_TESTS; i++) {
 	#if POLLING == 1
+		#if PROFILE_ACCEL == 1
 		read_full_xyz();
 		if (i2cLockedUp == WORKING){
 			convert_xyz_to_roll_pitch();
@@ -94,6 +108,9 @@ int main (void) {
 			i2cLockedUpCount++;
 			i2c_reset();
 		}
+		#else
+		calc_tilt_comp_heading();
+		#endif
 	
 	#else
 		i2c_int_start(MMA_ADDR, REG_XHI);
@@ -124,23 +141,27 @@ int main (void) {
 				i2cLockedUpCount++;
 				i2c_reset();
 			}
-			
-			// TODO
-			// 1 - set magnetometer readings to X_M_1, Y_M_1 and Z_M_1
-			// 2 - calculate tilt-compensated direction
-			
+			mag_X = X_M_1;								// set magnetometer values
+			mag_Y = Y_M_1;
+			mag_Z = Z_M_1;
+			calc_raw_heading();						// calculate raw heading for reference
+			calc_tilt_comp_heading();			// calculate heading
 			Control_RGB_LEDs(0, 0, 0);		// turn off LEDs
+			triggerState = 1;
 		}
 		else if (TRIGGER_2_ASSERTED){		// test case with fixed accel and mag
 			Control_RGB_LEDs(0, 0, 1);		// blue LED
-			
-			// TODO
-			// 1 - set accelerometer readings to X_ACC_2, Y_ACC_2 and Z_ACC_2
-			// 2 - calculate roll and pitch
-			// 3 - set magnetometer readings to X_M_2, Y_M_2 and Z_M_2
-			// 4 - calculate tilt-compensated direction
-			
+			acc_X = X_ACC_2;							// set values to constants
+			acc_Y = Y_ACC_2;						
+			acc_Z = Z_ACC_2;
+			mag_X = X_M_2;
+			mag_Y = Y_M_2;
+			mag_Z = Z_M_2;
+			convert_xyz_to_roll_pitch();	// calculate roll and pitch
+			calc_raw_heading();						// calculate raw heading for reference
+			calc_tilt_comp_heading();			// calculate heading
 			Control_RGB_LEDs(0, 0, 0);		// turn off LEDs
+			triggerState = 2;
 		}
 		else {			// regular operation
 			Control_RGB_LEDs(0, 1, 0);		// green LED
@@ -154,12 +175,15 @@ int main (void) {
 				i2cLockedUpCount++;
 				i2c_reset();
 			}
-			
+			mag_X = X_M_3;
+			mag_Y = Y_M_3;
+			mag_Z = Z_M_3;
 			// TODO
-			// 1 - read magnetometer
-			// 2 - calculate tilt-compensated direction
-			
+			// 1 - read magnetometer if possible (NOT IMPLEMENTED)
+			calc_raw_heading();						// calculate raw heading
+			calc_tilt_comp_heading();			// calculate heading
 			Control_RGB_LEDs(0, 0, 0);		// turn off LEDs
+			triggerState = 0;
 		}
 	}
 #endif

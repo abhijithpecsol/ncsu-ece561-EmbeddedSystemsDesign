@@ -5,5 +5,6 @@
 
 #endif // CONFIG_H
 
-#define PROFILING 1
+#define PROFILING 0
 #define POLLING 1
+#define PROFILE_ACCEL 0

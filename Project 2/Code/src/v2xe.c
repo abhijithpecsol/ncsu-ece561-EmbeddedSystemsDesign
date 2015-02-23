@@ -12,9 +12,15 @@
 #include "v2xe.h"
 #include "delay.h"
 #include "LEDs.h"
+#include "math.h"
+#include "approximations.h"
+#include "triggers.h"
+#include "gpio_defs.h"
 
 extern float roll, pitch;
-int32_t mag_X=0, mag_Y=0, mag_Z=0;
+float mag_X=0, mag_Y=0, mag_Z=0;
+float raw_direction=0.0f, corrected_direction=0.0f;
+extern uint8_t triggerState;
 
 // get data from v2xe
 void get_v2xe_data(V2XEData * data){
@@ -130,7 +136,36 @@ void calibrate_v2xe(){
 	// todo - do 
 }
 
+// calculate raw heading
+void calc_raw_heading(void){
+	if (!ST) {
+		float raw_direction_int = atan2_approx(mag_Y, mag_X)*(180/M_PI) - 90.0f;
+		// correct direction for orientation
+		if (raw_direction_int < 0){
+			raw_direction = raw_direction_int + 360.0f;
+		}
+		else {
+			raw_direction = raw_direction_int;
+		}
+	}
+}
+
 // calculate tilt-compensated heading
-void calculate_tilt_compensated_heading(void){
-	// todo - do
+void calc_tilt_comp_heading(void){
+	float yrc, xh, corrected_direction_int;
+	float rollRad = pitch*(M_PI/180.0f), pitchRad = roll*(M_PI/180.0f);
+	float sinRoll = sin_approx(rollRad);
+	float cosPitch = cos_approx(pitchRad);
+	float sinPitch = sin_approx(pitchRad);
+	yrc = mag_X*sinRoll*sinPitch + mag_Y*cos_approx(rollRad) - mag_Z*sinRoll*cosPitch;
+	xh = mag_X*cosPitch + mag_Z*sinPitch;
+	corrected_direction_int = atan2_approx(yrc, xh)*(180/M_PI) - 90.0f;
+	
+	// correct direction for orientation
+	if (corrected_direction_int < 0){ 
+		corrected_direction = corrected_direction_int + 360.0f;
+	}
+	else {
+		corrected_direction = corrected_direction_int;
+	}
 }
