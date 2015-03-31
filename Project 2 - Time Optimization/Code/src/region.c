@@ -1,0 +1,70 @@
+// Automatically generated file. Do not edit if you plan to regenerate it.
+#include "region.h"
+const REGION_T RegionTable[] = {
+	{0x000000d5, 0x0000014c, "SystemInit"}, // 0
+	{0x0000014d, 0x0000022c, "SystemCoreClockUpdate"}, // 1
+	{0x00000261, 0x00000268, "Reset_Handler"}, // 2
+	{0x00000269, 0x0000026a, "NMI_Handler"}, // 3
+	{0x0000026b, 0x0000026c, "HardFault_Handler"}, // 4
+	{0x0000026d, 0x0000026e, "SVC_Handler"}, // 5
+	{0x0000026f, 0x00000270, "PendSV_Handler"}, // 6
+	{0x00000271, 0x00000272, "SysTick_Handler"}, // 7
+	{0x0000027d, 0x000002ce, "Init_RGB_LEDs"}, // 8
+	{0x000002cf, 0x00000302, "Control_RGB_LEDs"}, // 9
+	{0x00000319, 0x0000032c, "Delay"}, // 10
+	{0x00000331, 0x00000378, "Init_Profiling"}, // 11
+	{0x00000379, 0x00000380, "Disable_Profiling"}, // 12
+	{0x00000381, 0x00000388, "Enable_Profiling"}, // 13
+	{0x00000399, 0x000003ce, "spi_init"}, // 14
+	{0x000003cf, 0x000003e2, "spi_transmit"}, // 15
+	{0x000003f1, 0x000003fe, "__scatterload_copy"}, // 16
+	{0x000003ff, 0x00000400, "__scatterload_null"}, // 17
+	{0x00000411, 0x00000570, "main"}, // 18
+	{0x000005c1, 0x0000064a, "PIT_IRQHandler"}, // 19
+	{0x0000064b, 0x00000696, "Init_PIT"}, // 20
+	{0x00000697, 0x000006a2, "Start_PIT"}, // 21
+	{0x000006a3, 0x000006ae, "Stop_PIT"}, // 22
+	{0x000006af, 0x00000700, "Init_PWM"}, // 23
+	{0x00000701, 0x0000071a, "Set_PWM_Values"}, // 24
+	{0x00000771, 0x000007b8, "i2c_init"}, // 25
+	{0x000007b9, 0x000007d2, "i2c_start"}, // 26
+	{0x000007d3, 0x00000800, "i2c_wait"}, // 27
+	{0x00000801, 0x00000844, "i2c_read_setup"}, // 28
+	{0x00000845, 0x0000087c, "i2c_repeated_read"}, // 29
+	{0x0000087d, 0x000008f2, "i2c_read_byte"}, // 30
+	{0x000008f3, 0x0000093a, "i2c_write_byte"}, // 31
+	{0x0000093b, 0x000009de, "i2c_reset"}, // 32
+	{0x000009df, 0x00000a8e, "I2C0_IRQHandler"}, // 33
+	{0x00000a8f, 0x00000ac4, "i2c_int_start"}, // 34
+	{0x00000ae5, 0x00000b28, "init_mma"}, // 35
+	{0x00000b29, 0x00000bae, "read_full_xyz"}, // 36
+	{0x00000baf, 0x00000bf2, "read_xyz"}, // 37
+	{0x00000bf3, 0x00000c68, "convert_xyz_to_roll_pitc"}, // 38
+	{0x00000c69, 0x00000cae, "get_accel_from_data"}, // 39
+	{0x00000cc1, 0x00000cdc, "sqrt_approx"}, // 40
+	{0x00000cdd, 0x00000d60, "atan2_approx"}, // 41
+	{0x00000d61, 0x00000dc6, "cos_approx"}, // 42
+	{0x00000dc7, 0x00000e2e, "sin_approx"}, // 43
+	{0x00000e5d, 0x00000fe0, "get_v2xe_data"}, // 44
+	{0x00000fe1, 0x00000fe2, "calibrate_v2xe"}, // 45
+	{0x00000fe3, 0x0000103c, "calc_raw_heading"}, // 46
+	{0x0000103d, 0x000010f6, "calc_tilt_comp_heading"}, // 47
+	{0x0000111d, 0x00001170, "init_triggers"}, // 48
+	{0x0000117d, 0x000011a8, "__aeabi_uidivmod"}, // 49
+	{0x000011a9, 0x0000124a, "__aeabi_fadd"}, // 50
+	{0x0000124b, 0x00001252, "__aeabi_fsub"}, // 51
+	{0x00001253, 0x0000125a, "__aeabi_frsub"}, // 52
+	{0x0000125b, 0x000012d4, "__aeabi_fmul"}, // 53
+	{0x000012d5, 0x00001350, "__aeabi_fdiv"}, // 54
+	{0x00001351, 0x00001368, "__ARM_scalbnf"}, // 55
+	{0x00001369, 0x0000137e, "__aeabi_i2f"}, // 56
+	{0x0000137f, 0x0000138e, "_float_round"}, // 57
+	{0x0000138f, 0x00001400, "_float_epilogue"}, // 58
+	{0x00001401, 0x00001458, "_fsqrt"}, // 59
+	{0x00001459, 0x00001474, "__scatterload"}, // 60
+	{0x0000147d, 0x0000148a, "__scatterload_zeroinit"}, // 61
+	{0x0000148d, 0x00001492, "__set_errno"}, // 62
+	{0x00001499, 0x000014c4, "sqrtf"}, // 63
+}; 
+const unsigned NumProfileRegions=64;
+volatile unsigned RegionCount[64];
