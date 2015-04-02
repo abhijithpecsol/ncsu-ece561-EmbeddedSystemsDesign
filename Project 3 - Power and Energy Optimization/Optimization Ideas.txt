@@ -1,0 +1,11 @@
+Ideas for optimizations:
+- Use a VLLS mode
+	--> See powerpoint for all the necessary configuration steps
+- Disable RTC clock
+	--> According to Section 7.5, enabled in LL modes
+- Optimize roll/pitch calculation to avoid doing trig functions and converting to degrees
+- PWM the LEDs
+- Interrupt from accel
+- delay_Read_Accel occurs every interrupt...so we don't really need to run code to execute it
+	--> Remove code
+- ensure LEDs are only on for 10 ms

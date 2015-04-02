@@ -1,0 +1,10 @@
+.\obj\tasks.o: src\tasks.c
+.\obj\tasks.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h
+.\obj\tasks.o: C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h
+.\obj\tasks.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\obj\tasks.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h
+.\obj\tasks.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h
+.\obj\tasks.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h
+.\obj\tasks.o: inc\mma8451.h
+.\obj\tasks.o: inc\LEDs.h
+.\obj\tasks.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

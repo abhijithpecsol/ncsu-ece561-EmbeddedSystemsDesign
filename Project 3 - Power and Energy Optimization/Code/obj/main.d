@@ -6,9 +6,10 @@
 .\obj\main.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h
 .\obj\main.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h
 .\obj\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
-.\obj\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\obj\main.o: inc\gpio_defs.h
 .\obj\main.o: inc\LEDs.h
 .\obj\main.o: inc\i2c.h
 .\obj\main.o: inc\mma8451.h
 .\obj\main.o: inc\delay.h
+.\obj\main.o: inc\timers.h
+.\obj\main.o: inc\tasks.h
