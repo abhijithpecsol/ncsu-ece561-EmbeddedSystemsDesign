@@ -12,9 +12,22 @@
 	
 #define NACK 	        I2C0->C1 |= I2C_C1_TXAK_MASK
 #define ACK           I2C0->C1 &= ~I2C_C1_TXAK_MASK
+	
+#define WORKING				(0x00)
+#define LOCKED_UP			(0x01)
+	
+#define CHECK_FOR_LOCKED_UP if (i2cLockedUp) return;
+#define CHECK_FOR_LOCKED_UP_NONVOID if (i2cLockedUp) return 0;
+	
+#define I2C_WAIT_LU_CHECK						i2c_wait();CHECK_FOR_LOCKED_UP;
+#define I2C_WAIT_LU_CHECK_NONVOID		i2c_wait();CHECK_FOR_LOCKED_UP_NONVOID;
+	
+#define I2C_DISABLE		I2C0->C1 &= ~(I2C_C1_IICEN_MASK);Delay(10);
+#define I2C_ENABLE		Delay(10);I2C0->C1 |= (I2C_C1_IICEN_MASK);
 
 void i2c_init(void);
-
+void i2c_wait(void);
+void i2c_reset(void);
 void i2c_start(void);
 void i2c_read_setup(uint8_t dev, uint8_t address);
 uint8_t i2c_repeated_read(uint8_t);

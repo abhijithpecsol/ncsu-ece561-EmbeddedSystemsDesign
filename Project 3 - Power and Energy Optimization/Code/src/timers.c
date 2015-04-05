@@ -7,6 +7,7 @@ volatile uint8_t run_Read_Accel = 0;
 volatile uint8_t run_Update_LEDs = 0;
 volatile uint8_t delay_Read_Accel = PERIOD_READ_ACCEL;
 volatile uint8_t delay_Update_LEDs = PERIOD_UPDATE_LEDS;
+volatile uint8_t led_on_period = 0;
 
 void Init_LPTMR(void) {
 	SIM->SCGC5 |=  SIM_SCGC5_LPTMR_MASK;
@@ -36,6 +37,20 @@ void LPTimer_IRQHandler(void) {
 	NVIC_ClearPendingIRQ(LPTimer_IRQn);
 	LPTMR0->CSR |= LPTMR_CSR_TCF_MASK;
 	
+	// check what time period interrupted us
+	// 10 ms LED on time, simply turn off LEDs
+	if (LPTMR0->CMR == LED_ON_TIME){
+		Control_RGB_LEDs(0,0,0);
+		LPTMR0->CMR = (ACCEL_CHECK_FREQ - LED_ON_TIME);		// 90 ms to next 100 ms
+		#if USE_PWM == 1
+			led_on_period = 0;
+		#endif
+		return;
+	}
+	if (LPTMR0->CMR == (ACCEL_CHECK_FREQ - LED_ON_TIME)){
+		LPTMR0->CMR = ACCEL_CHECK_FREQ;
+	}
+	
 	// decrement delay variables
 	delay_Read_Accel--;
 	delay_Update_LEDs--;
@@ -48,21 +63,26 @@ void LPTimer_IRQHandler(void) {
 	if (delay_Update_LEDs == 0){
 		run_Update_LEDs = 1;
 		delay_Update_LEDs = PERIOD_UPDATE_LEDS;
+		LPTMR0->CMR = LED_ON_TIME;
+		#if USE_PWM == 1
+			led_on_period = 1;
+		#endif
 	}
 }
 
+// Sets up configuration for the PIT. Period is how long for an interrupt.
 void Init_PIT(unsigned period) {
 	// Enable clock to PIT module
 	SIM->SCGC6 |= SIM_SCGC6_PIT_MASK;
 	
 	// Enable module, freeze timers in debug mode
-	PIT->MCR &= ~PIT_MCR_MDIS_MASK;
-	PIT->MCR |= PIT_MCR_FRZ_MASK;
+	PIT->MCR &= ~PIT_MCR_MDIS_MASK;			// enable module = 0
+	PIT->MCR |= PIT_MCR_FRZ_MASK;				// freeze timers in debug = 1
 	
 	// Initialize PIT0 to count down from argument 
 	PIT->CHANNEL[0].LDVAL = PIT_LDVAL_TSV(period);
 
-	// No chaining
+	// No chaining of timers
 	PIT->CHANNEL[0].TCTRL &= PIT_TCTRL_CHN_MASK;
 	
 	// Generate interrupts
@@ -71,9 +91,8 @@ void Init_PIT(unsigned period) {
 	/* Enable Interrupts */
 	NVIC_SetPriority(PIT_IRQn, 128); // 0, 64, 128 or 192
 	NVIC_ClearPendingIRQ(PIT_IRQn); 
-	NVIC_EnableIRQ(PIT_IRQn);	
+	NVIC_EnableIRQ(PIT_IRQn);
 }
-
 
 void Start_PIT(void) {
 // Enable counter
@@ -85,57 +104,22 @@ void Stop_PIT(void) {
 	PIT->CHANNEL[0].TCTRL &= ~PIT_TCTRL_TEN_MASK;
 }
 
-
-void PIT_IRQHandler() {	
+void PIT_IRQHandler() {
 	//clear pending IRQ
-	NVIC_ClearPendingIRQ(PIT_IRQn);
-	// check to see which channel triggered interrupt 
+	//NVIC_ClearPendingIRQ(PIT_IRQn);
+	
+	// channel 1
 	if (PIT->CHANNEL[0].TFLG & PIT_TFLG_TIF_MASK) {
 		// clear status flag for timer channel 0
 		PIT->CHANNEL[0].TFLG &= PIT_TFLG_TIF_MASK;
-	} else if (PIT->CHANNEL[1].TFLG & PIT_TFLG_TIF_MASK) {
+		
+		Stop_PIT();
+	} 
+	// channel 2
+	else if (PIT->CHANNEL[1].TFLG & PIT_TFLG_TIF_MASK) {
 		// clear status flag for timer channel 1
 		PIT->CHANNEL[1].TFLG &= PIT_TFLG_TIF_MASK;
 	} 
-}
-
-void Init_TPM(uint32_t period_ms)
-{
-	//turn on clock to TPM 
-	SIM->SCGC6 |= SIM_SCGC6_TPM0_MASK;
-	
-	//set clock source for tpm to be TPM Source 3 which is MCGIR (32 kHz)
-	SIM->SOPT2 |= SIM_SOPT2_TPMSRC(3);
-
-	// disable TPM
-	TPM0->SC = 0;
-
-	//set TPM to count up and divide by 32 with prescaler and use clock mode
-	// will count at 1 kHz
-	TPM0->SC = (TPM_SC_PS(5));
-	
-	//load the counter and mod. Note: 16-bit counter, not 32-bit
-	TPM0->MOD = TPM_MOD_MOD(period_ms);
-
-	
-	TPM0->SC |= TPM_SC_TOIE_MASK;
-
-	// Configure NVIC 
-	NVIC_SetPriority(TPM0_IRQn, 128); // 0, 64, 128 or 192
-	NVIC_ClearPendingIRQ(TPM0_IRQn); 
-	NVIC_EnableIRQ(TPM0_IRQn);	
-}
-
-void TPM0_IRQHandler() {	
-	//clear pending IRQ
-	NVIC_ClearPendingIRQ(TPM0_IRQn);
-	
-	TPM0->SC |= TPM_SC_TOF_MASK; 
-}
-
-void Start_TPM(void) {
-// Enable counter
-	TPM0->SC |= TPM_SC_CMOD(1);
 }
 
 

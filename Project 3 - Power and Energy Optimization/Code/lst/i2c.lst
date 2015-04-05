@@ -7294,9 +7294,22 @@ X#define I2C_WAIT			while((I2C0->S & I2C_S_IICIF_MASK)==0) {}                   
 N	
 N#define NACK 	        I2C0->C1 |= I2C_C1_TXAK_MASK
 N#define ACK           I2C0->C1 &= ~I2C_C1_TXAK_MASK
+N	
+N#define WORKING				(0x00)
+N#define LOCKED_UP			(0x01)
+N	
+N#define CHECK_FOR_LOCKED_UP if (i2cLockedUp) return;
+N#define CHECK_FOR_LOCKED_UP_NONVOID if (i2cLockedUp) return 0;
+N	
+N#define I2C_WAIT_LU_CHECK						i2c_wait();CHECK_FOR_LOCKED_UP;
+N#define I2C_WAIT_LU_CHECK_NONVOID		i2c_wait();CHECK_FOR_LOCKED_UP_NONVOID;
+N	
+N#define I2C_DISABLE		I2C0->C1 &= ~(I2C_C1_IICEN_MASK);Delay(10);
+N#define I2C_ENABLE		Delay(10);I2C0->C1 |= (I2C_C1_IICEN_MASK);
 N
 Nvoid i2c_init(void);
-N
+Nvoid i2c_wait(void);
+Nvoid i2c_reset(void);
 Nvoid i2c_start(void);
 Nvoid i2c_read_setup(uint8_t dev, uint8_t address);
 Nuint8_t i2c_repeated_read(uint8_t);
@@ -7304,6 +7317,9 @@ N
 Nuint8_t i2c_read_byte(uint8_t dev, uint8_t address);
 Nvoid i2c_write_byte(uint8_t dev, uint8_t address, uint8_t data);
 L 3 "src\i2c.c" 2
+N
+Nuint8_t i2cLockedUp = WORKING;
+Xuint8_t i2cLockedUp = (0x00);
 N
 N//init i2c0
 Nvoid i2c_init(void)
@@ -7323,6 +7339,7 @@ N
 N	//set to 100k baud
 N	//baud = bus freq/(scl_div+mul)
 N 	//~400k = 24M/(64); icr=0x12 sets scl_div to 64
+N	// this will be increased to 0x00 after mma initialization
 N 	I2C0->F = (I2C_F_ICR(0x12) | I2C_F_MULT(0));
 X 	((I2C_Type *)(0x40066000u))->F = ((((uint8_t)(((uint8_t)(0x12))<<0))&0x3Fu) | (((uint8_t)(((uint8_t)(0))<<6))&0xC0u));
 N	
@@ -7335,6 +7352,8 @@ N
 N//send start sequence
 Nvoid i2c_start()
 N{
+N	i2cLockedUp = WORKING;	// reset flag
+X	i2cLockedUp = (0x00);	
 N	I2C_TRAN;							/*set to transmit mode */
 X	((I2C_Type *)(0x40066000u))->C1 |= 0x10u;							 
 N	I2C_M_START;					/*send start	*/
@@ -7344,25 +7363,25 @@ N
 N//send device and register addresses
 Nvoid i2c_read_setup(uint8_t dev, uint8_t address)
 N{
-N	I2C0->D = dev;			  /*send dev address	*/
-X	((I2C_Type *)(0x40066000u))->D = dev;			   
-N	I2C_WAIT;							/*wait for completion */
-X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {} ((I2C_Type *)(0x40066000u))->S |= 0x2u;;							 
+N	I2C0->D = dev;			  	/*send dev address	*/
+X	((I2C_Type *)(0x40066000u))->D = dev;			  	 
+N	I2C_WAIT_LU_CHECK;			/*wait for completion */
+X	i2c_wait();if (i2cLockedUp) return;;;			 
 N	
-N	I2C0->D =  address;		/*send read address	*/
-X	((I2C_Type *)(0x40066000u))->D =  address;		 
-N	I2C_WAIT;							/*wait for completion */
-X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {} ((I2C_Type *)(0x40066000u))->S |= 0x2u;;							 
+N	I2C0->D =  address;			/*send read address	*/
+X	((I2C_Type *)(0x40066000u))->D =  address;			 
+N	I2C_WAIT_LU_CHECK;			/*wait for completion */
+X	i2c_wait();if (i2cLockedUp) return;;;			 
 N		
-N	I2C_M_RSTART;				   /*repeated start */
-X	((I2C_Type *)(0x40066000u))->C1 |= 0x4u;				    
-N	I2C0->D = (dev|0x1);	 /*send dev address (read)	*/
-X	((I2C_Type *)(0x40066000u))->D = (dev|0x1);	  
-N	I2C_WAIT;							 /*wait for completion */
-X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {} ((I2C_Type *)(0x40066000u))->S |= 0x2u;;							  
+N	I2C_M_RSTART;				   	/*repeated start */
+X	((I2C_Type *)(0x40066000u))->C1 |= 0x4u;				   	 
+N	I2C0->D = (dev|0x1);	 	/*send dev address (read)	*/
+X	((I2C_Type *)(0x40066000u))->D = (dev|0x1);	 	 
+N	I2C_WAIT_LU_CHECK;			/*wait for completion */
+X	i2c_wait();if (i2cLockedUp) return;;;			 
 N	
-N	I2C_REC;						   /*set to receive mode */
-X	((I2C_Type *)(0x40066000u))->C1 &= ~0x10u;						    
+N	I2C_REC;						   	/*set to recieve mode */
+X	((I2C_Type *)(0x40066000u))->C1 &= ~0x10u;						   	 
 N
 N}
 N
@@ -7381,8 +7400,8 @@ N	}
 N	
 N	data = I2C0->D;				/*dummy read	*/
 X	data = ((I2C_Type *)(0x40066000u))->D;				 
-N	I2C_WAIT;							/*wait for completion */
-X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {} ((I2C_Type *)(0x40066000u))->S |= 0x2u;;							 
+N	I2C_WAIT_LU_CHECK_NONVOID;		/*wait for completion */
+X	i2c_wait();if (i2cLockedUp) return 0;;;		 
 N	
 N	if(isLastRead)	{
 N		I2C_M_STOP;					/*send stop	*/
@@ -7406,32 +7425,32 @@ N	I2C_TRAN;							/*set to transmit mode */
 X	((I2C_Type *)(0x40066000u))->C1 |= 0x10u;							 
 N	I2C_M_START;					/*send start	*/
 X	((I2C_Type *)(0x40066000u))->C1 |= 0x20u;					 
-N	I2C0->D = dev;			  /*1. send dev address	*/
+N	I2C0->D = dev;			  /*send dev address	*/
 X	((I2C_Type *)(0x40066000u))->D = dev;			   
-N	I2C_WAIT;							/*wait for completion */
-X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {} ((I2C_Type *)(0x40066000u))->S |= 0x2u;;							 
+N	I2C_WAIT_LU_CHECK_NONVOID;		/*wait for completion */
+X	i2c_wait();if (i2cLockedUp) return 0;;;		 
 N	
-N	I2C0->D =  address;		/*2. send read address	*/
+N	I2C0->D =  address;		/*send read address	*/
 X	((I2C_Type *)(0x40066000u))->D =  address;		 
-N	I2C_WAIT;							/*wait for completion */
-X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {} ((I2C_Type *)(0x40066000u))->S |= 0x2u;;							 
+N	I2C_WAIT_LU_CHECK_NONVOID;		/*wait for completion */
+X	i2c_wait();if (i2cLockedUp) return 0;;;		 
 N		
 N	I2C_M_RSTART;				   /*repeated start */
 X	((I2C_Type *)(0x40066000u))->C1 |= 0x4u;				    
-N	I2C0->D = (dev|0x1);	 /*3. send dev address (read)	*/
+N	I2C0->D = (dev|0x1);	 /*send dev address (read)	*/
 X	((I2C_Type *)(0x40066000u))->D = (dev|0x1);	  
-N	I2C_WAIT;							 /*wait for completion */
-X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {} ((I2C_Type *)(0x40066000u))->S |= 0x2u;;							  
+N	I2C_WAIT_LU_CHECK_NONVOID;		/*wait for completion */
+X	i2c_wait();if (i2cLockedUp) return 0;;;		 
 N	
-N	I2C_REC;						   /*set to receive mode */
+N	I2C_REC;						   /*set to recieve mode */
 X	((I2C_Type *)(0x40066000u))->C1 &= ~0x10u;						    
 N	NACK;									 /*set NACK after read	*/
 X	((I2C_Type *)(0x40066000u))->C1 |= 0x8u;									  
 N	
 N	data = I2C0->D;					/*dummy read	*/
 X	data = ((I2C_Type *)(0x40066000u))->D;					 
-N	I2C_WAIT;								/*wait for completion */
-X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {} ((I2C_Type *)(0x40066000u))->S |= 0x2u;;								 
+N	I2C_WAIT_LU_CHECK_NONVOID;		/*wait for completion */
+X	i2c_wait();if (i2cLockedUp) return 0;;;		 
 N	
 N	I2C_M_STOP;							/*send stop	*/
 X	((I2C_Type *)(0x40066000u))->C1 &= ~0x20u;							 
@@ -7447,26 +7466,110 @@ N//using 7bit addressing writes a byte data to dev:address
 Nvoid i2c_write_byte(uint8_t dev, uint8_t address, uint8_t data)
 N{
 N	
-N	I2C_TRAN;							/*set to transmit mode */
-X	((I2C_Type *)(0x40066000u))->C1 |= 0x10u;							 
-N	I2C_M_START;					/*send start	*/
-X	((I2C_Type *)(0x40066000u))->C1 |= 0x20u;					 
-N	I2C0->D = dev;			  /*send dev address	*/
-X	((I2C_Type *)(0x40066000u))->D = dev;			   
-N	I2C_WAIT;						  /*wait for ack */
-X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {} ((I2C_Type *)(0x40066000u))->S |= 0x2u;;						   
+N	I2C_TRAN;								/*set to transmit mode */
+X	((I2C_Type *)(0x40066000u))->C1 |= 0x10u;								 
+N	I2C_M_START;						/*send start	*/
+X	((I2C_Type *)(0x40066000u))->C1 |= 0x20u;						 
+N	I2C0->D = dev;			  	/*send dev address	*/
+X	((I2C_Type *)(0x40066000u))->D = dev;			  	 
+N	I2C_WAIT_LU_CHECK;			/*wait for completion */
+X	i2c_wait();if (i2cLockedUp) return;;;			 
 N	
-N	I2C0->D =  address;		/*send write address	*/
-X	((I2C_Type *)(0x40066000u))->D =  address;		 
-N	I2C_WAIT;
-X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {} ((I2C_Type *)(0x40066000u))->S |= 0x2u;;
+N	I2C0->D =  address;			/*send write address	*/
+X	((I2C_Type *)(0x40066000u))->D =  address;			 
+N	I2C_WAIT_LU_CHECK;			/*wait for completion */
+X	i2c_wait();if (i2cLockedUp) return;;;			 
 N		
-N	I2C0->D = data;				/*send data	*/
-X	((I2C_Type *)(0x40066000u))->D = data;				 
-N	I2C_WAIT;
-X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {} ((I2C_Type *)(0x40066000u))->S |= 0x2u;;
+N	I2C0->D = data;					/*send data	*/
+X	((I2C_Type *)(0x40066000u))->D = data;					 
+N	I2C_WAIT_LU_CHECK;			/*wait for completion */
+X	i2c_wait();if (i2cLockedUp) return;;;			 
 N	I2C_M_STOP;
 X	((I2C_Type *)(0x40066000u))->C1 &= ~0x20u;
 N	
+N}
+N
+Nvoid i2c_wait(void){
+N	int waitCount = 0;
+N	
+N	while((I2C0->S & I2C_S_IICIF_MASK)==0) {
+X	while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {
+N		waitCount++;
+N		if (waitCount > 1000){
+N			i2cLockedUp = LOCKED_UP;
+X			i2cLockedUp = (0x01);
+N			return;
+N		}
+N	}
+N	I2C0->S |= I2C_S_IICIF_MASK;
+X	((I2C_Type *)(0x40066000u))->S |= 0x2u;
+N}
+N
+N// i2c reset to recover from locked i2c bus
+Nvoid i2c_reset(void){
+N	// bus is already busy => cancel previous operation
+N	if (I2C0->S & I2C_S_BUSY_MASK){
+X	if (((I2C_Type *)(0x40066000u))->S & 0x20u){
+N		// send start signal
+N		I2C0->C1 &= ~I2C_C1_IICEN_MASK;			
+X		((I2C_Type *)(0x40066000u))->C1 &= ~0x80u;			
+N		I2C0->C1 |= I2C_C1_TX_MASK;					// set transmit mode
+X		((I2C_Type *)(0x40066000u))->C1 |= 0x10u;					
+N		I2C0->C1 |= I2C_C1_MST_MASK;				// start signal generated
+X		((I2C_Type *)(0x40066000u))->C1 |= 0x20u;				
+N		I2C0->C1 |= I2C_C1_IICEN_MASK;
+X		((I2C_Type *)(0x40066000u))->C1 |= 0x80u;
+N		
+N		// send write command to release SDA line
+N		I2C0->C1 |= I2C_C1_MST_MASK;				// set master mode
+X		((I2C_Type *)(0x40066000u))->C1 |= 0x20u;				
+N		I2C0->C1 |= I2C_C1_TX_MASK;					// set tx mode
+X		((I2C_Type *)(0x40066000u))->C1 |= 0x10u;					
+N		I2C0->D = 0xFF;
+X		((I2C_Type *)(0x40066000u))->D = 0xFF;
+N		while((I2C0->S & I2C_S_IICIF_MASK)==0) {}		// wait interrupt
+X		while((((I2C_Type *)(0x40066000u))->S & 0x2u)==0) {}		
+N		I2C0->S |= I2C_S_IICIF_MASK; 				// clear interrupt bit
+X		((I2C_Type *)(0x40066000u))->S |= 0x2u; 				
+N			
+N		// clear arbitration error flag
+N		I2C0->S |= I2C_S_ARBL_MASK;
+X		((I2C_Type *)(0x40066000u))->S |= 0x10u;
+N			
+N		// send start
+N		I2C0->C1 &= ~I2C_C1_IICEN_MASK;  
+X		((I2C_Type *)(0x40066000u))->C1 &= ~0x80u;  
+N		I2C0->C1 |= I2C_C1_TX_MASK;					// set tx mode
+X		((I2C_Type *)(0x40066000u))->C1 |= 0x10u;					
+N		I2C0->C1 |= I2C_C1_MST_MASK;				// start signal generatred
+X		((I2C_Type *)(0x40066000u))->C1 |= 0x20u;				
+N		I2C0->C1 |= I2C_C1_IICEN_MASK;
+X		((I2C_Type *)(0x40066000u))->C1 |= 0x80u;
+N		
+N		// pause
+N		while(I2C0->S & I2C_S_BUSY_MASK);
+X		while(((I2C_Type *)(0x40066000u))->S & 0x20u);
+N			
+N		// send stop 
+N    I2C0->C1 &= ~I2C_C1_IICEN_MASK;  
+X    ((I2C_Type *)(0x40066000u))->C1 &= ~0x80u;  
+N		I2C0->C1 &= ~I2C_C1_MST_MASK;  			// set SLAVE mode 
+X		((I2C_Type *)(0x40066000u))->C1 &= ~0x20u;  			
+N		I2C0->C1 &= ~I2C_C1_TX_MASK;    		// set Rx
+X		((I2C_Type *)(0x40066000u))->C1 &= ~0x10u;    		
+N		I2C0->C1 |= I2C_C1_IICEN_MASK;  
+X		((I2C_Type *)(0x40066000u))->C1 |= 0x80u;  
+N			
+N		while (I2C0->S & I2C_S_BUSY_MASK){
+X		while (((I2C_Type *)(0x40066000u))->S & 0x20u){
+N				// wait
+N		}
+N		
+N		// clear arbitration error and interrupt flag
+N		I2C0->S |= I2C_S_IICIF_MASK;  
+X		((I2C_Type *)(0x40066000u))->S |= 0x2u;  
+N    I2C0->S |= I2C_S_ARBL_MASK; 
+X    ((I2C_Type *)(0x40066000u))->S |= 0x10u; 
+N	}
 N}
 N

@@ -7,3 +7,4 @@
 .\obj\leds.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h
 .\obj\leds.o: inc\LEDs.h
 .\obj\leds.o: inc\gpio_defs.h
+.\obj\leds.o: inc\project3.h

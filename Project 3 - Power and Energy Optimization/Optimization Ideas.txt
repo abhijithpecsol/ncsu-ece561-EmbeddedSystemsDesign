@@ -9,3 +9,4 @@ Ideas for optimizations:
 - delay_Read_Accel occurs every interrupt...so we don't really need to run code to execute it
 	--> Remove code
 - ensure LEDs are only on for 10 ms
+- Lower board frequency

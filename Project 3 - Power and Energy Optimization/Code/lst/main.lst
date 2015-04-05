@@ -8375,6 +8375,16 @@ N#define RED_LED_POS (18)		// on port B
 N#define GREEN_LED_POS (19)	// on port B
 N#define BLUE_LED_POS (1)		// on port D
 N
+N// PWM
+N#define TPM_Cn_MODE        (TPM_CnSC_MSB_MASK | TPM_CnSC_ELSA_MASK)
+N#define TPM_MODULE         1000
+N#define TPM_INIT_VAL       0
+N#define SET_LED_GREEN(x)   TPM2->CONTROLS[1].CnV = (x)
+N#define SET_LED_RED(x)     TPM2->CONTROLS[0].CnV = (x)
+N#define SET_LED_BLUE(x)    TPM0->CONTROLS[1].CnV = (x)
+N#define PWM_OFF							(0)
+N#define PWM_ON							(10)
+N
 N// function prototypes
 Nvoid Init_RGB_LEDs(void);
 Nvoid Control_RGB_LEDs(unsigned int red_on, unsigned int green_on, unsigned int blue_on);
@@ -8399,9 +8409,22 @@ X#define I2C_WAIT			while((I2C0->S & I2C_S_IICIF_MASK)==0) {}                   
 N	
 N#define NACK 	        I2C0->C1 |= I2C_C1_TXAK_MASK
 N#define ACK           I2C0->C1 &= ~I2C_C1_TXAK_MASK
+N	
+N#define WORKING				(0x00)
+N#define LOCKED_UP			(0x01)
+N	
+N#define CHECK_FOR_LOCKED_UP if (i2cLockedUp) return;
+N#define CHECK_FOR_LOCKED_UP_NONVOID if (i2cLockedUp) return 0;
+N	
+N#define I2C_WAIT_LU_CHECK						i2c_wait();CHECK_FOR_LOCKED_UP;
+N#define I2C_WAIT_LU_CHECK_NONVOID		i2c_wait();CHECK_FOR_LOCKED_UP_NONVOID;
+N	
+N#define I2C_DISABLE		I2C0->C1 &= ~(I2C_C1_IICEN_MASK);Delay(10);
+N#define I2C_ENABLE		Delay(10);I2C0->C1 |= (I2C_C1_IICEN_MASK);
 N
 Nvoid i2c_init(void);
-N
+Nvoid i2c_wait(void);
+Nvoid i2c_reset(void);
 Nvoid i2c_start(void);
 Nvoid i2c_read_setup(uint8_t dev, uint8_t address);
 Nuint8_t i2c_repeated_read(uint8_t);
@@ -8436,7 +8459,6 @@ Nvoid read_full_xyz(void);
 Nvoid read_xyz(void);
 Nvoid convert_xyz_to_roll_pitch(void);
 N
-Nextern float roll, pitch;
 Nextern int16_t acc_X, acc_Y, acc_Z;
 N
 N#endif
@@ -8478,16 +8500,36 @@ L 1 "inc\tasks.h" 1
 Nvoid Read_Accel(void);
 Nvoid Update_LEDs(void);
 L 12 "src\main.c" 2
+N#include "project3.h"
+L 1 "inc\project3.h" 1
+N// period/delay definitions
+N#define PERIOD_READ_ACCEL 	(1)			// 100 ms / 100 ms = 1
+N#define PERIOD_UPDATE_LEDS 	(5)			// 500 ms / 100 ms = 5
+N
+N// LPTMR period definitioms
+N#define LED_ON_TIME					(5)			// LEDs must be on for 10 ms
+N#define ACCEL_CHECK_FREQ		(50)		// check accelerometer every 100 ms
+N
+N// misc
+N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
+N
+N// incremental changes definitions
+N#define RUN_I2C_FAST				(1)
+N#define USE_RADIANS					(1)
+N#define USE_PWM							(0)
+N#define DISABLE_CLOCKS			(1)
+N#define LOW_POWER_ACCEL			(1)
+L 13 "src\main.c" 2
 N
 Nextern volatile uint8_t run_Read_Accel;
 Nextern volatile uint8_t run_Update_LEDs;
+Nextern volatile uint8_t led_on_period;
 N
 N/*----------------------------------------------------------------------------
 N  MAIN function
 N *----------------------------------------------------------------------------*/
 Nint main (void) {
 N	Init_RGB_LEDs();
-N	Control_RGB_LEDs(1, 1, 1);								// white = configuration
 N	
 N	// I2C and MMA
 N	i2c_init();																/* init i2c	*/
@@ -8496,6 +8538,17 @@ N		Control_RGB_LEDs(1, 0, 0);							/* Light red error LED */
 N		while (1)																/* not able to initialize mma */
 N			;
 N	}
+N	
+N	#if RUN_I2C_FAST == 1
+X	#if (1) == 1
+N		// increase i2c baud rate
+N		I2C_DISABLE;
+X		((I2C_Type *)(0x40066000u))->C1 &= ~(0x80u);Delay(10);;
+N		I2C0->F = (I2C_F_ICR(0x00) | I2C_F_MULT(0));
+X		((I2C_Type *)(0x40066000u))->F = ((((uint8_t)(((uint8_t)(0x00))<<0))&0x3Fu) | (((uint8_t)(((uint8_t)(0))<<6))&0xC0u));
+N		I2C_ENABLE;
+X		Delay(10);((I2C_Type *)(0x40066000u))->C1 |= (0x80u);;
+N	#endif
 N	
 N	// configure low power modes
 N	SMC->PMPROT = SMC_PMPROT_ALLS_MASK;				// allow low leakage stop mode
@@ -8513,7 +8566,16 @@ N	// enable stop mode (deep sleep)
 N	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 X	((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR |= (1UL << 2);
 N	
-N	Delay(1000);
+N	#if DISABLE_CLOCKS == 1
+X	#if (1) == 1
+N		// disable clocks to unused peripherals
+N		SIM->SCGC5 &= ~(SIM_SCGC5_PORTA_MASK);
+X		((SIM_Type *)(0x40047000u))->SCGC5 &= ~(0x200u);
+N		SIM->SCGC6 &= ~SIM_SCGC6_FTF_MASK;
+X		((SIM_Type *)(0x40047000u))->SCGC6 &= ~0x1u;
+N		SIM->SCGC7 &= ~SIM_SCGC7_DMA_MASK;
+X		((SIM_Type *)(0x40047000u))->SCGC7 &= ~0x100u;
+N	#endif
 N	
 N	// LPTMR
 N	Init_LPTMR();
@@ -8521,28 +8583,30 @@ N	Start_LPTMR();
 N
 N	__enable_irq();
 N	
-N	while (1) {		
-N		Control_RGB_LEDs(0,0,0);		// done to ensure LEDs blink...right now only 100 ms
-N		
+N	while (1) {				
 N		// read acceleration every 100 ms
 N		if (run_Read_Accel){
 N			run_Read_Accel = 0;
 N			Read_Accel();
 N		}
 N		
-N		// update LEDs every 500 ms
+N		// update LEDs every 500 ms; keep them on for 10 ms
 N		if (run_Update_LEDs){
 N			run_Update_LEDs = 0;
 N			Update_LEDs();
+N			
+N			#if USE_PWM == 1
+X			#if (0) == 1
+S				while(led_on_period);
+S//				OSC0->CR |= OSC_CR_EREFSTEN_MASK;
+S//				SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(0);			// switch to "normal" stop model OSCERCLK (PWM) does not work in LLS
+S//				__wfi();
+S//				OSC0->CR &= ~OSC_CR_EREFSTEN_MASK;
+S//				SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(3);			// return to LLS
+N			#endif
 N		}
 N		
 N		__wfi();			// go to sleep
-N		
-N		//read_full_xyz();
-N		//convert_xyz_to_roll_pitch();
-N		// Light green LED if pitch > 10 degrees
-N		// Light blue LED if roll > 10 degrees
-N		//Control_RGB_LEDs(0, (fabs(roll) > 10)? 1:0, (fabs(pitch) > 10)? 1:0);
 N	}
 N}
 N

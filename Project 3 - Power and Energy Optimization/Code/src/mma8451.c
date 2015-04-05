@@ -19,8 +19,14 @@ int init_mma()
 	  //check for device
 		if(i2c_read_byte(MMA_ADDR, REG_WHOAMI) == WHOAMI)	{
   		Delay(10);
-			//set active mode, 14 bit samples and 100 Hz ODR (0x19)
-			i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x01);
+			#if LOW_POWER_ACCEL == 1
+				//set active mode, 14 bit samples and 12.5 Hz ODR (0x29)
+				// 00111000 = 0x38
+				i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x38);
+			#else
+				//set active mode, 14 bit samples and 100 Hz ODR (0x19)
+				i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x01);
+			#endif
 			return 1;
 		}
 		//else error
@@ -62,8 +68,13 @@ void read_xyz(void)
 }
 
 void convert_xyz_to_roll_pitch(void) {	
-	roll = approx_atan2f(acc_Y, acc_Z)*(180/M_PI);
-	pitch = approx_atan2f(acc_X, approx_sqrtf(acc_Y*acc_Y + acc_Z*acc_Z))*(180/M_PI);
+	#if USE_RADIANS == 1
+		roll = approx_atan2f(acc_Y, acc_Z);
+		pitch = approx_atan2f(acc_X, approx_sqrtf(acc_Y*acc_Y + acc_Z*acc_Z));
+	#else
+		roll = approx_atan2f(acc_Y, acc_Z)*(180/M_PI);
+		pitch = approx_atan2f(acc_X, approx_sqrtf(acc_Y*acc_Y + acc_Z*acc_Z))*(180/M_PI);
+	#endif
 }
 
 

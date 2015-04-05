@@ -13,3 +13,4 @@
 .\obj\main.o: inc\delay.h
 .\obj\main.o: inc\timers.h
 .\obj\main.o: inc\tasks.h
+.\obj\main.o: inc\project3.h

@@ -1772,35 +1772,35 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-        96         18          0          0          0        697   adc.o
-       216         16          0          0          0     155129   app_init.o
-       108         14          0          0          0       1071   arm_cm0.o
-       540         78          0          0          0       1709   board.o
-       280         48          0          0          0       1190   events.o
-         0          0          0          0          0     159912   freemaster_appcmd.o
-       204          6          0          1          0       3686   freemaster_kxx.o
-       452          0          0          0          0       3605   freemaster_protocol.o
-       148          8          0          9         32       2067   freemaster_scope.o
-       632         14          0         24         76       3768   freemaster_serial.o
-       344          0          0          0          0       2536   freemaster_tsa.o
-       400         14          0          0          0       1423   i2c.o
-       328         14          0          0          0       1983   leds.o
-       376         16         18         40          0       2586   main.o
-      5016        334          0          0          0      12834   mcg_kl25.o
-       524         16          0         16          0       1781   mma8451.o
-        44         24        192          0       1024        908   startup_mkl25z4.o
-       164         34          0          4          0       1530   sysinit_kl25.o
-        12          0          0          0          0        457   system_mkl25z4.o
-       168         16          0          8          0       1267   timers.o
-        44         10         16          1          0     146375   tss_sensor.o
-         0          0          0          0          0      30801   tss_sensorgpio.o
-      2246        100         44          0         42      46010   tss_sensortsil.o
-        12          0        197         62         56      29402   tss_systemsetupdata.o
-       240         16          0          0          0       1808   uart_kl25.o
-        12          4          0          0          0        503   wdog_kl25.o
+        96         18          0          0          0        717   adc.o
+       216         16          0          0          0     155189   app_init.o
+       108         14          0          0          0       1091   arm_cm0.o
+       540         78          0          0          0       1729   board.o
+       280         48          0          0          0       1210   events.o
+         0          0          0          0          0     160012   freemaster_appcmd.o
+       204          6          0          1          0       3746   freemaster_kxx.o
+       452          0          0          0          0       3645   freemaster_protocol.o
+       148          8          0          9         32       2127   freemaster_scope.o
+       632         14          0         24         76       3828   freemaster_serial.o
+       344          0          0          0          0       2576   freemaster_tsa.o
+       400         14          0          0          0       1443   i2c.o
+       328         14          0          0          0       2023   leds.o
+       376         16         18         40          0       2646   main.o
+      5016        334          0          0          0      12854   mcg_kl25.o
+       524         16          0         16          0       1821   mma8451.o
+        44         24        192          0       1024        948   startup_mkl25z4.o
+       164         34          0          4          0       1590   sysinit_kl25.o
+        12          0          0          0          0        477   system_mkl25z4.o
+       168         16          0          8          0       1307   timers.o
+        44         10         16          1          0     146455   tss_sensor.o
+         0          0          0          0          0      30821   tss_sensorgpio.o
+      2246        100         44          0         42      46110   tss_sensortsil.o
+        12          0        197         62         56      29482   tss_systemsetupdata.o
+       240         16          0          0          0       1828   uart_kl25.o
+        12          4          0          0          0        523   wdog_kl25.o
 
     ----------------------------------------------------------------------
-     12606        800        510        176       1236     615038   Object Totals
+     12606        800        510        176       1236     616198   Object Totals
          0          0         32          0          0          0   (incl. Generated)
          0          0         11         11          6          0   (incl. Padding)
 
@@ -1879,8 +1879,8 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     24166       1918        670        196       1236     615834   Grand Totals
-     24166       1918        670        196       1236     615834   ELF Image Totals
+     24166       1918        670        196       1236     616994   Grand Totals
+     24166       1918        670        196       1236     616994   ELF Image Totals
      24166       1918        670        196          0          0   ROM Totals
 
 ==============================================================================

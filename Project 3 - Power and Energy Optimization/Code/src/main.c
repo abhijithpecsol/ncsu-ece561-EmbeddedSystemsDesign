@@ -9,16 +9,17 @@
 #include "delay.h"
 #include "timers.h"
 #include "tasks.h"
+#include "project3.h"
 
 extern volatile uint8_t run_Read_Accel;
 extern volatile uint8_t run_Update_LEDs;
+extern volatile uint8_t led_on_period;
 
 /*----------------------------------------------------------------------------
   MAIN function
  *----------------------------------------------------------------------------*/
 int main (void) {
 	Init_RGB_LEDs();
-	Control_RGB_LEDs(1, 1, 1);								// white = configuration
 	
 	// I2C and MMA
 	i2c_init();																/* init i2c	*/
@@ -27,6 +28,13 @@ int main (void) {
 		while (1)																/* not able to initialize mma */
 			;
 	}
+	
+	#if RUN_I2C_FAST == 1
+		// increase i2c baud rate
+		I2C_DISABLE;
+		I2C0->F = (I2C_F_ICR(0x00) | I2C_F_MULT(0));
+		I2C_ENABLE;
+	#endif
 	
 	// configure low power modes
 	SMC->PMPROT = SMC_PMPROT_ALLS_MASK;				// allow low leakage stop mode
@@ -39,7 +47,12 @@ int main (void) {
 	// enable stop mode (deep sleep)
 	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 	
-	Delay(1000);
+	#if DISABLE_CLOCKS == 1
+		// disable clocks to unused peripherals
+		SIM->SCGC5 &= ~(SIM_SCGC5_PORTA_MASK);
+		SIM->SCGC6 &= ~SIM_SCGC6_FTF_MASK;
+		SIM->SCGC7 &= ~SIM_SCGC7_DMA_MASK;
+	#endif
 	
 	// LPTMR
 	Init_LPTMR();
@@ -47,28 +60,29 @@ int main (void) {
 
 	__enable_irq();
 	
-	while (1) {		
-		Control_RGB_LEDs(0,0,0);		// done to ensure LEDs blink...right now only 100 ms
-		
+	while (1) {				
 		// read acceleration every 100 ms
 		if (run_Read_Accel){
 			run_Read_Accel = 0;
 			Read_Accel();
 		}
 		
-		// update LEDs every 500 ms
+		// update LEDs every 500 ms; keep them on for 10 ms
 		if (run_Update_LEDs){
 			run_Update_LEDs = 0;
 			Update_LEDs();
+			
+			#if USE_PWM == 1
+				while(led_on_period);
+//				OSC0->CR |= OSC_CR_EREFSTEN_MASK;
+//				SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(0);			// switch to "normal" stop model OSCERCLK (PWM) does not work in LLS
+//				__wfi();
+//				OSC0->CR &= ~OSC_CR_EREFSTEN_MASK;
+//				SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(3);			// return to LLS
+			#endif
 		}
 		
 		__wfi();			// go to sleep
-		
-		//read_full_xyz();
-		//convert_xyz_to_roll_pitch();
-		// Light green LED if pitch > 10 degrees
-		// Light blue LED if roll > 10 degrees
-		//Control_RGB_LEDs(0, (fabs(roll) > 10)? 1:0, (fabs(pitch) > 10)? 1:0);
 	}
 }
 

@@ -7304,7 +7304,6 @@ Nvoid read_full_xyz(void);
 Nvoid read_xyz(void);
 Nvoid convert_xyz_to_roll_pitch(void);
 N
-Nextern float roll, pitch;
 Nextern int16_t acc_X, acc_Y, acc_Z;
 N
 N#endif
@@ -7318,6 +7317,16 @@ N// Freedom KL25Z LEDs
 N#define RED_LED_POS (18)		// on port B
 N#define GREEN_LED_POS (19)	// on port B
 N#define BLUE_LED_POS (1)		// on port D
+N
+N// PWM
+N#define TPM_Cn_MODE        (TPM_CnSC_MSB_MASK | TPM_CnSC_ELSA_MASK)
+N#define TPM_MODULE         1000
+N#define TPM_INIT_VAL       0
+N#define SET_LED_GREEN(x)   TPM2->CONTROLS[1].CnV = (x)
+N#define SET_LED_RED(x)     TPM2->CONTROLS[0].CnV = (x)
+N#define SET_LED_BLUE(x)    TPM0->CONTROLS[1].CnV = (x)
+N#define PWM_OFF							(0)
+N#define PWM_ON							(10)
 N
 N// function prototypes
 Nvoid Init_RGB_LEDs(void);
@@ -8778,27 +8787,92 @@ N#endif /* __math_h */
 N
 N/* end of math.h */
 L 5 "src\tasks.c" 2
+N#include "i2c.h"
+L 1 "inc\i2c.h" 1
+N#define I2C_M_START 	I2C0->C1 |= I2C_C1_MST_MASK
+N#define I2C_M_STOP  	I2C0->C1 &= ~I2C_C1_MST_MASK
+N#define I2C_M_RSTART 	I2C0->C1 |= I2C_C1_RSTA_MASK
+N
+N#define I2C_TRAN			I2C0->C1 |= I2C_C1_TX_MASK
+N#define I2C_REC				I2C0->C1 &= ~I2C_C1_TX_MASK
+N
+N#define BUSY_ACK 	    while(I2C0->S & 0x01)
+N#define TRANS_COMP		while(!(I2C0->S & 0x80))
+N#define I2C_WAIT			while((I2C0->S & I2C_S_IICIF_MASK)==0) {} \
+N                                 I2C0->S |= I2C_S_IICIF_MASK;
+X#define I2C_WAIT			while((I2C0->S & I2C_S_IICIF_MASK)==0) {}                                  I2C0->S |= I2C_S_IICIF_MASK;
+N	
+N#define NACK 	        I2C0->C1 |= I2C_C1_TXAK_MASK
+N#define ACK           I2C0->C1 &= ~I2C_C1_TXAK_MASK
+N	
+N#define WORKING				(0x00)
+N#define LOCKED_UP			(0x01)
+N	
+N#define CHECK_FOR_LOCKED_UP if (i2cLockedUp) return;
+N#define CHECK_FOR_LOCKED_UP_NONVOID if (i2cLockedUp) return 0;
+N	
+N#define I2C_WAIT_LU_CHECK						i2c_wait();CHECK_FOR_LOCKED_UP;
+N#define I2C_WAIT_LU_CHECK_NONVOID		i2c_wait();CHECK_FOR_LOCKED_UP_NONVOID;
+N	
+N#define I2C_DISABLE		I2C0->C1 &= ~(I2C_C1_IICEN_MASK);Delay(10);
+N#define I2C_ENABLE		Delay(10);I2C0->C1 |= (I2C_C1_IICEN_MASK);
+N
+Nvoid i2c_init(void);
+Nvoid i2c_wait(void);
+Nvoid i2c_reset(void);
+Nvoid i2c_start(void);
+Nvoid i2c_read_setup(uint8_t dev, uint8_t address);
+Nuint8_t i2c_repeated_read(uint8_t);
+N	
+Nuint8_t i2c_read_byte(uint8_t dev, uint8_t address);
+Nvoid i2c_write_byte(uint8_t dev, uint8_t address, uint8_t data);
+L 6 "src\tasks.c" 2
 N
 Nextern float roll, pitch;
+Nextern uint8_t i2cLockedUp;
 N
 N// Read acceleration
 Nvoid Read_Accel(){
 N	read_full_xyz();
-N	convert_xyz_to_roll_pitch();
+N	if (i2cLockedUp == WORKING){
+X	if (i2cLockedUp == (0x00)){
+N			convert_xyz_to_roll_pitch();
+N		}
+N		else {
+N			// reset i2c if locked up
+N			i2cLockedUp = WORKING;
+X			i2cLockedUp = (0x00);
+N			i2c_reset();
+N		}
 N}
 N
 N// Update LEDs appropriately
 Nvoid Update_LEDs(){
-N	// green = less than 15 degrees
-N	if (fabs(roll) < 15.0 && fabs(pitch) < 15.0){
-N		Control_RGB_LEDs(0, 1, 0);
-N	}
-N	// red = over 30 degrees
-N	else if (fabs(roll) > 30.0 || fabs(roll) > 30.0){
-N		Control_RGB_LEDs(1, 0, 0);
-N	}
-N	// yellow = between 15 and 30 degrees
-N	else {
-N		Control_RGB_LEDs(1, 1, 0);
-N	}
+N	#if USE_RADIANS == 1
+S		// red = over 30 degrees
+S		if (fabs(roll) > DEG_TO_RAD(30.0) || fabs(pitch) > DEG_TO_RAD(30.0)){
+S			Control_RGB_LEDs(1, 0, 0);
+S		}
+S		// green = less than 15 degrees
+S		else if (fabs(roll) < DEG_TO_RAD(15.0) && fabs(pitch) < DEG_TO_RAD(15.0)){
+S			Control_RGB_LEDs(0, 1, 0);
+S		}
+S		// yellow = between 15 and 30 degrees
+S		else {
+S			Control_RGB_LEDs(1, 1, 0);
+S		}
+N	#else
+N		// red = over 30 degrees
+N		if (fabs(roll) > 30.0 || fabs(pitch) > 30.0){
+N			Control_RGB_LEDs(1, 0, 0);
+N		}
+N		// green = less than 15 degrees
+N		else if (fabs(roll) < 15.0 && fabs(pitch) < 15.0){
+N			Control_RGB_LEDs(0, 1, 0);
+N		}
+N		// yellow = between 15 and 30 degrees
+N		else {
+N			Control_RGB_LEDs(1, 1, 0);
+N		}
+N	#endif
 N}
