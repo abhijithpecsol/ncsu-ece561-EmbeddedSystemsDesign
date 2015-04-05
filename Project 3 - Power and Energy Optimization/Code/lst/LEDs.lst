@@ -7334,44 +7334,77 @@ N
 N// misc
 N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
 N
+N
+N// debug definitions
+N#define ALWAYS_RED					(1)
+N
 N// incremental changes definitions
 N#define RUN_I2C_FAST				(1)
 N#define USE_RADIANS					(1)
-N#define USE_PWM							(0)
-N#define DISABLE_CLOCKS			(1)
+N#define USE_PWM							(1)
+N#define DISABLE_CLOCKS			(0)
 N#define LOW_POWER_ACCEL			(1)
 L 5 "src\LEDs.c" 2
 N
 N#if USE_PWM == 1
-X#if (0) == 1
-S	void Init_RGB_LEDs(void) {
-S		SIM->SCGC5 |= SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTD_MASK;
-S		SIM->SCGC6 |= SIM_SCGC6_TPM0_MASK | SIM_SCGC6_TPM2_MASK;
-S		SIM->SOPT2 |= SIM_SOPT2_TPMSRC(2);
-S
-S		PORTB->PCR[18] &= ~PORT_PCR_MUX_MASK;  		
-S		PORTB->PCR[18] |= PORT_PCR_MUX(3);  			// TPM2_CH0 enable on PTB18
-S		PORTB->PCR[19] &= ~PORT_PCR_MUX_MASK;  
-S		PORTB->PCR[19] |= PORT_PCR_MUX(3);  			// TPM2_CH1 enable on PTB19
-S		PORTD->PCR[1] &= ~PORT_PCR_MUX_MASK;  
-S		PORTD->PCR[1] |= PORT_PCR_MUX(4);  				// TPM0_CH1 enable on PTD1
-S
-S		TPM0->MOD  = TPM_MODULE;   								// 0x0063 / 25MHz = 4uS PWM period
-S		TPM0->CONTROLS[1].CnSC = TPM_Cn_MODE;  		// No Interrupts; High True pulses on Edge Aligned PWM
-S		TPM0->CONTROLS[1].CnV  = TPM_INIT_VAL; 		// set to initial duty cycle
-S
-S		TPM2->MOD  = TPM_MODULE;   								// 0x0063 / 25MHz = 4uS PWM period */
-S		TPM2->CONTROLS[0].CnSC = TPM_Cn_MODE;  		// No Interrupts; High True pulses on Edge Aligned PWM
-S		TPM2->CONTROLS[0].CnV  = TPM_INIT_VAL; 		// set to initial duty cycle
-S		TPM2->CONTROLS[1].CnSC = TPM_Cn_MODE;  		// No Interrupts; High True pulses on Edge Aligned PWM
-S		TPM2->CONTROLS[1].CnV  = TPM_INIT_VAL; 		// set to initial duty cycle
-S
-S		TPM2->SC = TPM_SC_CMOD(1) | TPM_SC_PS(0);  // Edge Aligned PWM running from BUSCLK
-S		TPM0->SC = TPM_SC_CMOD(1) | TPM_SC_PS(0);  // Edge Aligned PWM running from BUSCLK
-S	}
-S		
-S	// rudimentary implementation
-S	void Control_RGB_LEDs(unsigned int red_on, unsigned int green_on, unsigned int blue_on){
+X#if (1) == 1
+N	void Init_RGB_LEDs(void) {
+N		SIM->SCGC5 |= SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTD_MASK;
+X		((SIM_Type *)(0x40047000u))->SCGC5 |= 0x400u | 0x1000u;
+N		SIM->SCGC6 |= SIM_SCGC6_TPM0_MASK | SIM_SCGC6_TPM2_MASK;
+X		((SIM_Type *)(0x40047000u))->SCGC6 |= 0x1000000u | 0x4000000u;
+N		SIM->SOPT2 |= SIM_SOPT2_TPMSRC(2);
+X		((SIM_Type *)(0x40047000u))->SOPT2 |= (((uint32_t)(((uint32_t)(2))<<24))&0x3000000u);
+N
+N		PORTB->PCR[18] &= ~PORT_PCR_MUX_MASK;  		
+X		((PORT_Type *)(0x4004A000u))->PCR[18] &= ~0x700u;  		
+N		PORTB->PCR[18] |= PORT_PCR_MUX(3);  			// TPM2_CH0 enable on PTB18
+X		((PORT_Type *)(0x4004A000u))->PCR[18] |= (((uint32_t)(((uint32_t)(3))<<8))&0x700u);  			
+N		PORTB->PCR[19] &= ~PORT_PCR_MUX_MASK;  
+X		((PORT_Type *)(0x4004A000u))->PCR[19] &= ~0x700u;  
+N		PORTB->PCR[19] |= PORT_PCR_MUX(3);  			// TPM2_CH1 enable on PTB19
+X		((PORT_Type *)(0x4004A000u))->PCR[19] |= (((uint32_t)(((uint32_t)(3))<<8))&0x700u);  			
+N		PORTD->PCR[1] &= ~PORT_PCR_MUX_MASK;  
+X		((PORT_Type *)(0x4004C000u))->PCR[1] &= ~0x700u;  
+N		PORTD->PCR[1] |= PORT_PCR_MUX(4);  				// TPM0_CH1 enable on PTD1
+X		((PORT_Type *)(0x4004C000u))->PCR[1] |= (((uint32_t)(((uint32_t)(4))<<8))&0x700u);  				
+N
+N		TPM0->MOD  = TPM_MODULE;   								// 0x0063 / 25MHz = 4uS PWM period
+X		((TPM_Type *)(0x40038000u))->MOD  = 1000;   								
+N		TPM0->CONTROLS[1].CnSC = TPM_Cn_MODE;  		// No Interrupts; High True pulses on Edge Aligned PWM
+X		((TPM_Type *)(0x40038000u))->CONTROLS[1].CnSC = (0x20u | 0x4u);  		
+N		TPM0->CONTROLS[1].CnV  = TPM_INIT_VAL; 		// set to initial duty cycle
+X		((TPM_Type *)(0x40038000u))->CONTROLS[1].CnV  = 0; 		
+N
+N		TPM2->MOD  = TPM_MODULE;   								// 0x0063 / 25MHz = 4uS PWM period */
+X		((TPM_Type *)(0x4003A000u))->MOD  = 1000;   								
+N		TPM2->CONTROLS[0].CnSC = TPM_Cn_MODE;  		// No Interrupts; High True pulses on Edge Aligned PWM
+X		((TPM_Type *)(0x4003A000u))->CONTROLS[0].CnSC = (0x20u | 0x4u);  		
+N		TPM2->CONTROLS[0].CnV  = TPM_INIT_VAL; 		// set to initial duty cycle
+X		((TPM_Type *)(0x4003A000u))->CONTROLS[0].CnV  = 0; 		
+N		TPM2->CONTROLS[1].CnSC = TPM_Cn_MODE;  		// No Interrupts; High True pulses on Edge Aligned PWM
+X		((TPM_Type *)(0x4003A000u))->CONTROLS[1].CnSC = (0x20u | 0x4u);  		
+N		TPM2->CONTROLS[1].CnV  = TPM_INIT_VAL; 		// set to initial duty cycle
+X		((TPM_Type *)(0x4003A000u))->CONTROLS[1].CnV  = 0; 		
+N
+N		TPM2->SC = TPM_SC_CMOD(1) | TPM_SC_PS(0);  // Edge Aligned PWM running from BUSCLK
+X		((TPM_Type *)(0x4003A000u))->SC = (((uint32_t)(((uint32_t)(1))<<3))&0x18u) | (((uint32_t)(((uint32_t)(0))<<0))&0x7u);  
+N		TPM0->SC = TPM_SC_CMOD(1) | TPM_SC_PS(0);  // Edge Aligned PWM running from BUSCLK
+X		((TPM_Type *)(0x40038000u))->SC = (((uint32_t)(((uint32_t)(1))<<3))&0x18u) | (((uint32_t)(((uint32_t)(0))<<0))&0x7u);  
+N	}
+N		
+N	// rudimentary implementation
+N	void Control_RGB_LEDs(unsigned int red_on, unsigned int green_on, unsigned int blue_on){
+N		#if ALWAYS_RED == 1
+X		#if (1) == 1
+N		if (red_on || green_on || blue_on) {
+N				SET_LED_RED(PWM_ON);
+X				((TPM_Type *)(0x4003A000u))->CONTROLS[0]. CnV = ((10));
+N		} else {
+N				SET_LED_RED(PWM_OFF);
+X				((TPM_Type *)(0x4003A000u))->CONTROLS[0]. CnV = ((0));
+N		}
+N		#else
 S		if (red_on) {
 S				SET_LED_RED(PWM_ON);
 S		} else {
@@ -7387,63 +7420,54 @@ S				SET_LED_BLUE(PWM_ON);
 S		}	else {
 S				SET_LED_BLUE(PWM_OFF);
 S		}
-S	}
-N#else
-N	void Init_RGB_LEDs(void) {
-N		// Enable clock to ports B and D
-N		SIM->SCGC5 |= SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTD_MASK;;
-X		((SIM_Type *)(0x40047000u))->SCGC5 |= 0x400u | 0x1000u;;
-N		
-N		// Make 3 pins GPIO
-N		PORTB->PCR[RED_LED_POS] &= ~PORT_PCR_MUX_MASK;          
-X		((PORT_Type *)(0x4004A000u))->PCR[(18)] &= ~0x700u;          
-N		PORTB->PCR[RED_LED_POS] |= PORT_PCR_MUX(1);          
-X		((PORT_Type *)(0x4004A000u))->PCR[(18)] |= (((uint32_t)(((uint32_t)(1))<<8))&0x700u);          
-N		PORTB->PCR[GREEN_LED_POS] &= ~PORT_PCR_MUX_MASK;          
-X		((PORT_Type *)(0x4004A000u))->PCR[(19)] &= ~0x700u;          
-N		PORTB->PCR[GREEN_LED_POS] |= PORT_PCR_MUX(1);          
-X		((PORT_Type *)(0x4004A000u))->PCR[(19)] |= (((uint32_t)(((uint32_t)(1))<<8))&0x700u);          
-N		PORTD->PCR[BLUE_LED_POS] &= ~PORT_PCR_MUX_MASK;          
-X		((PORT_Type *)(0x4004C000u))->PCR[(1)] &= ~0x700u;          
-N		PORTD->PCR[BLUE_LED_POS] |= PORT_PCR_MUX(1);       
-X		((PORT_Type *)(0x4004C000u))->PCR[(1)] |= (((uint32_t)(((uint32_t)(1))<<8))&0x700u);       
-N
-N		// Initially off
-N		PTB->PSOR = MASK(RED_LED_POS); 
-X		((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << ((18))); 
-N		PTB->PSOR = MASK(GREEN_LED_POS); 
-X		((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << ((19))); 
-N		PTD->PSOR = MASK(BLUE_LED_POS); 
-X		((GPIO_Type *)(0x400FF0C0u))->PSOR = (1UL << ((1))); 
-N		
-N		// Set ports to outputs
-N		PTB->PDDR |= MASK(RED_LED_POS) | MASK(GREEN_LED_POS);
-X		((GPIO_Type *)(0x400FF040u))->PDDR |= (1UL << ((18))) | (1UL << ((19)));
-N		PTD->PDDR |= MASK(BLUE_LED_POS);
-X		((GPIO_Type *)(0x400FF0C0u))->PDDR |= (1UL << ((1)));
+N		#endif
 N	}
-N
-N	void Control_RGB_LEDs(unsigned int red_on, unsigned int green_on, unsigned int blue_on) {
-N		if (red_on) {
-N				PTB->PCOR = MASK(RED_LED_POS);
-X				((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << ((18)));
-N		} else {
-N				PTB->PSOR = MASK(RED_LED_POS); 
-X				((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << ((18))); 
-N		}
-N		if (green_on) {
-N				PTB->PCOR = MASK(GREEN_LED_POS);
-X				((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << ((19)));
-N		}	else {
-N				PTB->PSOR = MASK(GREEN_LED_POS); 
-X				((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << ((19))); 
-N		} 
-N		if (blue_on) {
-N				PTD->PCOR = MASK(BLUE_LED_POS);
-X				((GPIO_Type *)(0x400FF0C0u))->PCOR = (1UL << ((1)));
-N		}	else {
-N				PTD->PSOR = MASK(BLUE_LED_POS); 
-X				((GPIO_Type *)(0x400FF0C0u))->PSOR = (1UL << ((1))); 
-N		}
-N	}	
+N#else
+S	void Init_RGB_LEDs(void) {
+S		// Enable clock to ports B and D
+S		SIM->SCGC5 |= SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTD_MASK;;
+S		
+S		// Make 3 pins GPIO
+S		PORTB->PCR[RED_LED_POS] &= ~PORT_PCR_MUX_MASK;          
+S		PORTB->PCR[RED_LED_POS] |= PORT_PCR_MUX(1);          
+S		PORTB->PCR[GREEN_LED_POS] &= ~PORT_PCR_MUX_MASK;          
+S		PORTB->PCR[GREEN_LED_POS] |= PORT_PCR_MUX(1);          
+S		PORTD->PCR[BLUE_LED_POS] &= ~PORT_PCR_MUX_MASK;          
+S		PORTD->PCR[BLUE_LED_POS] |= PORT_PCR_MUX(1);       
+S
+S		// Initially off
+S		PTB->PSOR = MASK(RED_LED_POS); 
+S		PTB->PSOR = MASK(GREEN_LED_POS); 
+S		PTD->PSOR = MASK(BLUE_LED_POS); 
+S		
+S		// Set ports to outputs
+S		PTB->PDDR |= MASK(RED_LED_POS) | MASK(GREEN_LED_POS);
+S		PTD->PDDR |= MASK(BLUE_LED_POS);
+S	}
+S
+S	void Control_RGB_LEDs(unsigned int red_on, unsigned int green_on, unsigned int blue_on) {
+S		#if ALWAYS_RED == 1
+S		if (red_on || green_on || blue_on) {
+S				PTB->PCOR = MASK(RED_LED_POS);
+S		} else {
+S				PTB->PSOR = MASK(RED_LED_POS); 
+S		}
+S		#else
+S		if (red_on) {
+S				PTB->PCOR = MASK(RED_LED_POS);
+S		} else {
+S				PTB->PSOR = MASK(RED_LED_POS); 
+S		}
+S		if (green_on) {
+S				PTB->PCOR = MASK(GREEN_LED_POS);
+S		}	else {
+S				PTB->PSOR = MASK(GREEN_LED_POS); 
+S		} 
+S		if (blue_on) {
+S				PTD->PCOR = MASK(BLUE_LED_POS);
+S		}	else {
+S				PTD->PSOR = MASK(BLUE_LED_POS); 
+S		}
+S		#endif
+S	}	
 N#endif

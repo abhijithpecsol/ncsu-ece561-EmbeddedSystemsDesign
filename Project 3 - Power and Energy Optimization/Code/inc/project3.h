@@ -9,9 +9,13 @@
 // misc
 #define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
 
+
+// debug definitions
+#define ALWAYS_RED					(1)
+
 // incremental changes definitions
 #define RUN_I2C_FAST				(1)
 #define USE_RADIANS					(1)
-#define USE_PWM							(0)
+#define USE_PWM							(1)
 #define DISABLE_CLOCKS			(0)
 #define LOW_POWER_ACCEL			(1)

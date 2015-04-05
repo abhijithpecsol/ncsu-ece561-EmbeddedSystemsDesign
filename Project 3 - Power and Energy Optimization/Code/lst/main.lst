@@ -8513,11 +8513,15 @@ N
 N// misc
 N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
 N
+N
+N// debug definitions
+N#define ALWAYS_RED					(1)
+N
 N// incremental changes definitions
 N#define RUN_I2C_FAST				(1)
 N#define USE_RADIANS					(1)
-N#define USE_PWM							(0)
-N#define DISABLE_CLOCKS			(1)
+N#define USE_PWM							(1)
+N#define DISABLE_CLOCKS			(0)
 N#define LOW_POWER_ACCEL			(1)
 L 13 "src\main.c" 2
 N
@@ -8567,14 +8571,11 @@ N	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 X	((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR |= (1UL << 2);
 N	
 N	#if DISABLE_CLOCKS == 1
-X	#if (1) == 1
-N		// disable clocks to unused peripherals
-N		SIM->SCGC5 &= ~(SIM_SCGC5_PORTA_MASK);
-X		((SIM_Type *)(0x40047000u))->SCGC5 &= ~(0x200u);
-N		SIM->SCGC6 &= ~SIM_SCGC6_FTF_MASK;
-X		((SIM_Type *)(0x40047000u))->SCGC6 &= ~0x1u;
-N		SIM->SCGC7 &= ~SIM_SCGC7_DMA_MASK;
-X		((SIM_Type *)(0x40047000u))->SCGC7 &= ~0x100u;
+X	#if (0) == 1
+S		// disable clocks to unused peripherals
+S		SIM->SCGC5 &= ~(SIM_SCGC5_PORTA_MASK);
+S		SIM->SCGC6 &= ~SIM_SCGC6_FTF_MASK;
+S		SIM->SCGC7 &= ~SIM_SCGC7_DMA_MASK;
 N	#endif
 N	
 N	// LPTMR
@@ -8596,13 +8597,18 @@ N			run_Update_LEDs = 0;
 N			Update_LEDs();
 N			
 N			#if USE_PWM == 1
-X			#if (0) == 1
-S				while(led_on_period);
-S//				OSC0->CR |= OSC_CR_EREFSTEN_MASK;
-S//				SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(0);			// switch to "normal" stop model OSCERCLK (PWM) does not work in LLS
-S//				__wfi();
-S//				OSC0->CR &= ~OSC_CR_EREFSTEN_MASK;
-S//				SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(3);			// return to LLS
+X			#if (1) == 1
+N				SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
+X				((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR &= ~(1UL << 2);
+N				__wfi();
+N				SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+X				((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR |= (1UL << 2);
+N				//while(led_on_period);
+N//				OSC0->CR |= OSC_CR_EREFSTEN_MASK;
+N//				SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(0);			// switch to "normal" stop model OSCERCLK (PWM) does not work in LLS
+N//				__wfi();
+N//				OSC0->CR &= ~OSC_CR_EREFSTEN_MASK;
+N//				SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(3);			// return to LLS
 N			#endif
 N		}
 N		

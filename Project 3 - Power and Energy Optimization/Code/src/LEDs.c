@@ -32,6 +32,13 @@
 		
 	// rudimentary implementation
 	void Control_RGB_LEDs(unsigned int red_on, unsigned int green_on, unsigned int blue_on){
+		#if ALWAYS_RED == 1
+		if (red_on || green_on || blue_on) {
+				SET_LED_RED(PWM_ON);
+		} else {
+				SET_LED_RED(PWM_OFF);
+		}
+		#else
 		if (red_on) {
 				SET_LED_RED(PWM_ON);
 		} else {
@@ -47,6 +54,7 @@
 		}	else {
 				SET_LED_BLUE(PWM_OFF);
 		}
+		#endif
 	}
 #else
 	void Init_RGB_LEDs(void) {
@@ -72,6 +80,13 @@
 	}
 
 	void Control_RGB_LEDs(unsigned int red_on, unsigned int green_on, unsigned int blue_on) {
+		#if ALWAYS_RED == 1
+		if (red_on || green_on || blue_on) {
+				PTB->PCOR = MASK(RED_LED_POS);
+		} else {
+				PTB->PSOR = MASK(RED_LED_POS); 
+		}
+		#else
 		if (red_on) {
 				PTB->PCOR = MASK(RED_LED_POS);
 		} else {
@@ -87,5 +102,6 @@
 		}	else {
 				PTD->PSOR = MASK(BLUE_LED_POS); 
 		}
+		#endif
 	}	
 #endif

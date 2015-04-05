@@ -73,7 +73,10 @@ int main (void) {
 			Update_LEDs();
 			
 			#if USE_PWM == 1
-				while(led_on_period);
+				SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
+				__wfi();
+				SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+				//while(led_on_period);
 //				OSC0->CR |= OSC_CR_EREFSTEN_MASK;
 //				SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(0);			// switch to "normal" stop model OSCERCLK (PWM) does not work in LLS
 //				__wfi();
