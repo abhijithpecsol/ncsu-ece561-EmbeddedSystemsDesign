@@ -8827,6 +8827,32 @@ N
 Nuint8_t i2c_read_byte(uint8_t dev, uint8_t address);
 Nvoid i2c_write_byte(uint8_t dev, uint8_t address, uint8_t data);
 L 6 "src\tasks.c" 2
+N#include "project3.h"
+L 1 "inc\project3.h" 1
+N// period/delay definitions
+N#define PERIOD_READ_ACCEL 	(1)			// 100 ms / 100 ms = 1
+N#define PERIOD_UPDATE_LEDS 	(5)			// 500 ms / 100 ms = 5
+N
+N// LPTMR period definitioms
+N#define LED_ON_TIME					(5)			// LEDs must be on for 10 ms
+N#define ACCEL_CHECK_FREQ		(50)		// check accelerometer every 100 ms
+N
+N// misc
+N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
+N
+N// debug definitions
+N#define ALWAYS_RED					0
+N#define DEBUG_SIGNALS				0
+N
+N// incremental changes definitions
+N#define USE_SLEEP_MODES			1
+N#define RUN_I2C_FAST				1
+N#define USE_RADIANS					0
+N#define USE_PWM							0
+N#define LOW_POWER_ACCEL			1
+N#define PWM_SLEEP						0
+N#define USE_VLPR						0
+L 7 "src\tasks.c" 2
 N
 Nextern float roll, pitch;
 Nextern uint8_t i2cLockedUp;
@@ -8849,6 +8875,7 @@ N
 N// Update LEDs appropriately
 Nvoid Update_LEDs(){
 N	#if USE_RADIANS == 1
+X	#if 0 == 1
 S		// red = over 30 degrees
 S		if (fabs(roll) > DEG_TO_RAD(30.0) || fabs(pitch) > DEG_TO_RAD(30.0)){
 S			Control_RGB_LEDs(1, 0, 0);

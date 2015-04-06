@@ -3,6 +3,7 @@
 #include "LEDs.h"
 #include <math.h>
 #include "i2c.h"
+#include "project3.h"
 
 extern float roll, pitch;
 extern uint8_t i2cLockedUp;

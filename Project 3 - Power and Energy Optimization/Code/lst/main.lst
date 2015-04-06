@@ -8514,16 +8514,17 @@ N// misc
 N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
 N
 N// debug definitions
-N#define ALWAYS_RED					1
+N#define ALWAYS_RED					0
 N#define DEBUG_SIGNALS				0
 N
 N// incremental changes definitions
 N#define USE_SLEEP_MODES			1
 N#define RUN_I2C_FAST				1
-N#define USE_RADIANS					1
-N#define USE_PWM							1
+N#define USE_RADIANS					0
+N#define USE_PWM							0
 N#define LOW_POWER_ACCEL			1
-N#define PWM_SLEEP						1
+N#define PWM_SLEEP						0
+N#define USE_VLPR						0
 L 13 "src\main.c" 2
 N
 Nextern volatile uint8_t run_Read_Accel;
@@ -8553,6 +8554,19 @@ N/*----------------------------------------------------------------------------
 N  MAIN function
 N *----------------------------------------------------------------------------*/
 Nint main (void) {
+N	#if USE_VLPR == 1
+X	#if 0 == 1
+S		// enter low power run
+S		SIM->CLKDIV1 = (0x1 << SIM_CLKDIV1_OUTDIV1_SHIFT) | (0x5 << SIM_CLKDIV1_OUTDIV4_SHIFT);		// reduce core clock < 4 MHz and flash < 1 MHz
+S		MCG->C6 &= ~MCG_C6_CME0_MASK;			// disable MCG clock monitor
+S		MCG->C2 |= MCG_C2_IRCS_MASK;			// don't use slow internal reference clock
+S		MCG->C1 |= MCG_C1_CLKS(2);				// enter BLPE mode
+S		MCG->C1 &= ~MCG_C1_IREFS_MASK;
+S		MCG->C6 &= ~MCG_C6_PLLS_MASK;
+S		while(!(MCG->S & MCG_S_IREFST_MASK >> MCG_S_IREFST_SHIFT));		// wait to ensure clock change
+S		MCG->C2 |= MCG_C2_LP_MASK;
+N	#endif
+N	
 N	Init_RGB_LEDs();
 N	
 N	#if DEBUG_SIGNALS == 1
@@ -8580,10 +8594,10 @@ X		Delay(10);((I2C_Type *)(0x40066000u))->C1 |= (0x80u);;
 N	#endif
 N	
 N	// configure low power modes
-N	SMC->PMPROT = SMC_PMPROT_ALLS_MASK;				// allow low leakage stop mode
-X	((SMC_Type *)(0x4007E000u))->PMPROT = 0x8u;				
-N	SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(3);	// enable normal run mode (00) and low leakage stop mode (011)
-X	((SMC_Type *)(0x4007E000u))->PMCTRL = (((uint8_t)(((uint8_t)(0))<<5))&0x60u) | (((uint8_t)(((uint8_t)(3))<<0))&0x7u);	
+N	SMC->PMPROT = SMC_PMPROT_ALLS_MASK | SMC_PMPROT_AVLP_MASK;				// allow low leakage stop mode
+X	((SMC_Type *)(0x4007E000u))->PMPROT = 0x8u | 0x20u;				
+N	SMC->PMCTRL = SMC_PMCTRL_RUNM(2) | SMC_PMCTRL_STOPM(3);	// enable low power run mode (10) and low leakage stop mode (011)
+X	((SMC_Type *)(0x4007E000u))->PMCTRL = (((uint8_t)(((uint8_t)(2))<<5))&0x60u) | (((uint8_t)(((uint8_t)(3))<<0))&0x7u);	
 N	SMC->STOPCTRL = SMC_STOPCTRL_PSTOPO(0) | SMC_STOPCTRL_VLLSM(3);	// normal stop mode and VLL stop3 (not needed?)
 X	((SMC_Type *)(0x4007E000u))->STOPCTRL = (((uint8_t)(((uint8_t)(0))<<6))&0xC0u) | (((uint8_t)(((uint8_t)(3))<<0))&0x7u);	
 N	
@@ -8614,24 +8628,19 @@ N			run_Update_LEDs = 0;
 N			Update_LEDs();
 N			
 N			#if USE_PWM == 1
-X			#if 1 == 1
-N				#if PWM_SLEEP == 1
-X				#if 1 == 1
-N					SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;		// switch to regular sleep mode
-X					((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR &= ~(1UL << 2);		
-N					#if USE_SLEEP_MODES == 1
-X					#if 1 == 1
-N						#if DEBUG_SIGNALS == 1
-X						#if 0 == 1
+X			#if 0 == 1
+S				#if PWM_SLEEP == 1
+S					SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;		// switch to regular sleep mode
+S					#if USE_SLEEP_MODES == 1
+S						#if DEBUG_SIGNALS == 1
 S							PTE->PSOR |= MASK(30);
-N						#endif
-N						__wfi();															// PWM does not work in LLS mode
-N					#endif
-N					SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;		// switch back to LLS mode
-X					((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR |= (1UL << 2);		
-N				#else
+S						#endif
+S						__wfi();															// PWM does not work in LLS mode
+S					#endif
+S					SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;		// switch back to LLS mode
+S				#else
 S					while(led_on_period);									// poll -> bad solution
-N				#endif
+S				#endif
 N			#endif
 N		}
 N				

@@ -10,4 +10,5 @@
 .\obj\mma8451.o: inc\delay.h
 .\obj\mma8451.o: inc\approx.h
 .\obj\mma8451.o: inc\my_math.h
+.\obj\mma8451.o: inc\project3.h
 .\obj\mma8451.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

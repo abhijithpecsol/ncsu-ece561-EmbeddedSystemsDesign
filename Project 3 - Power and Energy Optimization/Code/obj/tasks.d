@@ -9,3 +9,4 @@
 .\obj\tasks.o: inc\LEDs.h
 .\obj\tasks.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\obj\tasks.o: inc\i2c.h
+.\obj\tasks.o: inc\project3.h

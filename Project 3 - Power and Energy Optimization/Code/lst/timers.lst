@@ -7342,16 +7342,17 @@ N// misc
 N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
 N
 N// debug definitions
-N#define ALWAYS_RED					1
+N#define ALWAYS_RED					0
 N#define DEBUG_SIGNALS				0
 N
 N// incremental changes definitions
 N#define USE_SLEEP_MODES			1
 N#define RUN_I2C_FAST				1
-N#define USE_RADIANS					1
-N#define USE_PWM							1
+N#define USE_RADIANS					0
+N#define USE_PWM							0
 N#define LOW_POWER_ACCEL			1
-N#define PWM_SLEEP						1
+N#define PWM_SLEEP						0
+N#define USE_VLPR						0
 L 5 "src\timers.c" 2
 N#include "gpio_defs.h"
 L 1 "inc\gpio_defs.h" 1
@@ -7427,8 +7428,8 @@ N		Control_RGB_LEDs(0,0,0);
 N		LPTMR0->CMR = (ACCEL_CHECK_FREQ - LED_ON_TIME);		// 90 ms to next 100 ms
 X		((LPTMR_Type *)(0x40040000u))->CMR = ((50) - (5));		
 N		#if USE_PWM == 1
-X		#if 1 == 1
-N			led_on_period = 0;
+X		#if 0 == 1
+S			led_on_period = 0;
 N		#endif
 N		return;
 N	}
@@ -7439,15 +7440,14 @@ X		((LPTMR_Type *)(0x40040000u))->CMR = (50);
 N	}
 N	
 N	// decrement delay variables
-N	delay_Read_Accel--;
+N	//delay_Read_Accel--;
 N	delay_Update_LEDs--;
 N	
 N	// check if delay period has ended; indicate and reset if so
-N	if (delay_Read_Accel == 0){
+N	//if (delay_Read_Accel == 0){
 N		run_Read_Accel = 1;
-N		delay_Read_Accel = PERIOD_READ_ACCEL;
-X		delay_Read_Accel = (1);
-N	}
+N		//delay_Read_Accel = PERIOD_READ_ACCEL;
+N	//}
 N	if (delay_Update_LEDs == 0){
 N		run_Update_LEDs = 1;
 N		delay_Update_LEDs = PERIOD_UPDATE_LEDS;
@@ -7455,8 +7455,8 @@ X		delay_Update_LEDs = (5);
 N		LPTMR0->CMR = LED_ON_TIME;
 X		((LPTMR_Type *)(0x40040000u))->CMR = (5);
 N		#if USE_PWM == 1
-X		#if 1 == 1
-N			led_on_period = 1;
+X		#if 0 == 1
+S			led_on_period = 1;
 N		#endif
 N	}
 N}

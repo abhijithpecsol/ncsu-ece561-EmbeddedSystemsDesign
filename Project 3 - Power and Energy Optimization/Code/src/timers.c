@@ -57,14 +57,14 @@ void LPTimer_IRQHandler(void) {
 	}
 	
 	// decrement delay variables
-	delay_Read_Accel--;
+	//delay_Read_Accel--;
 	delay_Update_LEDs--;
 	
 	// check if delay period has ended; indicate and reset if so
-	if (delay_Read_Accel == 0){
+	//if (delay_Read_Accel == 0){
 		run_Read_Accel = 1;
-		delay_Read_Accel = PERIOD_READ_ACCEL;
-	}
+		//delay_Read_Accel = PERIOD_READ_ACCEL;
+	//}
 	if (delay_Update_LEDs == 0){
 		run_Update_LEDs = 1;
 		delay_Update_LEDs = PERIOD_UPDATE_LEDS;

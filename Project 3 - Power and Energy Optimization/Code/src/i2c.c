@@ -129,7 +129,7 @@ void i2c_wait(void){
 	
 	while((I2C0->S & I2C_S_IICIF_MASK)==0) {
 		waitCount++;
-		if (waitCount > 1000){
+		if (waitCount > 500){
 			i2cLockedUp = LOCKED_UP;
 			return;
 		}

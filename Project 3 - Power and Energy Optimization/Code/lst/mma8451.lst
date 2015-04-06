@@ -7379,6 +7379,32 @@ N#define M_PI_4 (M_PI/4.0)
 N
 N#endif // MY_MATH_H
 L 7 "src\mma8451.c" 2
+N#include "project3.h"
+L 1 "inc\project3.h" 1
+N// period/delay definitions
+N#define PERIOD_READ_ACCEL 	(1)			// 100 ms / 100 ms = 1
+N#define PERIOD_UPDATE_LEDS 	(5)			// 500 ms / 100 ms = 5
+N
+N// LPTMR period definitioms
+N#define LED_ON_TIME					(5)			// LEDs must be on for 10 ms
+N#define ACCEL_CHECK_FREQ		(50)		// check accelerometer every 100 ms
+N
+N// misc
+N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
+N
+N// debug definitions
+N#define ALWAYS_RED					0
+N#define DEBUG_SIGNALS				0
+N
+N// incremental changes definitions
+N#define USE_SLEEP_MODES			1
+N#define RUN_I2C_FAST				1
+N#define USE_RADIANS					0
+N#define USE_PWM							0
+N#define LOW_POWER_ACCEL			1
+N#define PWM_SLEEP						0
+N#define USE_VLPR						0
+L 8 "src\mma8451.c" 2
 N#include <math.h>
 L 1 "C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h" 1
 N/*
@@ -8830,7 +8856,7 @@ N
 N#endif /* __math_h */
 N
 N/* end of math.h */
-L 8 "src\mma8451.c" 2
+L 9 "src\mma8451.c" 2
 N
 Nint16_t acc_X=0, acc_Y=0, acc_Z=0;
 Nfloat roll=0.0, pitch=0.0;
@@ -8847,13 +8873,21 @@ N		if(i2c_read_byte(MMA_ADDR, REG_WHOAMI) == WHOAMI)	{
 X		if(i2c_read_byte(0x3A, 0x0D) == 0x1A)	{
 N  		Delay(10);
 N			#if LOW_POWER_ACCEL == 1
-S				//set active mode, 14 bit samples and 12.5 Hz ODR (0x29)
-S				// 00111000 = 0x38
-S				i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x38);
-N			#else
-N				//set active mode, 14 bit samples and 100 Hz ODR (0x19)
+X			#if 1 == 1
+N				// set active mode
 N				i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x01);
 X				i2c_write_byte(0x3A, 0x2A, 0x01);
+N				Delay(10);
+N				// enable auto sleep and low power mode
+N				i2c_write_byte(MMA_ADDR, 0x2B, 0x1F);
+X				i2c_write_byte(0x3A, 0x2B, 0x1F);
+N				Delay(10);
+N				// set low frequency (12.5 Hz)
+N				i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x6B);
+X				i2c_write_byte(0x3A, 0x2A, 0x6B);
+N			#else
+S				//set active mode, 14 bit samples and 100 Hz ODR (0x19)
+S				i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x01);
 N			#endif
 N			return 1;
 N		}
@@ -8901,6 +8935,7 @@ N}
 N
 Nvoid convert_xyz_to_roll_pitch(void) {	
 N	#if USE_RADIANS == 1
+X	#if 0 == 1
 S		roll = approx_atan2f(acc_Y, acc_Z);
 S		pitch = approx_atan2f(acc_X, approx_sqrtf(acc_Y*acc_Y + acc_Z*acc_Z));
 N	#else

@@ -4,6 +4,7 @@
 #include "delay.h"
 #include "approx.h"
 #include "my_math.h"
+#include "project3.h"
 #include <math.h>
 
 int16_t acc_X=0, acc_Y=0, acc_Z=0;
@@ -20,9 +21,14 @@ int init_mma()
 		if(i2c_read_byte(MMA_ADDR, REG_WHOAMI) == WHOAMI)	{
   		Delay(10);
 			#if LOW_POWER_ACCEL == 1
-				//set active mode, 14 bit samples and 12.5 Hz ODR (0x29)
-				// 00111000 = 0x38
-				i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x38);
+				// set active mode
+				i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x01);
+				Delay(10);
+				// enable auto sleep and low power mode
+				i2c_write_byte(MMA_ADDR, 0x2B, 0x1F);
+				Delay(10);
+				// set low frequency (12.5 Hz)
+				i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x6B);
 			#else
 				//set active mode, 14 bit samples and 100 Hz ODR (0x19)
 				i2c_write_byte(MMA_ADDR, REG_CTRL1, 0x01);

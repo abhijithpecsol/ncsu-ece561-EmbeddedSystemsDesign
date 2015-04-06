@@ -33,6 +33,18 @@ void Init_Debug_Signals(void) {
   MAIN function
  *----------------------------------------------------------------------------*/
 int main (void) {
+	#if USE_VLPR == 1
+		// enter low power run
+		SIM->CLKDIV1 = (0x1 << SIM_CLKDIV1_OUTDIV1_SHIFT) | (0x5 << SIM_CLKDIV1_OUTDIV4_SHIFT);		// reduce core clock < 4 MHz and flash < 1 MHz
+		MCG->C6 &= ~MCG_C6_CME0_MASK;			// disable MCG clock monitor
+		MCG->C2 |= MCG_C2_IRCS_MASK;			// don't use slow internal reference clock
+		MCG->C1 |= MCG_C1_CLKS(2);				// enter BLPE mode
+		MCG->C1 &= ~MCG_C1_IREFS_MASK;
+		MCG->C6 &= ~MCG_C6_PLLS_MASK;
+		while(!(MCG->S & MCG_S_IREFST_MASK >> MCG_S_IREFST_SHIFT));		// wait to ensure clock change
+		MCG->C2 |= MCG_C2_LP_MASK;
+	#endif
+	
 	Init_RGB_LEDs();
 	
 	#if DEBUG_SIGNALS == 1
@@ -55,8 +67,8 @@ int main (void) {
 	#endif
 	
 	// configure low power modes
-	SMC->PMPROT = SMC_PMPROT_ALLS_MASK;				// allow low leakage stop mode
-	SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(3);	// enable normal run mode (00) and low leakage stop mode (011)
+	SMC->PMPROT = SMC_PMPROT_ALLS_MASK | SMC_PMPROT_AVLP_MASK;				// allow low leakage stop mode
+	SMC->PMCTRL = SMC_PMCTRL_RUNM(2) | SMC_PMCTRL_STOPM(3);	// enable low power run mode (10) and low leakage stop mode (011)
 	SMC->STOPCTRL = SMC_STOPCTRL_PSTOPO(0) | SMC_STOPCTRL_VLLSM(3);	// normal stop mode and VLL stop3 (not needed?)
 	
 	// configure low leakage wakeup unit (LLWU)
