@@ -18,7 +18,11 @@ void Init_LPTMR(void) {
 	// resulting in 500 Hz clock
 	LPTMR0->PSR = LPTMR_PSR_PCS(1) | LPTMR_PSR_PRESCALE(0); 
 	LPTMR0->CSR = LPTMR_CSR_TIE_MASK;
-	LPTMR0->CMR = 50; // Generate interrupt every 50 clock ticks or 100 ms
+	#if EXTRA_CREDIT == 1
+		LPTMR0->CMR = 50*5; // extra credit generates every 500 ms
+	#else
+		LPTMR0->CMR = 50; 	// Generate interrupt every 50 clock ticks or 100 ms
+	#endif
 
 	// Configure NVIC 
 	NVIC_SetPriority(LPTimer_IRQn, 128); // 0, 64, 128 or 192

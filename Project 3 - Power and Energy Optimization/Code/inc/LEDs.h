@@ -15,6 +15,7 @@
 #define SET_LED_BLUE(x)    TPM0->CONTROLS[1].CnV = (x)
 #define PWM_OFF							(0)
 #define PWM_ON							(10)
+#define LEDS_ON_TIME			4
 
 // function prototypes
 void Init_RGB_LEDs(void);

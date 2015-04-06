@@ -7327,6 +7327,7 @@ N#define SET_LED_RED(x)     TPM2->CONTROLS[0].CnV = (x)
 N#define SET_LED_BLUE(x)    TPM0->CONTROLS[1].CnV = (x)
 N#define PWM_OFF							(0)
 N#define PWM_ON							(10)
+N#define LEDS_ON_TIME			4
 N
 N// function prototypes
 Nvoid Init_RGB_LEDs(void);
@@ -8834,8 +8835,8 @@ N#define PERIOD_READ_ACCEL 	(1)			// 100 ms / 100 ms = 1
 N#define PERIOD_UPDATE_LEDS 	(5)			// 500 ms / 100 ms = 5
 N
 N// LPTMR period definitioms
-N#define LED_ON_TIME					(5)			// LEDs must be on for 10 ms
-N#define ACCEL_CHECK_FREQ		(50)		// check accelerometer every 100 ms
+N#define LED_ON_TIME					(5)			// 10 ms
+N#define ACCEL_CHECK_FREQ		(50)		// 100 ms
 N
 N// misc
 N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
@@ -8852,54 +8853,105 @@ N#define USE_PWM							0
 N#define LOW_POWER_ACCEL			1
 N#define PWM_SLEEP						0
 N#define USE_VLPR						0
+N#define USE_ANGLE_OPT				1
+N
+N// extra credit investigation
+N#define EXTRA_CREDIT				0
 L 7 "src\tasks.c" 2
+N#include "approx.h"
+L 1 "inc\approx.h" 1
+N#ifndef APPROX_H
+N#define APPROX_H
+N
+Nfloat approx_sqrtf(float z);
+Nfloat approx_atan2f(float y, float x);
+Nfloat approx_rsqrt(float x0);
+N
+N#endif // APPROX_H
+L 8 "src\tasks.c" 2
 N
 Nextern float roll, pitch;
+Nextern int16_t acc_X, acc_Y, acc_Z;
 Nextern uint8_t i2cLockedUp;
 N
 N// Read acceleration
 Nvoid Read_Accel(){
 N	read_full_xyz();
-N	if (i2cLockedUp == WORKING){
-X	if (i2cLockedUp == (0x00)){
-N			convert_xyz_to_roll_pitch();
-N		}
-N		else {
+N	#if USE_ANGLE_OPT == 1
+X	#if 1 == 1
+N		if (i2cLockedUp != WORKING){
+X		if (i2cLockedUp != (0x00)){
 N			// reset i2c if locked up
 N			i2cLockedUp = WORKING;
 X			i2cLockedUp = (0x00);
 N			i2c_reset();
 N		}
+N	#else
+S		if (i2cLockedUp == WORKING){
+S			convert_xyz_to_roll_pitch();
+S		}
+S		else {
+S			// reset i2c if locked up
+S			i2cLockedUp = WORKING;
+S			i2c_reset();
+S		}
+N	#endif
 N}
 N
 N// Update LEDs appropriately
 Nvoid Update_LEDs(){
-N	#if USE_RADIANS == 1
-X	#if 0 == 1
-S		// red = over 30 degrees
-S		if (fabs(roll) > DEG_TO_RAD(30.0) || fabs(pitch) > DEG_TO_RAD(30.0)){
-S			Control_RGB_LEDs(1, 0, 0);
-S		}
-S		// green = less than 15 degrees
-S		else if (fabs(roll) < DEG_TO_RAD(15.0) && fabs(pitch) < DEG_TO_RAD(15.0)){
-S			Control_RGB_LEDs(0, 1, 0);
-S		}
-S		// yellow = between 15 and 30 degrees
-S		else {
-S			Control_RGB_LEDs(1, 1, 0);
-S		}
-N	#else
-N		// red = over 30 degrees
-N		if (fabs(roll) > 30.0 || fabs(pitch) > 30.0){
+N	#if USE_ANGLE_OPT == 1
+X	#if 1 == 1
+N		// determine pitch and roll atan2 arguments
+N		float pitch_ratio = fabs((float)acc_X/approx_sqrtf(acc_Y*acc_Y + acc_Z*acc_Z));
+N		float roll_ratio = fabs((float)acc_Y/acc_Z);
+N		float test_ratio;
+N	
+N		// pick the larger of the two arguments
+N		if (roll_ratio > pitch_ratio){
+N			test_ratio = roll_ratio;
+N		}
+N		else {
+N			test_ratio = pitch_ratio;
+N		}
+N		
+N		// check what angle range we are in
+N		if (test_ratio > .57735f){
 N			Control_RGB_LEDs(1, 0, 0);
 N		}
-N		// green = less than 15 degrees
-N		else if (fabs(roll) < 15.0 && fabs(pitch) < 15.0){
+N		else if (test_ratio < .26795f){
 N			Control_RGB_LEDs(0, 1, 0);
 N		}
-N		// yellow = between 15 and 30 degrees
 N		else {
 N			Control_RGB_LEDs(1, 1, 0);
 N		}
+N	#else
+S		#if USE_RADIANS == 1
+S			// red = over 30 degrees
+S			if (fabs(roll) > DEG_TO_RAD(30.0) || fabs(pitch) > DEG_TO_RAD(30.0)){
+S				Control_RGB_LEDs(1, 0, 0);
+S			}
+S			// green = less than 15 degrees
+S			else if (fabs(roll) < DEG_TO_RAD(15.0) && fabs(pitch) < DEG_TO_RAD(15.0)){
+S				Control_RGB_LEDs(0, 1, 0);
+S			}
+S			// yellow = between 15 and 30 degrees
+S			else {
+S				Control_RGB_LEDs(1, 1, 0);
+S			}
+S		#else
+S			// red = over 30 degrees
+S			if (fabs(roll) > 30.0 || fabs(pitch) > 30.0){
+S				Control_RGB_LEDs(1, 0, 0);
+S			}
+S			// green = less than 15 degrees
+S			else if (fabs(roll) < 15.0 && fabs(pitch) < 15.0){
+S				Control_RGB_LEDs(0, 1, 0);
+S			}
+S			// yellow = between 15 and 30 degrees
+S			else {
+S				Control_RGB_LEDs(1, 1, 0);
+S			}
+S		#endif
 N	#endif
 N}

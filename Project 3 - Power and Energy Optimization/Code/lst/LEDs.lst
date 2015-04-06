@@ -7296,6 +7296,7 @@ N#define SET_LED_RED(x)     TPM2->CONTROLS[0].CnV = (x)
 N#define SET_LED_BLUE(x)    TPM0->CONTROLS[1].CnV = (x)
 N#define PWM_OFF							(0)
 N#define PWM_ON							(10)
+N#define LEDS_ON_TIME			4
 N
 N// function prototypes
 Nvoid Init_RGB_LEDs(void);
@@ -7328,8 +7329,8 @@ N#define PERIOD_READ_ACCEL 	(1)			// 100 ms / 100 ms = 1
 N#define PERIOD_UPDATE_LEDS 	(5)			// 500 ms / 100 ms = 5
 N
 N// LPTMR period definitioms
-N#define LED_ON_TIME					(5)			// LEDs must be on for 10 ms
-N#define ACCEL_CHECK_FREQ		(50)		// check accelerometer every 100 ms
+N#define LED_ON_TIME					(5)			// 10 ms
+N#define ACCEL_CHECK_FREQ		(50)		// 100 ms
 N
 N// misc
 N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
@@ -7346,6 +7347,10 @@ N#define USE_PWM							0
 N#define LOW_POWER_ACCEL			1
 N#define PWM_SLEEP						0
 N#define USE_VLPR						0
+N#define USE_ANGLE_OPT				1
+N
+N// extra credit investigation
+N#define EXTRA_CREDIT				0
 L 5 "src\LEDs.c" 2
 N
 N#if USE_PWM == 1
