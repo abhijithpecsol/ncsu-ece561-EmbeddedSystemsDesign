@@ -8,3 +8,4 @@
 .\obj\timers.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h
 .\obj\timers.o: inc\LEDs.h
 .\obj\timers.o: inc\project3.h
+.\obj\timers.o: inc\gpio_defs.h

@@ -2,6 +2,7 @@
 #include "MKL25Z4.h"
 #include "LEDs.h"
 #include "project3.h"
+#include "gpio_defs.h"
 
 volatile uint8_t run_Read_Accel = 0;
 volatile uint8_t run_Update_LEDs = 0;
@@ -34,6 +35,10 @@ void Stop_LPTMR(void) {
 }
 
 void LPTimer_IRQHandler(void) {
+	#if DEBUG_SIGNALS
+		PTE->PCOR |= MASK(30);
+	#endif
+	
 	NVIC_ClearPendingIRQ(LPTimer_IRQn);
 	LPTMR0->CSR |= LPTMR_CSR_TCF_MASK;
 	

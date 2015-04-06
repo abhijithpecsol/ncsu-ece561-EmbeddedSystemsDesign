@@ -8513,27 +8513,52 @@ N
 N// misc
 N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
 N
-N
 N// debug definitions
-N#define ALWAYS_RED					(1)
+N#define ALWAYS_RED					1
+N#define DEBUG_SIGNALS				0
 N
 N// incremental changes definitions
-N#define RUN_I2C_FAST				(1)
-N#define USE_RADIANS					(1)
-N#define USE_PWM							(1)
-N#define DISABLE_CLOCKS			(0)
-N#define LOW_POWER_ACCEL			(1)
+N#define USE_SLEEP_MODES			1
+N#define RUN_I2C_FAST				1
+N#define USE_RADIANS					1
+N#define USE_PWM							1
+N#define LOW_POWER_ACCEL			1
+N#define PWM_SLEEP						1
 L 13 "src\main.c" 2
 N
 Nextern volatile uint8_t run_Read_Accel;
 Nextern volatile uint8_t run_Update_LEDs;
 Nextern volatile uint8_t led_on_period;
 N
+Nvoid Init_Debug_Signals(void) {
+N	// Enable clock to ports E
+N	SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
+X	((SIM_Type *)(0x40047000u))->SCGC5 |= 0x2000u;
+N	
+N	// Make 3 pins GPIO
+N	PORTE->PCR[30] &= ~PORT_PCR_MUX_MASK;          
+X	((PORT_Type *)(0x4004D000u))->PCR[30] &= ~0x700u;          
+N	PORTE->PCR[30] |= PORT_PCR_MUX(1);          
+X	((PORT_Type *)(0x4004D000u))->PCR[30] |= (((uint32_t)(((uint32_t)(1))<<8))&0x700u);          
+N	
+N	// Set ports to outputs
+N	PTE->PDDR |= MASK(30);
+X	((GPIO_Type *)(0x400FF100u))->PDDR |= (1UL << (30));
+N	
+N	PTE->PSOR |= MASK(30);
+X	((GPIO_Type *)(0x400FF100u))->PSOR |= (1UL << (30));
+N}	
+N
 N/*----------------------------------------------------------------------------
 N  MAIN function
 N *----------------------------------------------------------------------------*/
 Nint main (void) {
 N	Init_RGB_LEDs();
+N	
+N	#if DEBUG_SIGNALS == 1
+X	#if 0 == 1
+S		Init_Debug_Signals();
+N	#endif
 N	
 N	// I2C and MMA
 N	i2c_init();																/* init i2c	*/
@@ -8544,7 +8569,7 @@ N			;
 N	}
 N	
 N	#if RUN_I2C_FAST == 1
-X	#if (1) == 1
+X	#if 1 == 1
 N		// increase i2c baud rate
 N		I2C_DISABLE;
 X		((I2C_Type *)(0x40066000u))->C1 &= ~(0x80u);Delay(10);;
@@ -8570,14 +8595,6 @@ N	// enable stop mode (deep sleep)
 N	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 X	((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR |= (1UL << 2);
 N	
-N	#if DISABLE_CLOCKS == 1
-X	#if (0) == 1
-S		// disable clocks to unused peripherals
-S		SIM->SCGC5 &= ~(SIM_SCGC5_PORTA_MASK);
-S		SIM->SCGC6 &= ~SIM_SCGC6_FTF_MASK;
-S		SIM->SCGC7 &= ~SIM_SCGC7_DMA_MASK;
-N	#endif
-N	
 N	// LPTMR
 N	Init_LPTMR();
 N	Start_LPTMR();
@@ -8597,22 +8614,35 @@ N			run_Update_LEDs = 0;
 N			Update_LEDs();
 N			
 N			#if USE_PWM == 1
-X			#if (1) == 1
-N				SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
-X				((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR &= ~(1UL << 2);
-N				__wfi();
-N				SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-X				((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR |= (1UL << 2);
-N				//while(led_on_period);
-N//				OSC0->CR |= OSC_CR_EREFSTEN_MASK;
-N//				SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(0);			// switch to "normal" stop model OSCERCLK (PWM) does not work in LLS
-N//				__wfi();
-N//				OSC0->CR &= ~OSC_CR_EREFSTEN_MASK;
-N//				SMC->PMCTRL = SMC_PMCTRL_RUNM(0) | SMC_PMCTRL_STOPM(3);			// return to LLS
+X			#if 1 == 1
+N				#if PWM_SLEEP == 1
+X				#if 1 == 1
+N					SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;		// switch to regular sleep mode
+X					((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR &= ~(1UL << 2);		
+N					#if USE_SLEEP_MODES == 1
+X					#if 1 == 1
+N						#if DEBUG_SIGNALS == 1
+X						#if 0 == 1
+S							PTE->PSOR |= MASK(30);
+N						#endif
+N						__wfi();															// PWM does not work in LLS mode
+N					#endif
+N					SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;		// switch back to LLS mode
+X					((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SCR |= (1UL << 2);		
+N				#else
+S					while(led_on_period);									// poll -> bad solution
+N				#endif
 N			#endif
 N		}
-N		
-N		__wfi();			// go to sleep
+N				
+N		#if USE_SLEEP_MODES == 1
+X		#if 1 == 1
+N			#if DEBUG_SIGNALS == 1
+X			#if 0 == 1
+S					PTE->PSOR |= MASK(30);
+N			#endif
+N			__wfi();			// go to sleep
+N		#endif
 N	}
 N}
 N

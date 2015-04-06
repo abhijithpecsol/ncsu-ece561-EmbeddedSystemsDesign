@@ -7341,17 +7341,35 @@ N
 N// misc
 N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
 N
-N
 N// debug definitions
-N#define ALWAYS_RED					(1)
+N#define ALWAYS_RED					1
+N#define DEBUG_SIGNALS				0
 N
 N// incremental changes definitions
-N#define RUN_I2C_FAST				(1)
-N#define USE_RADIANS					(1)
-N#define USE_PWM							(1)
-N#define DISABLE_CLOCKS			(0)
-N#define LOW_POWER_ACCEL			(1)
+N#define USE_SLEEP_MODES			1
+N#define RUN_I2C_FAST				1
+N#define USE_RADIANS					1
+N#define USE_PWM							1
+N#define LOW_POWER_ACCEL			1
+N#define PWM_SLEEP						1
 L 5 "src\timers.c" 2
+N#include "gpio_defs.h"
+L 1 "inc\gpio_defs.h" 1
+N#ifndef GPIO_DEFS_H
+N#define GPIO_DEFS_H
+N
+N// basic light switch 
+N#define LED1_POS (1)	// on port A
+N#define LED2_POS (2)	// on port A
+N#define SW1_POS (5)		// on port A
+N
+N#define MASK(x) (1UL << (x))
+N
+N// Speaker output
+N#define SPKR_POS (0) 	// on port C
+N
+N#endif
+L 6 "src\timers.c" 2
 N
 Nvolatile uint8_t run_Read_Accel = 0;
 Nvolatile uint8_t run_Update_LEDs = 0;
@@ -7392,6 +7410,11 @@ X	((LPTMR_Type *)(0x40040000u))->CSR &= ~0x1u;
 N}
 N
 Nvoid LPTimer_IRQHandler(void) {
+N	#if DEBUG_SIGNALS
+X	#if 0
+S		PTE->PCOR |= MASK(30);
+N	#endif
+N	
 N	NVIC_ClearPendingIRQ(LPTimer_IRQn);
 N	LPTMR0->CSR |= LPTMR_CSR_TCF_MASK;
 X	((LPTMR_Type *)(0x40040000u))->CSR |= 0x80u;
@@ -7404,7 +7427,7 @@ N		Control_RGB_LEDs(0,0,0);
 N		LPTMR0->CMR = (ACCEL_CHECK_FREQ - LED_ON_TIME);		// 90 ms to next 100 ms
 X		((LPTMR_Type *)(0x40040000u))->CMR = ((50) - (5));		
 N		#if USE_PWM == 1
-X		#if (1) == 1
+X		#if 1 == 1
 N			led_on_period = 0;
 N		#endif
 N		return;
@@ -7432,7 +7455,7 @@ X		delay_Update_LEDs = (5);
 N		LPTMR0->CMR = LED_ON_TIME;
 X		((LPTMR_Type *)(0x40040000u))->CMR = (5);
 N		#if USE_PWM == 1
-X		#if (1) == 1
+X		#if 1 == 1
 N			led_on_period = 1;
 N		#endif
 N	}

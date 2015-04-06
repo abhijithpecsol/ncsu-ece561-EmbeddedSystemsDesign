@@ -7334,20 +7334,21 @@ N
 N// misc
 N#define DEG_TO_RAD(X)				(((X)*(180/3.14159265f)))
 N
-N
 N// debug definitions
-N#define ALWAYS_RED					(1)
+N#define ALWAYS_RED					1
+N#define DEBUG_SIGNALS				0
 N
 N// incremental changes definitions
-N#define RUN_I2C_FAST				(1)
-N#define USE_RADIANS					(1)
-N#define USE_PWM							(1)
-N#define DISABLE_CLOCKS			(0)
-N#define LOW_POWER_ACCEL			(1)
+N#define USE_SLEEP_MODES			1
+N#define RUN_I2C_FAST				1
+N#define USE_RADIANS					1
+N#define USE_PWM							1
+N#define LOW_POWER_ACCEL			1
+N#define PWM_SLEEP						1
 L 5 "src\LEDs.c" 2
 N
 N#if USE_PWM == 1
-X#if (1) == 1
+X#if 1 == 1
 N	void Init_RGB_LEDs(void) {
 N		SIM->SCGC5 |= SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTD_MASK;
 X		((SIM_Type *)(0x40047000u))->SCGC5 |= 0x400u | 0x1000u;
@@ -7396,7 +7397,7 @@ N
 N	// rudimentary implementation
 N	void Control_RGB_LEDs(unsigned int red_on, unsigned int green_on, unsigned int blue_on){
 N		#if ALWAYS_RED == 1
-X		#if (1) == 1
+X		#if 1 == 1
 N		if (red_on || green_on || blue_on) {
 N				SET_LED_RED(PWM_ON);
 X				((TPM_Type *)(0x4003A000u))->CONTROLS[0]. CnV = ((10));
