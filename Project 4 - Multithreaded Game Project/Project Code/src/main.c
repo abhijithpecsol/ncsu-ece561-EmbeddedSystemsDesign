@@ -34,7 +34,7 @@ int main (void) {
 	TFT_Init();
 	TFT_Text_Init(1);
 	TFT_Erase();
-	TFT_Text_PrintStr_RC(0,0, "Test Code");
+	TFT_Text_PrintStr_RC(0,0, "Doodle Jump v0.1");
 	
 /*
 	Graphics_Test();
@@ -46,15 +46,12 @@ int main (void) {
 //	TFT_TS_Calibrate();
 //	TFT_TS_Test();
 
-	TFT_Text_PrintStr_RC(1,0, "Accel...");
-
 	i2c_init();											// init I2C peripheral
 	if (!init_mma()) {							// init accelerometer
 		Control_RGB_LEDs(1,0,0);			// accel initialization failed, so turn on red error light
 		while (1)
 			;
 	}
-	TFT_Text_PrintStr_RC(1,9, "Done");
 
 	Delay(70);
 

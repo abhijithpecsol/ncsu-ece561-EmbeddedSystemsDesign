@@ -8,10 +8,11 @@
 #include "mma8451.h"
 #include "sound.h"
 #include "gpio_defs.h"
+#include "game.h"
 
 U64 RA_Stack[64];
 
-OS_TID t_Read_TS, t_Read_Accelerometer, t_Sound;
+OS_TID t_Read_TS, t_Read_Accelerometer, t_Sound, t_Update_Game;
 OS_MUT LCD_mutex;
 OS_MUT TS_mutex;
 
@@ -49,6 +50,7 @@ __task void Task_Init(void) {
 	t_Read_TS = os_tsk_create(Task_Read_TS, 4);
 	t_Read_Accelerometer = os_tsk_create_user(Task_Read_Accelerometer, 3, RA_Stack, 512);
 	t_Sound = os_tsk_create(Task_Sound, 2);
+	t_Update_Game = os_tsk_create(Task_Update_Game_State, 5);
   os_tsk_delete_self ();
 }
 
@@ -84,9 +86,7 @@ __task void Task_Read_TS(void) {
 	}
 }
 
-__task void Task_Read_Accelerometer(void) {
-	char buffer[16];
-	
+__task void Task_Read_Accelerometer(void) {	
 	os_itv_set(TASK_READ_ACCELEROMETER_PERIOD_TICKS);
 
 	while (1) {
@@ -94,30 +94,9 @@ __task void Task_Read_Accelerometer(void) {
 		PTB->PSOR = MASK(DEBUG_T0_POS);
 		read_full_xyz();
 		convert_xyz_to_roll_pitch();
-#if 0
-		sprintf(buffer, "X: %6d", acc_X);
-		TFT_Text_PrintStr_RC(2, 0, buffer);
-		sprintf(buffer, "Y: %6d", acc_Y);
-		TFT_Text_PrintStr_RC(3, 0, buffer);
-		sprintf(buffer, "Z: %6d", acc_Z);
-		TFT_Text_PrintStr_RC(4, 0, buffer);
-#else
-		// PTB->PTOR = MASK(DEBUG_T0_POS);
-		sprintf(buffer, "Roll: %6.2f", roll);
-		// PTB->PTOR = MASK(DEBUG_T0_POS);
 
-		os_mut_wait(&LCD_mutex, WAIT_FOREVER);
-		TFT_Text_PrintStr_RC(2, 0, buffer);
-		os_mut_release(&LCD_mutex);
+		// TODO - mailbox roll/pitch to game thread
 		
-		// PTB->PTOR = MASK(DEBUG_T0_POS);
-		sprintf(buffer, "Pitch: %6.2f", pitch);
-		// PTB->PTOR = MASK(DEBUG_T0_POS);
-
-		os_mut_wait(&LCD_mutex, WAIT_FOREVER);
-		TFT_Text_PrintStr_RC(3, 0, buffer);
-		os_mut_release(&LCD_mutex);
-#endif
 		PTB->PCOR = MASK(DEBUG_T0_POS);
 	}
 }
@@ -159,3 +138,23 @@ __task void Task_Sound(void) {
 		}
 	}
 }
+
+__task void Task_Update_Game_State(void) {
+	CHARACTER_T ch;
+	
+	Game_Init(&ch);
+	
+	os_itv_set(TASK_UPDATE_GAME_STATE_TICKS);
+
+	while (1) {
+		os_itv_wait();
+		//PTB->PSOR = MASK(DEBUG_T0_POS);
+		
+		Detect_Collision(&ch);
+		Move_Character(&ch);
+		Redraw_Platforms();
+
+		//PTB->PCOR = MASK(DEBUG_T0_POS);
+	}
+}
+

@@ -1,0 +1,35 @@
+	if (ch->Vy >= 0){
+		p = ch->loc, pp = ch->loc;
+		p.X -= MAX_CHAR_DISPLACEMENT;
+		p.Y -= MAX_CHAR_DISPLACEMENT;
+		pp.X += (CHAR_BODY_WIDTH + MAX_CHAR_DISPLACEMENT);
+		pp.Y += CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT;
+	}
+	else {
+		p = ch->loc, pp = ch->loc;
+		p.X -= MAX_CHAR_DISPLACEMENT;
+		pp.X += (CHAR_BODY_WIDTH + MAX_CHAR_DISPLACEMENT);
+		pp.Y += (CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT + MAX_CHAR_DISPLACEMENT);
+	}
+	
+	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+	TFT_Start_Rectangle(&p, &pp);
+	if (ch->Vy >= 0){
+		TFT_Write_Rectangle_Pixel(&c_bg, (2*MAX_CHAR_DISPLACEMENT+CHAR_BODY_WIDTH+1)*MAX_CHAR_DISPLACEMENT);
+	}
+	for (i = 0; i < CHAR_BODY_HEIGHT; i++){
+		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + 1);
+		TFT_Write_Rectangle_Pixel(&c_char, CHAR_BODY_WIDTH);
+		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT);
+	}
+	for (i = 0; i < CHAR_LEG_HEIGHT; i++){
+		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET + 1);
+		TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+		TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_GAP);
+		TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET);
+	}
+	if (ch->Vy < 0){
+		TFT_Write_Rectangle_Pixel(&c_bg, (2*MAX_CHAR_DISPLACEMENT+CHAR_BODY_WIDTH+1)*MAX_CHAR_DISPLACEMENT);
+	}
+	os_mut_release(&LCD_mutex);

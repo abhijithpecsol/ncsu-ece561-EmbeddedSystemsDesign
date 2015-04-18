@@ -678,6 +678,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\tft_graphics.c</FilePath>
             </File>
+            <File>
+              <FileName>game.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\game.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

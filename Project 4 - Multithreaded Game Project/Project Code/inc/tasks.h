@@ -2,9 +2,10 @@
 #define TASKS_H
 #include <RTL.h>
 
-#define TASK_READ_TS_PERIOD_TICKS (20)  // 1 tick/ms
-#define TASK_READ_ACCELEROMETER_PERIOD_TICKS (250)  // 1 tick/ms
+#define TASK_READ_TS_PERIOD_TICKS (100)  // 1 tick/ms
+#define TASK_READ_ACCELEROMETER_PERIOD_TICKS (100)  // 1 tick/ms
 #define TASK_SOUND_PERIOD_TICKS (1)  // 1 tick/ms
+#define TASK_UPDATE_GAME_STATE_TICKS (50)	
 
 // Debug outputs on Port B
 #define DEBUG_T0_POS 	0		// J10 pin 2
@@ -22,4 +23,5 @@ extern __task void Task_Init(void);
 extern __task void Task_Read_TS(void);
 extern __task void Task_Read_Accelerometer(void);
 extern __task void Task_Sound(void);
+extern __task void Task_Update_Game_State(void);
 #endif

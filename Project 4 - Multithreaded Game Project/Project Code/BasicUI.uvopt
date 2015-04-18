@@ -116,6 +116,11 @@
       <TargetDriverDllRegistry>
         <SetRegEntry>
           <Number>0</Number>
+          <Key>ARMRTXEVENTFLAGS</Key>
+          <Name>-L50 -Z18 -C0 -M0 -T0</Name>
+        </SetRegEntry>
+        <SetRegEntry>
+          <Number>0</Number>
           <Key>UL2CM3</Key>
           <Name>UL2CM3(-S0 -C0 -P0 -FD1FFFF000 -FC4000 -FN1 -FF0MK_P128_48MHZ -FS00 -FL020000 -FP0($$Device:MKL25Z128xxx4$Flash\MK_P128_48MHZ.FLM))</Name>
         </SetRegEntry>
@@ -145,7 +150,24 @@
           <Name>-O2510 -S0 -C0 -FO15 -FD20000000 -FC800 -FN1 -FF0MK_P128_48MHZ -FS00 -FL020000)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>214</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>8164</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\src\game.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\BasicUI\src/game.c\214</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -195,132 +217,137 @@
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>r</ItemText>
+          <ItemText>num_lost,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>num_lost,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>11</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>xl,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>12</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>xr,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>13</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>yu,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>14</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>yd,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>15</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>p</ItemText>
-        </Ww>
-        <Ww>
-          <count>16</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>b</ItemText>
+          <ItemText>platforms</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
           <count>0</count>
           <WinNumber>2</WinNumber>
-          <ItemText>RegionCount,0x0A</ItemText>
+          <ItemText>r</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>2</WinNumber>
-          <ItemText>profile_ticks,0x0A</ItemText>
+          <ItemText>xl,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>2</WinNumber>
-          <ItemText>num_lost,0x0A</ItemText>
+          <ItemText>xr,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>2</WinNumber>
-          <ItemText>adx_lost,0x10</ItemText>
+          <ItemText>yu,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>2</WinNumber>
-          <ItemText>TFT_TS_X_Offset,0x0A</ItemText>
+          <ItemText>yd,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>2</WinNumber>
-          <ItemText>TFT_TS_Y_Offset,0x0A</ItemText>
+          <ItemText>p</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>2</WinNumber>
-          <ItemText>TFT_TS_X_Scale,0x0A</ItemText>
+          <ItemText>b</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>2</WinNumber>
-          <ItemText>TFT_TS_Y_Scale,0x0A</ItemText>
+          <ItemText>RegionCount,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>2</WinNumber>
-          <ItemText>p_bound,0x0A</ItemText>
+          <ItemText>profile_ticks,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>2</WinNumber>
-          <ItemText>x,0x0A</ItemText>
+          <ItemText>num_lost,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>2</WinNumber>
-          <ItemText>y,0x0A</ItemText>
+          <ItemText>adx_lost,0x10</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>2</WinNumber>
-          <ItemText>TS_Max,0x0A</ItemText>
+          <ItemText>TFT_TS_X_Offset,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>2</WinNumber>
-          <ItemText>TS_Min,0x0A</ItemText>
+          <ItemText>TFT_TS_Y_Offset,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>2</WinNumber>
-          <ItemText>x,0x0A</ItemText>
+          <ItemText>TFT_TS_X_Scale,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>2</WinNumber>
-          <ItemText>y,0x0A</ItemText>
+          <ItemText>TFT_TS_Y_Scale,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>2</WinNumber>
-          <ItemText>position,0x0A</ItemText>
+          <ItemText>p_bound,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>2</WinNumber>
-          <ItemText>TFT_TS_Calibrated</ItemText>
+          <ItemText>x,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>y,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>18</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>TS_Max,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>19</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>TS_Min,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>20</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>x,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>21</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>y,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>22</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>position,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>23</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>TFT_TS_Calibrated</ItemText>
+        </Ww>
+        <Ww>
+          <count>24</count>
           <WinNumber>2</WinNumber>
           <ItemText>val</ItemText>
         </Ww>
@@ -353,7 +380,7 @@
         <AscS3>0</AscS3>
         <aSer3>0</aSer3>
         <eProf>0</eProf>
-        <aLa>1</aLa>
+        <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
         <aSer4>0</aSer4>
@@ -364,12 +391,6 @@
       </DebugFlag>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
-      <SystemViewers>
-        <Entry>
-          <Name>OS Support\System and Thread Viewer</Name>
-          <WinId>35905</WinId>
-        </Entry>
-      </SystemViewers>
     </TargetOption>
   </Target>
 
@@ -631,6 +652,19 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\src\tft_graphics.c</PathWithFileName>
       <FilenameWithoutPath>tft_graphics.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>20</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\src\game.c</PathWithFileName>
+      <FilenameWithoutPath>game.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

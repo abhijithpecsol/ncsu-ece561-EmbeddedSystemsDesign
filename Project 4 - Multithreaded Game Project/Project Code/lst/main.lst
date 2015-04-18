@@ -10852,9 +10852,10 @@ N#ifndef TASKS_H
 N#define TASKS_H
 N#include <RTL.h>
 N
-N#define TASK_READ_TS_PERIOD_TICKS (20)  // 1 tick/ms
-N#define TASK_READ_ACCELEROMETER_PERIOD_TICKS (250)  // 1 tick/ms
+N#define TASK_READ_TS_PERIOD_TICKS (100)  // 1 tick/ms
+N#define TASK_READ_ACCELEROMETER_PERIOD_TICKS (100)  // 1 tick/ms
 N#define TASK_SOUND_PERIOD_TICKS (1)  // 1 tick/ms
+N#define TASK_UPDATE_GAME_STATE_TICKS (50)	
 N
 N// Debug outputs on Port B
 N#define DEBUG_T0_POS 	0		// J10 pin 2
@@ -10876,6 +10877,8 @@ Nextern __task void Task_Read_Accelerometer(void);
 Xextern __declspec(noreturn) void Task_Read_Accelerometer(void);
 Nextern __task void Task_Sound(void);
 Xextern __declspec(noreturn) void Task_Sound(void);
+Nextern __task void Task_Update_Game_State(void);
+Xextern __declspec(noreturn) void Task_Update_Game_State(void);
 N#endif
 L 22 "src\main.c" 2
 N
@@ -10893,7 +10896,7 @@ N
 N	TFT_Init();
 N	TFT_Text_Init(1);
 N	TFT_Erase();
-N	TFT_Text_PrintStr_RC(0,0, "Test Code");
+N	TFT_Text_PrintStr_RC(0,0, "Doodle Jump v0.1");
 N	
 N/*
 N	Graphics_Test();
@@ -10905,15 +10908,12 @@ N
 N//	TFT_TS_Calibrate();
 N//	TFT_TS_Test();
 N
-N	TFT_Text_PrintStr_RC(1,0, "Accel...");
-N
 N	i2c_init();											// init I2C peripheral
 N	if (!init_mma()) {							// init accelerometer
 N		Control_RGB_LEDs(1,0,0);			// accel initialization failed, so turn on red error light
 N		while (1)
 N			;
 N	}
-N	TFT_Text_PrintStr_RC(1,9, "Done");
 N
 N	Delay(70);
 N

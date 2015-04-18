@@ -18,6 +18,7 @@
 ".\obj\sound.o"
 ".\obj\tasks.o"
 ".\obj\tft_graphics.o"
+".\obj\game.o"
 C:\Keil_v5\ARM\RV31\LIB\RTX_CM1.LIB
 --library_type=microlib --strict --scatter ".\obj\BasicUI.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols

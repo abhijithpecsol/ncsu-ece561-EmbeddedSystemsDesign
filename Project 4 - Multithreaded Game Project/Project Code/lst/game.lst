@@ -1,4 +1,12 @@
-L 1 "src\tasks.c"
+L 1 "src\game.c"
+N/*
+N * Game.c
+N *
+N * This file will contain various helper functions for the game processing.
+N * Header file contains various structs and data structures as well.
+N *
+N */
+N
 N#include <stdint.h>
 L 1 "C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h" 1
 N/* Copyright (C) ARM Ltd., 1999,2014 */
@@ -330,7 +338,7 @@ N
 N#endif /* __stdint_h */
 N
 N/* end of stdint.h */
-L 2 "src\tasks.c" 2
+L 10 "src\game.c" 2
 N#include <stdio.h>
 L 1 "C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h" 1
 N/* stdio.h: ANSI 'C' (X3J11 Oct 88) library header, section 4.9 */
@@ -1399,7 +1407,7 @@ N#endif /* ndef __stdio_h */
 N
 N/* end of stdio.h */
 N
-L 3 "src\tasks.c" 2
+L 11 "src\game.c" 2
 N#include <RTL.h>
 L 1 "C:\Keil_v5\ARM\RV31\INC\RTL.h" 1
 N/*----------------------------------------------------------------------------
@@ -2136,7 +2144,7 @@ N *---------------------------------------------------------------------------*/
 N
 N#endif
 N 
-L 4 "src\tasks.c" 2
+L 12 "src\game.c" 2
 N#include <MKL25Z4.h>
 L 1 "C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h" 1
 N/*
@@ -9083,8 +9091,7 @@ N
 N#endif  /* #if !defined(MKL25Z4_H_) */
 N
 N/* MKL25Z4.h, eof. */
-L 5 "src\tasks.c" 2
-N
+L 13 "src\game.c" 2
 N#include "tft_lcd.h"
 L 1 ".\inc\tft_lcd.h" 1
 N#ifndef TFT_LCD_H
@@ -9179,7 +9186,7 @@ Nextern uint8_t G_TFT_char_width, G_TFT_char_height;
 N
 N
 N#endif
-L 7 "src\tasks.c" 2
+L 14 "src\game.c" 2
 N#include "tasks.h"
 L 1 ".\inc\tasks.h" 1
 N#ifndef TASKS_H
@@ -9214,7 +9221,7 @@ Xextern __declspec(noreturn) void Task_Sound(void);
 Nextern __task void Task_Update_Game_State(void);
 Xextern __declspec(noreturn) void Task_Update_Game_State(void);
 N#endif
-L 8 "src\tasks.c" 2
+L 15 "src\game.c" 2
 N#include "mma8451.h"
 L 1 ".\inc\mma8451.h" 1
 N#ifndef MMA8451_H
@@ -9247,7 +9254,7 @@ Nextern float roll, pitch;
 Nextern int16_t acc_X, acc_Y, acc_Z;
 N
 N#endif
-L 9 "src\tasks.c" 2
+L 16 "src\game.c" 2
 N#include "sound.h"
 L 1 ".\inc\sound.h" 1
 N#ifndef SOUND_H
@@ -9264,7 +9271,7 @@ Nextern void Play_Tone(void);
 Nextern void Sound_Init(void);
 N
 N#endif // SOUND_H
-L 10 "src\tasks.c" 2
+L 17 "src\game.c" 2
 N#include "gpio_defs.h"
 L 1 ".\inc\gpio_defs.h" 1
 N#ifndef GPIO_DEFS_H
@@ -9279,7 +9286,7 @@ N#define BLUE_LED_POS (1)		// on port D
 N
 N#endif
 N// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
-L 11 "src\tasks.c" 2
+L 18 "src\game.c" 2
 N#include "game.h"
 L 1 ".\inc\game.h" 1
 N/*
@@ -9339,204 +9346,279 @@ Nvoid Erase_Platform(PLATFORM_T * p, COLOR_T * bg);		// Erase platform with the 
 Nvoid Redraw_Platforms(void);													// Redraw all platforms to counter erased content
 Nvoid Move_Character(CHARACTER_T * ch);								// Move character based on velocity and adjust velocity
 Nvoid Detect_Collision(CHARACTER_T * ch);							// Detect whether the character has hit a hall, platform, or monster
-L 12 "src\tasks.c" 2
+L 19 "src\game.c" 2
 N
-NU64 RA_Stack[64];
+Nextern OS_MUT LCD_mutex;
+NCOLOR_T c_char, c_plat, c_bg;
+NPLATFORM_FIFO_T platforms;
 N
-NOS_TID t_Read_TS, t_Read_Accelerometer, t_Sound, t_Update_Game;
-NOS_MUT LCD_mutex;
-NOS_MUT TS_mutex;
-N
-Nvoid Init_Debug_Signals(void) {
-N	// Enable clock to port B
-N	SIM->SCGC5 |= SIM_SCGC5_PORTB_MASK;
-X	((SIM_Type *)(0x40047000u))->SCGC5 |= 0x400u;
+N// Create initial game state
+Nvoid Game_Init(CHARACTER_T * ch) {
+N	PLATFORM_T * start_plat;
+N	PLATFORM_T * sp;
 N	
-N	// Make 3 pins GPIO
-N	PORTB->PCR[DEBUG_T0_POS] &= ~PORT_PCR_MUX_MASK;          
-X	((PORT_Type *)(0x4004A000u))->PCR[0] &= ~0x700u;          
-N	PORTB->PCR[DEBUG_T0_POS] |= PORT_PCR_MUX(1);          
-X	((PORT_Type *)(0x4004A000u))->PCR[0] |= (((uint32_t)(((uint32_t)(1))<<8))&0x700u);          
-N	PORTB->PCR[DEBUG_T1_POS] &= ~PORT_PCR_MUX_MASK;          
-X	((PORT_Type *)(0x4004A000u))->PCR[1] &= ~0x700u;          
-N	PORTB->PCR[DEBUG_T1_POS] |= PORT_PCR_MUX(1);          
-X	((PORT_Type *)(0x4004A000u))->PCR[1] |= (((uint32_t)(((uint32_t)(1))<<8))&0x700u);          
-N	PORTB->PCR[DEBUG_T2_POS] &= ~PORT_PCR_MUX_MASK;          
-X	((PORT_Type *)(0x4004A000u))->PCR[2] &= ~0x700u;          
-N	PORTB->PCR[DEBUG_T2_POS] |= PORT_PCR_MUX(1);          
-X	((PORT_Type *)(0x4004A000u))->PCR[2] |= (((uint32_t)(((uint32_t)(1))<<8))&0x700u);          
-N	PORTB->PCR[DEBUG_T3_POS] &= ~PORT_PCR_MUX_MASK;          
-X	((PORT_Type *)(0x4004A000u))->PCR[3] &= ~0x700u;          
-N	PORTB->PCR[DEBUG_T3_POS] |= PORT_PCR_MUX(1);          
-X	((PORT_Type *)(0x4004A000u))->PCR[3] |= (((uint32_t)(((uint32_t)(1))<<8))&0x700u);          
+N	// platform color
+N	c_plat.R = 126;
+N	c_plat.G = 192;
+N	c_plat.B = 56;
 N	
-N	// Set ports to outputs
-N	PTB->PDDR |= MASK(DEBUG_T0_POS);
-X	((GPIO_Type *)(0x400FF040u))->PDDR |= (1UL << (0));
-N	PTB->PDDR |= MASK(DEBUG_T1_POS);
-X	((GPIO_Type *)(0x400FF040u))->PDDR |= (1UL << (1));
-N	PTB->PDDR |= MASK(DEBUG_T2_POS);
-X	((GPIO_Type *)(0x400FF040u))->PDDR |= (1UL << (2));
-N	PTB->PDDR |= MASK(DEBUG_T3_POS);
-X	((GPIO_Type *)(0x400FF040u))->PDDR |= (1UL << (3));
+N	// mr. doodle color
+N	c_char.R = 150;
+N	c_char.G = 200;
+N	c_char.B = 255;
 N	
-N	// Initial values are 0
-N	PTB->PCOR = MASK(DEBUG_T0_POS);
-X	((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (0));
-N	PTB->PCOR = MASK(DEBUG_T1_POS);
-X	((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (1));
-N	PTB->PCOR = MASK(DEBUG_T2_POS);
-X	((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (2));
-N	PTB->PCOR = MASK(DEBUG_T3_POS);
-X	((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (3));
-N}	
-N
-N__task void Task_Init(void) {
-X__declspec(noreturn) void Task_Init(void) {
+N	// background color
+N	c_bg.R = 0;
+N	c_bg.G = 0;
+N	c_bg.B = 0;
 N	
-N	os_mut_init(&LCD_mutex);
-X	_os_mut_init((U32)rt_mut_init,&LCD_mutex);
+N	// initial position of character
+N	ch->loc.X = CHAR_START_POS_X;
+X	ch->loc.X = (((240) - (26))/2);
+N	ch->loc.Y = CHAR_START_POS_Y;
+X	ch->loc.Y = (((320) - (10) - (10)) - (40) - (10));
 N	
-N	t_Read_TS = os_tsk_create(Task_Read_TS, 4);
-X	t_Read_TS = _os_tsk_create((U32)rt_tsk_create,Task_Read_TS,4,0,0);
-N	t_Read_Accelerometer = os_tsk_create_user(Task_Read_Accelerometer, 3, RA_Stack, 512);
-X	t_Read_Accelerometer = _os_tsk_create((U32)rt_tsk_create,Task_Read_Accelerometer,3|(512<<8),RA_Stack,0);
-N	t_Sound = os_tsk_create(Task_Sound, 2);
-X	t_Sound = _os_tsk_create((U32)rt_tsk_create,Task_Sound,2,0,0);
-N	t_Update_Game = os_tsk_create(Task_Update_Game_State, 5);
-X	t_Update_Game = _os_tsk_create((U32)rt_tsk_create,Task_Update_Game_State,5,0,0);
-N  os_tsk_delete_self ();
-X  { _os_tsk_delete((U32)rt_tsk_delete, 0); for(;;); };
+N	// initial position of start platform
+N	start_plat = Add_Platform();
+N	start_plat->loc.X = PLAT_START_POS_X;
+X	start_plat->loc.X = (((240) - (50))/2);
+N	start_plat->loc.Y = PLAT_START_POS_Y;
+X	start_plat->loc.Y = ((320) - (10) - (10));
+N	Draw_Platform(start_plat, &c_plat);
+N	
+N	//sp = Add_Platform();
+N	//sp->loc.X = PLAT_START_POS_X;
+N	//sp->loc.Y = PLAT_START_POS_Y - 75;
+N	//Draw_Platform(sp, &c_plat);
+W "src\game.c" 27 15 variable "sp" was declared but never referenced
 N}
 N
-N__task void Task_Read_TS(void) {
-X__declspec(noreturn) void Task_Read_TS(void) {
+N// Draw character at it's existing position in the selected color
+Nvoid Draw_Character(CHARACTER_T * ch, COLOR_T * c) {
 N	PT_T p, pp;
-N	COLOR_T c;
-N	
-N	c.R = 150;
-N	c.G = 200;
-N	c.B = 255;
-N	
-N	os_itv_set(TASK_READ_TS_PERIOD_TICKS);
-X	_os_itv_set((U32)rt_itv_set,(100));
-N
-N	while (1) {
-N		os_itv_wait();
-X		_os_itv_wait((U32)rt_itv_wait);
-N		PTB->PSOR = MASK(DEBUG_T1_POS);
-X		((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << (1));
-N		if (TFT_TS_Read(&p)) { 
-N			// Send message indicating screen was pressed
-N			os_evt_set(EV_PLAYSOUND, t_Sound);
-X			_os_evt_set((U32)rt_evt_set,(1),t_Sound);
-N			// Also draw on screen
-N			if ((pp.X == 0) && (pp.Y == 0)) {
-N				pp = p;
-N			}
-N			os_mut_wait(&LCD_mutex, WAIT_FOREVER);
-X			_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
-N			TFT_Draw_Line(&p, &pp, &c);
-N			os_mut_release(&LCD_mutex);
-X			_os_mut_release((U32)rt_mut_release,&LCD_mutex);
-N			pp = p;
-N		} else {
-N			pp.X = 0;
-N			pp.Y = 0;
-N		}
-N		PTB->PCOR = MASK(DEBUG_T1_POS);
-X		((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (1));
-N	}
-N}
-N
-N__task void Task_Read_Accelerometer(void) {	
-X__declspec(noreturn) void Task_Read_Accelerometer(void) {	
-N	os_itv_set(TASK_READ_ACCELEROMETER_PERIOD_TICKS);
-X	_os_itv_set((U32)rt_itv_set,(100));
-N
-N	while (1) {
-N		os_itv_wait();
-X		_os_itv_wait((U32)rt_itv_wait);
-N		PTB->PSOR = MASK(DEBUG_T0_POS);
-X		((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << (0));
-N		read_full_xyz();
-N		convert_xyz_to_roll_pitch();
-N
-N		// TODO - mailbox roll/pitch to game thread
 N		
-N		PTB->PCOR = MASK(DEBUG_T0_POS);
-X		((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (0));
-N	}
+N	// body
+N	p = ch->loc;
+N	pp.X = ch->loc.X + CHAR_BODY_WIDTH;
+X	pp.X = ch->loc.X + (26);
+N	pp.Y = ch->loc.Y + CHAR_BODY_HEIGHT;
+X	pp.Y = ch->loc.Y + (40);
+N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N	TFT_Fill_Rectangle(&p, &pp, c);
+N	os_mut_release(&LCD_mutex);
+X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N	
+N	// left leg
+N	p.X = p.X + CHAR_LEG_INSET;
+X	p.X = p.X + (5);
+N	p.Y = p.Y + CHAR_BODY_HEIGHT;
+X	p.Y = p.Y + (40);
+N	pp.X = p.X + CHAR_LEG_WIDTH;
+X	pp.X = p.X + (5);
+N	pp.Y = p.Y + CHAR_LEG_HEIGHT;
+X	pp.Y = p.Y + (10);
+N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N	TFT_Fill_Rectangle(&p, &pp, c);
+N	os_mut_release(&LCD_mutex);
+X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N	
+N	// right leg
+N	p.X = p.X - CHAR_LEG_INSET + CHAR_BODY_WIDTH - CHAR_LEG_INSET - CHAR_LEG_WIDTH;
+X	p.X = p.X - (5) + (26) - (5) - (5);
+N	pp.X = p.X + CHAR_LEG_WIDTH;
+X	pp.X = p.X + (5);
+N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N	TFT_Fill_Rectangle(&p, &pp, c);
+N	os_mut_release(&LCD_mutex);
+X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
 N}
 N
-N__task void Task_Sound(void) {
-X__declspec(noreturn) void Task_Sound(void) {
-N	uint32_t num_cycles, phase;
-N	uint16_t val, out_val;
-N	uint32_t temp_val;
+N// Erase character in the selected background color
+Nvoid Erase_Character(CHARACTER_T * ch, COLOR_T * bg){
+N	PT_T p, pp;
+N	p = ch->loc;
+N	pp.X = ch->loc.X + CHAR_BODY_WIDTH;
+X	pp.X = ch->loc.X + (26);
+N	pp.Y = ch->loc.Y + CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT;
+X	pp.Y = ch->loc.Y + (40) + (10);
+N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N	TFT_Fill_Rectangle(&p, &pp, bg);
+N	os_mut_release(&LCD_mutex);
+X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N}
+N
+N// Erases and redraws the character fast, avoids flickering.
+N// TODO - MAX_CHAR_DISPLACEMENT can be replaced with velocity in each direction for better code
+N// TODO - only need to erase away from the direction of travel
+Nvoid Redraw_Character(CHARACTER_T * ch){
+N	uint8_t i;
+N	PT_T p, pp;
 N	
-N	os_itv_set(TASK_SOUND_PERIOD_TICKS);
-X	_os_itv_set((U32)rt_itv_set,(1));
+N	if (ch->Vy >= 0){
+N		p = ch->loc, pp = ch->loc;
+N		p.X -= MAX_CHAR_DISPLACEMENT;
+X		p.X -= (-((-13)));
+N		p.Y -= MAX_CHAR_DISPLACEMENT;
+X		p.Y -= (-((-13)));
+N		pp.X += (CHAR_BODY_WIDTH + MAX_CHAR_DISPLACEMENT);
+X		pp.X += ((26) + (-((-13))));
+N		pp.Y += CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT;
+X		pp.Y += (40) + (10);
+N	}
+N	else {
+N		p = ch->loc, pp = ch->loc;
+N		p.X -= MAX_CHAR_DISPLACEMENT;
+X		p.X -= (-((-13)));
+N		pp.X += (CHAR_BODY_WIDTH + MAX_CHAR_DISPLACEMENT);
+X		pp.X += ((26) + (-((-13))));
+N		pp.Y += (CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT + MAX_CHAR_DISPLACEMENT);
+X		pp.Y += ((40) + (10) + (-((-13))));
+N	}
+N	
+N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N	TFT_Start_Rectangle(&p, &pp);
+N	if (ch->Vy >= 0){
+N		TFT_Write_Rectangle_Pixel(&c_bg, (2*MAX_CHAR_DISPLACEMENT+CHAR_BODY_WIDTH+1)*MAX_CHAR_DISPLACEMENT);
+X		TFT_Write_Rectangle_Pixel(&c_bg, (2*(-((-13)))+(26)+1)*(-((-13))));
+N	}
+N	for (i = 0; i < CHAR_BODY_HEIGHT; i++){
+X	for (i = 0; i < (40); i++){
+N		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + 1);
+X		TFT_Write_Rectangle_Pixel(&c_bg, (-((-13))) + 1);
+N		TFT_Write_Rectangle_Pixel(&c_char, CHAR_BODY_WIDTH);
+X		TFT_Write_Rectangle_Pixel(&c_char, (26));
+N		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT);
+X		TFT_Write_Rectangle_Pixel(&c_bg, (-((-13))));
+N	}
+N	for (i = 0; i < CHAR_LEG_HEIGHT; i++){
+X	for (i = 0; i < (10); i++){
+N		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET + 1);
+X		TFT_Write_Rectangle_Pixel(&c_bg, (-((-13))) + (5) + 1);
+N		TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+X		TFT_Write_Rectangle_Pixel(&c_char, (5));
+N		TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_GAP);
+X		TFT_Write_Rectangle_Pixel(&c_bg, ((26) - 2*(5) - 2*(5)));
+N		TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+X		TFT_Write_Rectangle_Pixel(&c_char, (5));
+N		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET);
+X		TFT_Write_Rectangle_Pixel(&c_bg, (-((-13))) + (5));
+N	}
+N	if (ch->Vy <= 0){
+N		TFT_Write_Rectangle_Pixel(&c_bg, (2*MAX_CHAR_DISPLACEMENT+CHAR_BODY_WIDTH+1)*MAX_CHAR_DISPLACEMENT);
+X		TFT_Write_Rectangle_Pixel(&c_bg, (2*(-((-13)))+(26)+1)*(-((-13))));
+N	}
+N	os_mut_release(&LCD_mutex);
+X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N}
 N
-N	while (1) {
-N		os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
-X		_os_evt_wait((U32)rt_evt_wait,(1),(0xffff),1); 
-N		val = MAX_DAC_CODE/2;
-X		val = (4095)/2;
-N		out_val = 0;
-N		phase = 1;
-N		for (num_cycles = 0; num_cycles < 1000; num_cycles++) {
-N			PTB->PSOR = MASK(DEBUG_T2_POS);
-X			((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << (2));
-N#if 0
-S			out_val = MAX_DAC_CODE - out_val;	
-N#else
-N			// Generate next sample
-N			if (phase > 0) {
-N				out_val = MAX_DAC_CODE/2 + val;
-X				out_val = (4095)/2 + val;
-N			} else {
-N				out_val = MAX_DAC_CODE/2 - val;
-X				out_val = (4095)/2 - val;
-N			}
-N			phase = 1 - phase;
-N			temp_val = val * 0xFF00;
-N			val = temp_val >> 16;
-N#endif
-N			// Wait for next interval to play the sample
-N			os_itv_wait(); 
-X			_os_itv_wait((U32)rt_itv_wait); 
-N			// Send sample to DAC
-N			DAC0->DAT[0].DATH = DAC_DATH_DATA1(out_val >> 8);
-X			((DAC_Type *)(0x4003F000u))->DAT[0].DATH = (((uint8_t)(((uint8_t)(out_val >> 8))<<0))&0xFu);
-N			DAC0->DAT[0].DATL = DAC_DATL_DATA0(out_val);
-X			((DAC_Type *)(0x4003F000u))->DAT[0].DATL = (((uint8_t)(((uint8_t)(out_val))<<0))&0xFFu);
-N			PTB->PCOR = MASK(DEBUG_T2_POS);
-X			((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (2));
+N// Returns a pointer to a platform that may be created and displayed. If one cannot be created, returns null.
+NPLATFORM_T * Add_Platform(void) {
+N	PLATFORM_T * pt;
+N	if (platforms.num < MAX_NUM_PLATFORMS){
+X	if (platforms.num < (15)){
+N		pt = &(platforms.platforms[platforms.next]);
+N		platforms.next++;
+N		if (platforms.next >= MAX_NUM_PLATFORMS){
+X		if (platforms.next >= (15)){
+N			platforms.next = 0;
+N		}
+N		platforms.num++;
+N	}
+N	return pt;
+N}
 N
+N// Draw platform in the selected color
+Nvoid Draw_Platform(PLATFORM_T * p, COLOR_T * c) {
+N	PT_T pp;
+N	pp.X = p->loc.X + PLAT_WIDTH;
+X	pp.X = p->loc.X + (50);
+N	pp.Y = p->loc.Y + PLAT_HEIGHT;
+X	pp.Y = p->loc.Y + (10);
+N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N	TFT_Fill_Rectangle(&p->loc, &pp, c);
+N	os_mut_release(&LCD_mutex);
+X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N}
+N
+N// Erase platform with selected background color
+Nvoid Erase_Platform(PLATFORM_T * p, COLOR_T * bg) {
+N	Draw_Platform(p, bg);
+N}
+N
+N// Redraw all platforms
+Nvoid Redraw_Platforms(void) {
+N	uint8_t i = 0;
+N	uint8_t index = index = platforms.first;
+N	for (i = 0; i < platforms.num; i++){
+N		PT_T p = platforms.platforms[index].loc, pp;
+N		pp.X = p.X + PLAT_WIDTH;
+X		pp.X = p.X + (50);
+N		pp.Y = p.Y + PLAT_HEIGHT;
+X		pp.Y = p.Y + (10);
+N		//Draw_Platform(&platforms.platforms[index], &c_plat);
+N		os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X		_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N		TFT_Start_Rectangle(&p, &pp);
+N		TFT_Write_Rectangle_Pixel(&c_plat, ((PLAT_WIDTH+1)*(PLAT_HEIGHT+1)));
+X		TFT_Write_Rectangle_Pixel(&c_plat, (((50)+1)*((10)+1)));
+N		os_mut_release(&LCD_mutex);
+X		_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N		index++;
+N		if (index >= MAX_NUM_PLATFORMS){
+X		if (index >= (15)){
+N			index = 0;
 N		}
 N	}
 N}
 N
-N__task void Task_Update_Game_State(void) {
-X__declspec(noreturn) void Task_Update_Game_State(void) {
-N	CHARACTER_T ch;
-N	
-N	Game_Init(&ch);
-N	
-N	os_itv_set(TASK_UPDATE_GAME_STATE_TICKS);
-X	_os_itv_set((U32)rt_itv_set,(50));
-N
-N	while (1) {
-N		os_itv_wait();
-X		_os_itv_wait((U32)rt_itv_wait);
-N		//PTB->PSOR = MASK(DEBUG_T0_POS);
-N		
-N		Detect_Collision(&ch);
-N		Move_Character(&ch);
-N		Redraw_Platforms();
-N
-N		//PTB->PCOR = MASK(DEBUG_T0_POS);
-N	}
+N// Move character based on velocity and adjust velocity
+Nvoid Move_Character(CHARACTER_T * ch) {
+N	// adjust position
+N	ch->loc.X += ch->Vx;
+N	ch->loc.Y += ch->Vy;
+N	// modify vertical velocity due to gravity
+N	ch->Vy += ACCEL_GRAVITY;
+X	ch->Vy += (1);
+N	// redraw character
+N	Redraw_Character(ch);
 N}
 N
+N// Detect whether the character has hit a hall, platform, or monster
+Nvoid Detect_Collision(CHARACTER_T * ch) {
+N	uint8_t i = 0;
+N	uint8_t index = 0;
+N	uint8_t left_of_ch = ch->loc.X;
+N	uint8_t right_of_ch = ch->loc.X + CHAR_BODY_WIDTH;
+X	uint8_t right_of_ch = ch->loc.X + (26);
+N	uint8_t bot_of_ch = ch->loc.Y + (CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT);
+X	uint8_t bot_of_ch = ch->loc.Y + ((40) + (10));
+N	
+N	// collision with platforms, only downward
+N	if (ch->Vy >= 0) {
+N		index = platforms.first;
+N		for (i = 0; i < platforms.num; i++){
+N			uint8_t left_of_platform = platforms.platforms[index].loc.X;
+N			uint8_t top_of_platform = platforms.platforms[index].loc.Y;
+N			if (left_of_ch >= left_of_platform && right_of_ch <= left_of_platform + PLAT_WIDTH){
+X			if (left_of_ch >= left_of_platform && right_of_ch <= left_of_platform + (50)){
+N				if (bot_of_ch >= top_of_platform && bot_of_ch <= top_of_platform + PLAT_HEIGHT) {
+X				if (bot_of_ch >= top_of_platform && bot_of_ch <= top_of_platform + (10)) {
+N					ch->Vy = JUMP_VELOCITY;
+X					ch->Vy = (-13);
+N					break;		// only need one collision
+N				}
+N			}
+N			index++;
+N			if (index >= MAX_NUM_PLATFORMS){
+X			if (index >= (15)){
+N				index = 0;
+N			}
+N		}
+N	}
+N}

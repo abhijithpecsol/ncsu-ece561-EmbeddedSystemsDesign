@@ -12,3 +12,4 @@
 .\obj\tasks.o: .\inc\mma8451.h
 .\obj\tasks.o: .\inc\sound.h
 .\obj\tasks.o: .\inc\gpio_defs.h
+.\obj\tasks.o: .\inc\game.h
