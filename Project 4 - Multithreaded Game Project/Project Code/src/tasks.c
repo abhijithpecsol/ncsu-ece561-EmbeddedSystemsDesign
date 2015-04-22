@@ -12,9 +12,11 @@
 
 U64 RA_Stack[64];
 
+extern float roll;
 OS_TID t_Read_TS, t_Read_Accelerometer, t_Sound, t_Update_Game;
 OS_MUT LCD_mutex;
 OS_MUT TS_mutex;
+OS_MUT roll_mutex;
 
 void Init_Debug_Signals(void) {
 	// Enable clock to port B
@@ -46,11 +48,12 @@ void Init_Debug_Signals(void) {
 __task void Task_Init(void) {
 	
 	os_mut_init(&LCD_mutex);
+	os_mut_init(&roll_mutex);
 	
 	t_Read_TS = os_tsk_create(Task_Read_TS, 4);
-	t_Read_Accelerometer = os_tsk_create_user(Task_Read_Accelerometer, 3, RA_Stack, 512);
+	t_Read_Accelerometer = os_tsk_create(Task_Read_Accelerometer, 3);
 	t_Sound = os_tsk_create(Task_Sound, 2);
-	t_Update_Game = os_tsk_create(Task_Update_Game_State, 5);
+	t_Update_Game = os_tsk_create_user(Task_Update_Game_State, 5, RA_Stack, 512);
   os_tsk_delete_self ();
 }
 
@@ -93,10 +96,9 @@ __task void Task_Read_Accelerometer(void) {
 		os_itv_wait();
 		PTB->PSOR = MASK(DEBUG_T0_POS);
 		read_full_xyz();
+		os_mut_wait(&roll_mutex, WAIT_FOREVER);
 		convert_xyz_to_roll_pitch();
-
-		// TODO - mailbox roll/pitch to game thread
-		
+		os_mut_release(&roll_mutex);
 		PTB->PCOR = MASK(DEBUG_T0_POS);
 	}
 }

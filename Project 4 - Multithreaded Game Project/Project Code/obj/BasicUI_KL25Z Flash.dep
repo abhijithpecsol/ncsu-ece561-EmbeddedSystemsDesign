@@ -27,7 +27,7 @@ I (.\inc\delay.h)(0x553119D6)
 I (.\inc\profile.h)(0x553119D7)
 I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x5476B7DE)
 I (C:\Keil_v5\ARM\RV31\INC\RTL.h)(0x54332E14)
-I (.\inc\tasks.h)(0x55327DA6)
+I (.\inc\tasks.h)(0x55373282)
 F (.\src\LEDs.c)(0x553119DE)(-c --cpu Cortex-M0+ -D__RTX -D__EVAL -D__MICROLIB -g -O1 --apcs=interwork -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-D__UVISION_VERSION="513"-o .\obj\leds.o --list_dir ".\\lst\\" --list --omf_browse .\obj\leds.crf --depend .\obj\leds.d)
 I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.H)(0x5346EE14)
 I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x54BB2EB8)
@@ -123,7 +123,7 @@ I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
 I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
 I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
 I (.\inc\sound.h)(0x553119D7)
-F (.\src\tasks.c)(0x5531F2B0)(-c --cpu Cortex-M0+ -D__RTX -D__EVAL -D__MICROLIB -g -O1 --apcs=interwork -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-D__UVISION_VERSION="513"-o .\obj\tasks.o --list_dir ".\\lst\\" --list --omf_browse .\obj\tasks.crf --depend .\obj\tasks.d)
+F (.\src\tasks.c)(0x5537310F)(-c --cpu Cortex-M0+ -D__RTX -D__EVAL -D__MICROLIB -g -O1 --apcs=interwork -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-D__UVISION_VERSION="513"-o .\obj\tasks.o --list_dir ".\\lst\\" --list --omf_browse .\obj\tasks.crf --depend .\obj\tasks.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476B7E0)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5476B7E0)
 I (C:\Keil_v5\ARM\RV31\INC\RTL.h)(0x54332E14)
@@ -133,15 +133,15 @@ I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
 I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
 I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
 I (.\inc\tft_lcd.h)(0x553119D8)
-I (.\inc\tasks.h)(0x55327DA6)
+I (.\inc\tasks.h)(0x55373282)
 I (.\inc\mma8451.h)(0x553119D7)
 I (.\inc\sound.h)(0x553119D7)
 I (.\inc\gpio_defs.h)(0x553119D6)
-I (.\inc\game.h)(0x5531F3F7)
+I (.\inc\game.h)(0x55373401)
 F (.\src\tft_graphics.c)(0x553119DE)(-c --cpu Cortex-M0+ -D__RTX -D__EVAL -D__MICROLIB -g -O1 --apcs=interwork -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-D__UVISION_VERSION="513"-o .\obj\tft_graphics.o --list_dir ".\\lst\\" --list --omf_browse .\obj\tft_graphics.crf --depend .\obj\tft_graphics.d)
 I (.\inc\tft_lcd.h)(0x553119D8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476B7E0)
-F (.\src\game.c)(0x5532813A)(-c --cpu Cortex-M0+ -D__RTX -D__EVAL -D__MICROLIB -g -O1 --apcs=interwork -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-D__UVISION_VERSION="513"-o .\obj\game.o --list_dir ".\\lst\\" --list --omf_browse .\obj\game.crf --depend .\obj\game.d)
+F (.\src\game.c)(0x55373451)(-c --cpu Cortex-M0+ -D__RTX -D__EVAL -D__MICROLIB -g -O1 --apcs=interwork -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-D__UVISION_VERSION="513"-o .\obj\game.o --list_dir ".\\lst\\" --list --omf_browse .\obj\game.crf --depend .\obj\game.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5476B7E0)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5476B7E0)
 I (C:\Keil_v5\ARM\RV31\INC\RTL.h)(0x54332E14)
@@ -150,9 +150,11 @@ I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x54BB2EB8)
 I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
 I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
 I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+I (C:\Keil_v5\ARM\ARMCC\include\Math.h)(0x5476B7DE)
 I (.\inc\tft_lcd.h)(0x553119D8)
-I (.\inc\tasks.h)(0x55327DA6)
+I (.\inc\tasks.h)(0x55373282)
 I (.\inc\mma8451.h)(0x553119D7)
 I (.\inc\sound.h)(0x553119D7)
 I (.\inc\gpio_defs.h)(0x553119D6)
-I (.\inc\game.h)(0x5531F3F7)
+I (.\inc\game.h)(0x55373401)
+I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5476B7E0)

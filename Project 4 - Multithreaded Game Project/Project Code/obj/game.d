@@ -7,9 +7,11 @@
 .\obj\game.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h
 .\obj\game.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h
 .\obj\game.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h
+.\obj\game.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\Math.h
 .\obj\game.o: .\inc\tft_lcd.h
 .\obj\game.o: .\inc\tasks.h
 .\obj\game.o: .\inc\mma8451.h
 .\obj\game.o: .\inc\sound.h
 .\obj\game.o: .\inc\gpio_defs.h
 .\obj\game.o: .\inc\game.h
+.\obj\game.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

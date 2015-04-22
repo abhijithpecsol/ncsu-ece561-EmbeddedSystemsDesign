@@ -17,6 +17,7 @@
 #define CHAR_START_POS_Y	(PLAT_START_POS_Y - CHAR_BODY_HEIGHT - CHAR_LEG_HEIGHT)
 #define ACCEL_GRAVITY			(1)		// downward is +y
 #define JUMP_VELOCITY			(-13)
+#define TERMINAL_VELOCITY	(25)
 #define MAX_CHAR_DISPLACEMENT	(-(JUMP_VELOCITY))
 typedef struct {
 	PT_T loc;					// top left location of character
@@ -54,3 +55,4 @@ void Erase_Platform(PLATFORM_T * p, COLOR_T * bg);		// Erase platform with the s
 void Redraw_Platforms(void);													// Redraw all platforms to counter erased content
 void Move_Character(CHARACTER_T * ch);								// Move character based on velocity and adjust velocity
 void Detect_Collision(CHARACTER_T * ch);							// Detect whether the character has hit a hall, platform, or monster
+void Convert_Tilt(CHARACTER_T * ch);									// Convert tilt to side to side movement speed

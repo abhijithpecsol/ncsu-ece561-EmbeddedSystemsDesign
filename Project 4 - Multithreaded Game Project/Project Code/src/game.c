@@ -10,14 +10,16 @@
 #include <stdio.h>
 #include <RTL.h>
 #include <MKL25Z4.h>
+#include <Math.h>
 #include "tft_lcd.h"
 #include "tasks.h"
 #include "mma8451.h"
 #include "sound.h"
 #include "gpio_defs.h"
 #include "game.h"
+#include <stdlib.h>
 
-extern OS_MUT LCD_mutex;
+extern OS_MUT LCD_mutex, roll_mutex;
 COLOR_T c_char, c_plat, c_bg;
 PLATFORM_FIFO_T platforms;
 
@@ -51,10 +53,10 @@ void Game_Init(CHARACTER_T * ch) {
 	start_plat->loc.Y = PLAT_START_POS_Y;
 	Draw_Platform(start_plat, &c_plat);
 	
-	//sp = Add_Platform();
-	//sp->loc.X = PLAT_START_POS_X;
-	//sp->loc.Y = PLAT_START_POS_Y - 100;		// 100 ~ max jump
-	//Draw_Platform(sp, &c_plat);
+	sp = Add_Platform();
+	sp->loc.X = PLAT_START_POS_X-(PLAT_START_POS_X/2)-20;	// offset left
+	sp->loc.Y = PLAT_START_POS_Y - 80;		// 100 ~ max jump
+	Draw_Platform(sp, &c_plat);
 }
 
 // Draw character at it's existing position in the selected color
@@ -107,7 +109,7 @@ void Redraw_Character(CHARACTER_T * ch){
 	if (ch->Vy >= 0){
 		p = ch->loc, pp = ch->loc;
 		p.X -= MAX_CHAR_DISPLACEMENT;
-		p.Y -= MAX_CHAR_DISPLACEMENT;
+		p.Y -= TERMINAL_VELOCITY;
 		pp.X += (CHAR_BODY_WIDTH + MAX_CHAR_DISPLACEMENT);
 		pp.Y += CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT;
 	}
@@ -121,7 +123,7 @@ void Redraw_Character(CHARACTER_T * ch){
 	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 	TFT_Start_Rectangle(&p, &pp);
 	if (ch->Vy >= 0){
-		TFT_Write_Rectangle_Pixel(&c_bg, (2*MAX_CHAR_DISPLACEMENT+CHAR_BODY_WIDTH+1)*MAX_CHAR_DISPLACEMENT);
+		TFT_Write_Rectangle_Pixel(&c_bg, (2*MAX_CHAR_DISPLACEMENT+CHAR_BODY_WIDTH+1)*TERMINAL_VELOCITY);
 	}
 	for (i = 0; i < CHAR_BODY_HEIGHT; i++){
 		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + 1);
@@ -192,11 +194,18 @@ void Redraw_Platforms(void) {
 
 // Move character based on velocity and adjust velocity
 void Move_Character(CHARACTER_T * ch) {
+	// if new roll is available, set Vy based on it
+	Convert_Tilt(ch);
 	// adjust position
 	ch->loc.X += ch->Vx;
 	ch->loc.Y += ch->Vy;
 	// modify vertical velocity due to gravity
-	ch->Vy += ACCEL_GRAVITY;
+	if (ch->Vy < TERMINAL_VELOCITY){
+		ch->Vy += ACCEL_GRAVITY;
+	}
+	else {
+		ch->Vy = TERMINAL_VELOCITY;
+	}
 	// redraw character
 	Redraw_Character(ch);
 }
@@ -215,7 +224,7 @@ void Detect_Collision(CHARACTER_T * ch) {
 		for (i = 0; i < platforms.num; i++){
 			uint8_t left_of_platform = platforms.platforms[index].loc.X;
 			uint8_t top_of_platform = platforms.platforms[index].loc.Y;
-			if (left_of_ch >= left_of_platform && right_of_ch <= left_of_platform + PLAT_WIDTH){
+			if (left_of_ch <= left_of_platform + PLAT_WIDTH && right_of_ch >= left_of_platform ){
 				if (bot_of_ch >= top_of_platform && bot_of_ch <= top_of_platform + PLAT_HEIGHT) {
 					ch->Vy = JUMP_VELOCITY;
 					break;		// only need one collision
@@ -225,6 +234,53 @@ void Detect_Collision(CHARACTER_T * ch) {
 			if (index >= MAX_NUM_PLATFORMS){
 				index = 0;
 			}
+		}
+	}
+}
+
+// Convert tilt to side to side movement speed
+void Convert_Tilt(CHARACTER_T * ch) {
+	float roll_val, abs_roll_val;
+	char buffer[16];
+	
+	// get current roll value
+	os_mut_wait(&roll_mutex, WAIT_FOREVER);
+	roll_val = roll;
+	os_mut_release(&roll_mutex);
+	
+	// write to screen (debug)
+	sprintf(buffer, "Roll: %6.2f", roll_val);
+	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+	TFT_Text_PrintStr_RC(1, 0, buffer);
+	os_mut_release(&LCD_mutex);
+	
+	// do conversion
+	abs_roll_val = fabs(roll_val);
+	if (abs_roll_val < 5){
+		ch->Vx = 0;
+	}
+	else if (abs_roll_val > 5 && abs_roll_val < 15){
+		if (roll_val < 0){
+			ch->Vx = -4;
+		}
+		else {
+			ch->Vx = 4;
+		}
+	}
+	else if (abs_roll_val > 15 && abs_roll_val < 30){
+		if (roll_val < 0){
+			ch->Vx = -8;
+		}
+		else {
+			ch->Vx = 8;
+		}
+	}
+	else if (abs_roll_val > 30){
+		if (roll_val < 0){
+			ch->Vx = -12;
+		}
+		else {
+			ch->Vx = 12;
 		}
 	}
 }

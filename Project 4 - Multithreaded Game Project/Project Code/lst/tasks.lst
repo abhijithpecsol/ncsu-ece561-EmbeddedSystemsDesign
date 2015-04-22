@@ -9189,7 +9189,7 @@ N
 N#define TASK_READ_TS_PERIOD_TICKS (100)  // 1 tick/ms
 N#define TASK_READ_ACCELEROMETER_PERIOD_TICKS (100)  // 1 tick/ms
 N#define TASK_SOUND_PERIOD_TICKS (1)  // 1 tick/ms
-N#define TASK_UPDATE_GAME_STATE_TICKS (50)	
+N#define TASK_UPDATE_GAME_STATE_TICKS (40)	
 N
 N// Debug outputs on Port B
 N#define DEBUG_T0_POS 	0		// J10 pin 2
@@ -9301,6 +9301,7 @@ N#define CHAR_START_POS_X	((TFT_WIDTH - CHAR_BODY_WIDTH)/2)
 N#define CHAR_START_POS_Y	(PLAT_START_POS_Y - CHAR_BODY_HEIGHT - CHAR_LEG_HEIGHT)
 N#define ACCEL_GRAVITY			(1)		// downward is +y
 N#define JUMP_VELOCITY			(-13)
+N#define TERMINAL_VELOCITY	(25)
 N#define MAX_CHAR_DISPLACEMENT	(-(JUMP_VELOCITY))
 Ntypedef struct {
 N	PT_T loc;					// top left location of character
@@ -9339,13 +9340,16 @@ Nvoid Erase_Platform(PLATFORM_T * p, COLOR_T * bg);		// Erase platform with the 
 Nvoid Redraw_Platforms(void);													// Redraw all platforms to counter erased content
 Nvoid Move_Character(CHARACTER_T * ch);								// Move character based on velocity and adjust velocity
 Nvoid Detect_Collision(CHARACTER_T * ch);							// Detect whether the character has hit a hall, platform, or monster
+Nvoid Convert_Tilt(CHARACTER_T * ch);									// Convert tilt to side to side movement speed
 L 12 "src\tasks.c" 2
 N
 NU64 RA_Stack[64];
 N
+Nextern float roll;
 NOS_TID t_Read_TS, t_Read_Accelerometer, t_Sound, t_Update_Game;
 NOS_MUT LCD_mutex;
 NOS_MUT TS_mutex;
+NOS_MUT roll_mutex;
 N
 Nvoid Init_Debug_Signals(void) {
 N	// Enable clock to port B
@@ -9396,15 +9400,17 @@ X__declspec(noreturn) void Task_Init(void) {
 N	
 N	os_mut_init(&LCD_mutex);
 X	_os_mut_init((U32)rt_mut_init,&LCD_mutex);
+N	os_mut_init(&roll_mutex);
+X	_os_mut_init((U32)rt_mut_init,&roll_mutex);
 N	
 N	t_Read_TS = os_tsk_create(Task_Read_TS, 4);
 X	t_Read_TS = _os_tsk_create((U32)rt_tsk_create,Task_Read_TS,4,0,0);
-N	t_Read_Accelerometer = os_tsk_create_user(Task_Read_Accelerometer, 3, RA_Stack, 512);
-X	t_Read_Accelerometer = _os_tsk_create((U32)rt_tsk_create,Task_Read_Accelerometer,3|(512<<8),RA_Stack,0);
+N	t_Read_Accelerometer = os_tsk_create(Task_Read_Accelerometer, 3);
+X	t_Read_Accelerometer = _os_tsk_create((U32)rt_tsk_create,Task_Read_Accelerometer,3,0,0);
 N	t_Sound = os_tsk_create(Task_Sound, 2);
 X	t_Sound = _os_tsk_create((U32)rt_tsk_create,Task_Sound,2,0,0);
-N	t_Update_Game = os_tsk_create(Task_Update_Game_State, 5);
-X	t_Update_Game = _os_tsk_create((U32)rt_tsk_create,Task_Update_Game_State,5,0,0);
+N	t_Update_Game = os_tsk_create_user(Task_Update_Game_State, 5, RA_Stack, 512);
+X	t_Update_Game = _os_tsk_create((U32)rt_tsk_create,Task_Update_Game_State,5|(512<<8),RA_Stack,0);
 N  os_tsk_delete_self ();
 X  { _os_tsk_delete((U32)rt_tsk_delete, 0); for(;;); };
 N}
@@ -9460,10 +9466,11 @@ X		_os_itv_wait((U32)rt_itv_wait);
 N		PTB->PSOR = MASK(DEBUG_T0_POS);
 X		((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << (0));
 N		read_full_xyz();
+N		os_mut_wait(&roll_mutex, WAIT_FOREVER);
+X		_os_mut_wait((U32)rt_mut_wait,&roll_mutex,(0xffff));
 N		convert_xyz_to_roll_pitch();
-N
-N		// TODO - mailbox roll/pitch to game thread
-N		
+N		os_mut_release(&roll_mutex);
+X		_os_mut_release((U32)rt_mut_release,&roll_mutex);
 N		PTB->PCOR = MASK(DEBUG_T0_POS);
 X		((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (0));
 N	}
@@ -9525,7 +9532,7 @@ N
 N	Game_Init(&ch);
 N	
 N	os_itv_set(TASK_UPDATE_GAME_STATE_TICKS);
-X	_os_itv_set((U32)rt_itv_set,(50));
+X	_os_itv_set((U32)rt_itv_set,(40));
 N
 N	while (1) {
 N		os_itv_wait();
