@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <RTL.h>
 #include <MKL25Z4.h>
-
+#include <stdlib.h>
 #include "tft_lcd.h"
 #include "tasks.h"
 #include "mma8451.h"
@@ -13,10 +13,14 @@
 U64 RA_Stack[64];
 
 extern float roll;
-OS_TID t_Read_TS, t_Read_Accelerometer, t_Sound, t_Update_Game;
+OS_TID t_Read_TS, t_Read_Accelerometer, t_Sound, t_Update_Game, t_Scroll_Cam;
 OS_MUT LCD_mutex;
 OS_MUT TS_mutex;
-OS_MUT roll_mutex;
+OS_MUT game_obj_mutex;
+os_mbx_declare(roll_mbx, 1);
+os_mbx_declare(plat_mbx, 1);
+CHARACTER_T ch;
+
 
 void Init_Debug_Signals(void) {
 	// Enable clock to port B
@@ -48,12 +52,16 @@ void Init_Debug_Signals(void) {
 __task void Task_Init(void) {
 	
 	os_mut_init(&LCD_mutex);
-	os_mut_init(&roll_mutex);
+	os_mut_init(&game_obj_mutex);
+	
+	os_mbx_init(&roll_mbx, sizeof(roll_mbx));
+	os_mbx_init(&plat_mbx, sizeof(plat_mbx));
 	
 	t_Read_TS = os_tsk_create(Task_Read_TS, 4);
 	t_Read_Accelerometer = os_tsk_create(Task_Read_Accelerometer, 3);
 	t_Sound = os_tsk_create(Task_Sound, 2);
 	t_Update_Game = os_tsk_create_user(Task_Update_Game_State, 5, RA_Stack, 512);
+	t_Scroll_Cam = os_tsk_create(Task_Scroll_Camera, 3);
   os_tsk_delete_self ();
 }
 
@@ -90,15 +98,18 @@ __task void Task_Read_TS(void) {
 }
 
 __task void Task_Read_Accelerometer(void) {	
+	float * msg;
+	
 	os_itv_set(TASK_READ_ACCELEROMETER_PERIOD_TICKS);
 
 	while (1) {
 		os_itv_wait();
 		PTB->PSOR = MASK(DEBUG_T0_POS);
 		read_full_xyz();
-		os_mut_wait(&roll_mutex, WAIT_FOREVER);
+		msg = malloc(sizeof(float));
+		*msg = roll;
 		convert_xyz_to_roll_pitch();
-		os_mut_release(&roll_mutex);
+		os_mbx_send(&roll_mbx, (void *)msg, WAIT_FOREVER);
 		PTB->PCOR = MASK(DEBUG_T0_POS);
 	}
 }
@@ -141,8 +152,8 @@ __task void Task_Sound(void) {
 	}
 }
 
-__task void Task_Update_Game_State(void) {
-	CHARACTER_T ch;
+__task void Task_Update_Game_State(void) {	
+	uint8_t collision;
 	
 	Game_Init(&ch);
 	
@@ -152,11 +163,48 @@ __task void Task_Update_Game_State(void) {
 		os_itv_wait();
 		//PTB->PSOR = MASK(DEBUG_T0_POS);
 		
-		Detect_Collision(&ch);
+		os_mut_wait(&game_obj_mutex, WAIT_FOREVER);
+		
+		collision = Detect_Collision(&ch);
 		Move_Character(&ch);
 		Redraw_Platforms();
+		
+		os_mut_release(&game_obj_mutex);
+		
+		// handle collision
+		if (collision == HIT_PLATFORM){
+			os_evt_set(EV_SCROLLCAM, t_Scroll_Cam);
+		}
 
 		//PTB->PCOR = MASK(DEBUG_T0_POS);
 	}
 }
 
+__task void Task_Scroll_Camera(void) {
+	void * msg;
+	uint32_t current_height;
+	uint8_t count;
+	
+	os_itv_set(TASK_SCROLL_CAMERA_TICKS);
+	
+	while (1) {
+		os_evt_wait_and(EV_SCROLLCAM, WAIT_FOREVER);
+		
+		count++;
+		
+		// get the initial height of the platform jumped on from mailbox
+		//os_mbx_wait(plat_mbx, &msg, WAIT_FOREVER);
+		//current_height = *(uint32_t *)msg;
+		//free(msg);
+//		os_mut_wait(&game_obj_mutex, WAIT_FOREVER);
+//		current_height = ch.loc.Y + CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT;
+//		os_mut_release(&game_obj_mutex);
+		
+//		
+//		// scroll down until we are at the set height
+//		while (current_height > SCROLL_DOWN_LIMIT){
+//			current_height = SCROLL_DOWN_LIMIT;
+//			os_itv_wait();
+//		}
+	}
+}

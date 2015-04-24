@@ -6,6 +6,7 @@
 #define TASK_READ_ACCELEROMETER_PERIOD_TICKS (100)  // 1 tick/ms
 #define TASK_SOUND_PERIOD_TICKS (1)  // 1 tick/ms
 #define TASK_UPDATE_GAME_STATE_TICKS (40)	
+#define TASK_SCROLL_CAMERA_TICKS	(5)
 
 // Debug outputs on Port B
 #define DEBUG_T0_POS 	0		// J10 pin 2
@@ -15,7 +16,8 @@
 
 extern void	Init_Debug_Signals(void);
 
-#define EV_PLAYSOUND (1) 
+#define EV_PLAYSOUND 	(1) 
+#define EV_SCROLLCAM	(2)
 
 #define WAIT_FOREVER (0xffff)
 
@@ -24,4 +26,5 @@ extern __task void Task_Read_TS(void);
 extern __task void Task_Read_Accelerometer(void);
 extern __task void Task_Sound(void);
 extern __task void Task_Update_Game_State(void);
+extern __task void Task_Scroll_Camera(void);
 #endif

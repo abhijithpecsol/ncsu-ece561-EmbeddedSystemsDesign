@@ -19,7 +19,9 @@
 #include "game.h"
 #include <stdlib.h>
 
-extern OS_MUT LCD_mutex, roll_mutex;
+extern OS_MUT LCD_mutex, game_obj_mutex;
+extern OS_TID t_Scroll_Cam;
+extern OS_MBX roll_mbx, plat_mbx;
 COLOR_T c_char, c_plat, c_bg;
 PLATFORM_FIFO_T platforms;
 
@@ -101,44 +103,102 @@ void Erase_Character(CHARACTER_T * ch, COLOR_T * bg){
 
 // Erases and redraws the character fast, avoids flickering.
 // TODO - MAX_CHAR_DISPLACEMENT can be replaced with velocity in each direction for better code
-// TODO - only need to erase away from the direction of travel
+//		--> partially done for x direction only
 void Redraw_Character(CHARACTER_T * ch){
 	uint8_t i;
 	PT_T p, pp;
 	
+	int16_t x_dis = ch->Vx; 
+	if (x_dis > 0 && ch->loc.X < x_dis){
+		x_dis = ch->loc.X;
+	}
+	//else if (x_dis < 0 && abs(x_dis) > TFT_WIDTH - 1 - ch->loc.X){
+	//	x_dis = (TFT_WIDTH - 1 - ch->loc.X);
+	//}
+	
+	// Determine bounding box
+	// Moving down the screen
 	if (ch->Vy >= 0){
 		p = ch->loc, pp = ch->loc;
-		p.X -= MAX_CHAR_DISPLACEMENT;
+		// only need to erase above us
 		p.Y -= TERMINAL_VELOCITY;
-		pp.X += (CHAR_BODY_WIDTH + MAX_CHAR_DISPLACEMENT);
 		pp.Y += CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT;
 	}
+	// Moving up the screen
 	else {
 		p = ch->loc, pp = ch->loc;
-		p.X -= MAX_CHAR_DISPLACEMENT;
-		pp.X += (CHAR_BODY_WIDTH + MAX_CHAR_DISPLACEMENT);
+		// only need to below above us
 		pp.Y += (CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT + MAX_CHAR_DISPLACEMENT);
 	}
 	
+	// moving right on the screen
+	// first handle cases on the edge of the screen
+	if (x_dis == 0){
+		if (ch->loc.X == 0){
+			x_dis = -1*MAX_CHAR_DISPLACEMENT;
+		}
+		else {
+			x_dis = MAX_CHAR_DISPLACEMENT;
+		}
+	}
+	if (x_dis >= 0){
+		// only need to erase to the left
+		p.X -= x_dis;
+		pp.X += CHAR_BODY_WIDTH;
+	}
+	// moving left on the screen
+	else {
+		// only need to erase to the right
+		pp.X += CHAR_BODY_WIDTH - x_dis;
+	}
+	
+	// Do the actual drawing
 	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 	TFT_Start_Rectangle(&p, &pp);
-	if (ch->Vy >= 0){
-		TFT_Write_Rectangle_Pixel(&c_bg, (2*MAX_CHAR_DISPLACEMENT+CHAR_BODY_WIDTH+1)*TERMINAL_VELOCITY);
+	// Moving right across the screen
+	if (x_dis >= 0){
+		if (ch->Vy >= 0){
+			TFT_Write_Rectangle_Pixel(&c_bg, (x_dis+CHAR_BODY_WIDTH+1)*TERMINAL_VELOCITY);
+		}
+		for (i = 0; i < CHAR_BODY_HEIGHT; i++){
+			TFT_Write_Rectangle_Pixel(&c_bg, x_dis + 1);
+			TFT_Write_Rectangle_Pixel(&c_char, CHAR_BODY_WIDTH);
+			//TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT);
+		}
+		for (i = 0; i < CHAR_LEG_HEIGHT; i++){
+			TFT_Write_Rectangle_Pixel(&c_bg, x_dis + CHAR_LEG_INSET + 1);
+			TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+			TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_GAP);
+			TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+			//TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET);
+			TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_INSET);
+		}
+		if (ch->Vy <= 0){
+			TFT_Write_Rectangle_Pixel(&c_bg, (x_dis+CHAR_BODY_WIDTH+1)*MAX_CHAR_DISPLACEMENT);
+		}
 	}
-	for (i = 0; i < CHAR_BODY_HEIGHT; i++){
-		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + 1);
-		TFT_Write_Rectangle_Pixel(&c_char, CHAR_BODY_WIDTH);
-		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT);
-	}
-	for (i = 0; i < CHAR_LEG_HEIGHT; i++){
-		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET + 1);
-		TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
-		TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_GAP);
-		TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
-		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET);
-	}
-	if (ch->Vy <= 0){
-		TFT_Write_Rectangle_Pixel(&c_bg, (2*MAX_CHAR_DISPLACEMENT+CHAR_BODY_WIDTH+1)*MAX_CHAR_DISPLACEMENT);
+	// Moving left across the screen
+	else {
+		if (ch->Vy >= 0){
+			TFT_Write_Rectangle_Pixel(&c_bg, (-1*x_dis+CHAR_BODY_WIDTH+1)*TERMINAL_VELOCITY);
+		}
+		for (i = 0; i < CHAR_BODY_HEIGHT; i++){
+			//TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + 1);
+			TFT_Write_Rectangle_Pixel(&c_bg, 1);
+			TFT_Write_Rectangle_Pixel(&c_char, CHAR_BODY_WIDTH);
+			TFT_Write_Rectangle_Pixel(&c_bg, -1*x_dis);
+		}
+		for (i = 0; i < CHAR_LEG_HEIGHT; i++){
+			//TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET + 1);
+			TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_INSET + 1);
+			TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+			TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_GAP);
+			TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+			TFT_Write_Rectangle_Pixel(&c_bg, -1*x_dis + CHAR_LEG_INSET);
+		}
+		if (ch->Vy <= 0){
+			TFT_Write_Rectangle_Pixel(&c_bg, (-1*x_dis+CHAR_BODY_WIDTH+1)*MAX_CHAR_DISPLACEMENT);
+		}
 	}
 	os_mut_release(&LCD_mutex);
 }
@@ -211,23 +271,63 @@ void Move_Character(CHARACTER_T * ch) {
 }
 
 // Detect whether the character has hit a hall, platform, or monster
-void Detect_Collision(CHARACTER_T * ch) {
+uint8_t Detect_Collision(CHARACTER_T * ch) {
 	uint8_t i = 0;
-	uint8_t index = 0;
-	uint8_t left_of_ch = ch->loc.X;
-	uint8_t right_of_ch = ch->loc.X + CHAR_BODY_WIDTH;
-	uint8_t bot_of_ch = ch->loc.Y + (CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT);
+	uint16_t index = 0;
+	int16_t left_of_ch = ch->loc.X;
+	int16_t right_of_ch = ch->loc.X + CHAR_BODY_WIDTH;
+	int16_t bot_of_ch = ch->loc.Y + (CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT);
+	
+	// bottom of screen
+	if (bot_of_ch >= TFT_HEIGHT - ch->Vy){		// Mr. Doodle will hit bottom in the next frame
+		// TODO - game over
+		// for now, just bounce up
+		ch->Vy = JUMP_VELOCITY;
+	}
+	
+	// side of the screen, switch Mr. Doodle's side
+	#if 0
+	if (left_of_ch + ch->Vx <= 0){
+		Erase_Character(ch, &c_bg);		// need to erase first
+		ch->loc.X = TFT_WIDTH - CHAR_BODY_WIDTH - MAX_CHAR_DISPLACEMENT;
+	}
+	else if (right_of_ch + ch->Vx >= TFT_WIDTH){
+		Erase_Character(ch, &c_bg);		// need to erase first
+		ch->loc.X = MAX_CHAR_DISPLACEMENT;
+	}
+	#else
+	// alternative, stop Mr. Doodle dead in his tracks
+	if (left_of_ch + ch->Vx <= 0){
+		ch->Vx = 0;
+		ch->loc.X = 0;			// lock to left wall
+	}
+	else if (right_of_ch + ch->Vx >= TFT_WIDTH - 1){
+		ch->Vx = 0;
+		ch->loc.X = TFT_WIDTH - CHAR_BODY_WIDTH - 1;		// lock to right wall
+	}
+	#endif
 	
 	// collision with platforms, only downward
 	if (ch->Vy >= 0) {
 		index = platforms.first;
 		for (i = 0; i < platforms.num; i++){
-			uint8_t left_of_platform = platforms.platforms[index].loc.X;
-			uint8_t top_of_platform = platforms.platforms[index].loc.Y;
+			uint16_t left_of_platform = platforms.platforms[index].loc.X;
+			uint16_t top_of_platform = platforms.platforms[index].loc.Y;
 			if (left_of_ch <= left_of_platform + PLAT_WIDTH && right_of_ch >= left_of_platform ){
 				if (bot_of_ch >= top_of_platform && bot_of_ch <= top_of_platform + PLAT_HEIGHT) {
+					//if (os_mbx_check(plat_mbx) > 0){	// avoid double triggering which causes freezing
+						// get location of platform landed on and put it in mailbox
+						//uint32_t * msg = malloc(sizeof(uint32_t));
+						//*msg = top_of_platform;
+						//os_mbx_send(plat_mbx, (void *)msg, WAIT_FOREVER);
+						
+						// trigger event
+						//os_evt_set(EV_SCROLLCAM, t_Scroll_Cam);
+					//}
+					// reset jump velocity of character
 					ch->Vy = JUMP_VELOCITY;
-					break;		// only need one collision
+					
+					return HIT_PLATFORM;		// only need one collision
 				}
 			}
 			index++;
@@ -236,17 +336,25 @@ void Detect_Collision(CHARACTER_T * ch) {
 			}
 		}
 	}
+	
+	return NO_HIT;
 }
 
 // Convert tilt to side to side movement speed
 void Convert_Tilt(CHARACTER_T * ch) {
 	float roll_val, abs_roll_val;
 	char buffer[16];
+	void * msg;
 	
-	// get current roll value
-	os_mut_wait(&roll_mutex, WAIT_FOREVER);
-	roll_val = roll;
-	os_mut_release(&roll_mutex);
+	// get current roll value from mailbox, if it's there
+	if (os_mbx_check(roll_mbx) == 0){
+		os_mbx_wait(roll_mbx, &msg, WAIT_FOREVER);
+		roll_val = *(float *)msg;
+		free(msg);
+	}
+	else {
+		return;
+	}
 	
 	// write to screen (debug)
 	sprintf(buffer, "Roll: %6.2f", roll_val);
@@ -256,31 +364,36 @@ void Convert_Tilt(CHARACTER_T * ch) {
 	
 	// do conversion
 	abs_roll_val = fabs(roll_val);
-	if (abs_roll_val < 5){
+	if ((ch->loc.X == 0 && roll_val < 0) || (ch->loc.X >= (TFT_WIDTH - CHAR_BODY_WIDTH - 1) && roll_val > 0)){
 		ch->Vx = 0;
 	}
-	else if (abs_roll_val > 5 && abs_roll_val < 15){
-		if (roll_val < 0){
-			ch->Vx = -4;
+	else {
+		if (abs_roll_val < 5){
+			ch->Vx = 0;
 		}
-		else {
-			ch->Vx = 4;
+		else if (abs_roll_val > 5 && abs_roll_val < 15){
+			if (roll_val < 0){
+				ch->Vx = -4;
+			}
+			else {
+				ch->Vx = 4;
+			}
 		}
-	}
-	else if (abs_roll_val > 15 && abs_roll_val < 30){
-		if (roll_val < 0){
-			ch->Vx = -8;
+		else if (abs_roll_val > 15 && abs_roll_val < 30){
+			if (roll_val < 0){
+				ch->Vx = -8;
+			}
+			else {
+				ch->Vx = 8;
+			}
 		}
-		else {
-			ch->Vx = 8;
-		}
-	}
-	else if (abs_roll_val > 30){
-		if (roll_val < 0){
-			ch->Vx = -12;
-		}
-		else {
-			ch->Vx = 12;
+		else if (abs_roll_val > 30){
+			if (roll_val < 0){
+				ch->Vx = -12;
+			}
+			else {
+				ch->Vx = 12;
+			}
 		}
 	}
 }

@@ -27,10 +27,14 @@ Project File Date:  04/18/2015
 <h2>Output:</h2>
 Build target 'KL25Z Flash'
 compiling tasks.c...
-compiling game.c...
+src\tasks.c(184): warning:  #177-D: variable "msg" was declared but never referenced
+        void * msg;
+src\tasks.c(185): warning:  #177-D: variable "current_height" was declared but never referenced
+        uint32_t current_height;
+src\tasks.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=15580 RO-data=7460 RW-data=160 ZI-data=4984  
-".\obj\BasicUI.axf" - 0 Error(s), 0 Warning(s).
+Program Size: Code=16576 RO-data=7460 RW-data=172 ZI-data=5356  
+".\obj\BasicUI.axf" - 0 Error(s), 2 Warning(s).
 </pre>
 </body>
 </html>

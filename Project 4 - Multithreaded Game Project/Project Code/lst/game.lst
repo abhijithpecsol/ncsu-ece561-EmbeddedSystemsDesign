@@ -10649,6 +10649,7 @@ N#define TASK_READ_TS_PERIOD_TICKS (100)  // 1 tick/ms
 N#define TASK_READ_ACCELEROMETER_PERIOD_TICKS (100)  // 1 tick/ms
 N#define TASK_SOUND_PERIOD_TICKS (1)  // 1 tick/ms
 N#define TASK_UPDATE_GAME_STATE_TICKS (40)	
+N#define TASK_SCROLL_CAMERA_TICKS	(5)
 N
 N// Debug outputs on Port B
 N#define DEBUG_T0_POS 	0		// J10 pin 2
@@ -10658,7 +10659,8 @@ N#define DEBUG_T3_POS 	3		// J10 pin 8
 N
 Nextern void	Init_Debug_Signals(void);
 N
-N#define EV_PLAYSOUND (1) 
+N#define EV_PLAYSOUND 	(1) 
+N#define EV_SCROLLCAM	(2)
 N
 N#define WAIT_FOREVER (0xffff)
 N
@@ -10672,6 +10674,8 @@ Nextern __task void Task_Sound(void);
 Xextern __declspec(noreturn) void Task_Sound(void);
 Nextern __task void Task_Update_Game_State(void);
 Xextern __declspec(noreturn) void Task_Update_Game_State(void);
+Nextern __task void Task_Scroll_Camera(void);
+Xextern __declspec(noreturn) void Task_Scroll_Camera(void);
 N#endif
 L 16 "src\game.c" 2
 N#include "mma8451.h"
@@ -10785,6 +10789,12 @@ N	uint8_t next;
 N	uint8_t num;
 N} PLATFORM_FIFO_T;
 N
+N// Camera scroller
+N#define NO_HIT						(0x00)
+N#define HIT_PLATFORM			(0x01)
+N#define SCROLL_DOWN_LIMIT	(25)
+N#define CAM_SCROLL_SPEED	(3)
+N
 N
 N// ****************
 N// HELPER FUNCTIONS
@@ -10798,8 +10808,9 @@ Nvoid Draw_Platform(PLATFORM_T * p, COLOR_T * c);			// Draw platform in the sele
 Nvoid Erase_Platform(PLATFORM_T * p, COLOR_T * bg);		// Erase platform with the selected background color
 Nvoid Redraw_Platforms(void);													// Redraw all platforms to counter erased content
 Nvoid Move_Character(CHARACTER_T * ch);								// Move character based on velocity and adjust velocity
-Nvoid Detect_Collision(CHARACTER_T * ch);							// Detect whether the character has hit a hall, platform, or monster
+Nuint8_t Detect_Collision(CHARACTER_T * ch);						// Detect whether the character has hit a hall, platform, or monster
 Nvoid Convert_Tilt(CHARACTER_T * ch);									// Convert tilt to side to side movement speed
+Nvoid Scroll_Camera(CHARACTER_T * ch);									// Scrolls camera down
 L 20 "src\game.c" 2
 N#include <stdlib.h>
 L 1 "C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h" 1
@@ -11775,7 +11786,9 @@ N
 N/* end of stdlib.h */
 L 21 "src\game.c" 2
 N
-Nextern OS_MUT LCD_mutex, roll_mutex;
+Nextern OS_MUT LCD_mutex, game_obj_mutex;
+Nextern OS_TID t_Scroll_Cam;
+Nextern OS_MBX roll_mbx, plat_mbx;
 NCOLOR_T c_char, c_plat, c_bg;
 NPLATFORM_FIFO_T platforms;
 N
@@ -11881,64 +11894,130 @@ N}
 N
 N// Erases and redraws the character fast, avoids flickering.
 N// TODO - MAX_CHAR_DISPLACEMENT can be replaced with velocity in each direction for better code
-N// TODO - only need to erase away from the direction of travel
+N//		--> partially done for x direction only
 Nvoid Redraw_Character(CHARACTER_T * ch){
 N	uint8_t i;
 N	PT_T p, pp;
 N	
+N	int16_t x_dis = ch->Vx; 
+N	if (x_dis > 0 && ch->loc.X < x_dis){
+N		x_dis = ch->loc.X;
+N	}
+N	//else if (x_dis < 0 && abs(x_dis) > TFT_WIDTH - 1 - ch->loc.X){
+N	//	x_dis = (TFT_WIDTH - 1 - ch->loc.X);
+N	//}
+N	
+N	// Determine bounding box
+N	// Moving down the screen
 N	if (ch->Vy >= 0){
 N		p = ch->loc, pp = ch->loc;
-N		p.X -= MAX_CHAR_DISPLACEMENT;
-X		p.X -= (-((-13)));
+N		// only need to erase above us
 N		p.Y -= TERMINAL_VELOCITY;
 X		p.Y -= (25);
-N		pp.X += (CHAR_BODY_WIDTH + MAX_CHAR_DISPLACEMENT);
-X		pp.X += ((26) + (-((-13))));
 N		pp.Y += CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT;
 X		pp.Y += (40) + (10);
 N	}
+N	// Moving up the screen
 N	else {
 N		p = ch->loc, pp = ch->loc;
-N		p.X -= MAX_CHAR_DISPLACEMENT;
-X		p.X -= (-((-13)));
-N		pp.X += (CHAR_BODY_WIDTH + MAX_CHAR_DISPLACEMENT);
-X		pp.X += ((26) + (-((-13))));
+N		// only need to below above us
 N		pp.Y += (CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT + MAX_CHAR_DISPLACEMENT);
 X		pp.Y += ((40) + (10) + (-((-13))));
 N	}
 N	
+N	// moving right on the screen
+N	// first handle cases on the edge of the screen
+N	if (x_dis == 0){
+N		if (ch->loc.X == 0){
+N			x_dis = -1*MAX_CHAR_DISPLACEMENT;
+X			x_dis = -1*(-((-13)));
+N		}
+N		else {
+N			x_dis = MAX_CHAR_DISPLACEMENT;
+X			x_dis = (-((-13)));
+N		}
+N	}
+N	if (x_dis >= 0){
+N		// only need to erase to the left
+N		p.X -= x_dis;
+N		pp.X += CHAR_BODY_WIDTH;
+X		pp.X += (26);
+N	}
+N	// moving left on the screen
+N	else {
+N		// only need to erase to the right
+N		pp.X += CHAR_BODY_WIDTH - x_dis;
+X		pp.X += (26) - x_dis;
+N	}
+N	
+N	// Do the actual drawing
 N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
 N	TFT_Start_Rectangle(&p, &pp);
-N	if (ch->Vy >= 0){
-N		TFT_Write_Rectangle_Pixel(&c_bg, (2*MAX_CHAR_DISPLACEMENT+CHAR_BODY_WIDTH+1)*TERMINAL_VELOCITY);
-X		TFT_Write_Rectangle_Pixel(&c_bg, (2*(-((-13)))+(26)+1)*(25));
+N	// Moving right across the screen
+N	if (x_dis >= 0){
+N		if (ch->Vy >= 0){
+N			TFT_Write_Rectangle_Pixel(&c_bg, (x_dis+CHAR_BODY_WIDTH+1)*TERMINAL_VELOCITY);
+X			TFT_Write_Rectangle_Pixel(&c_bg, (x_dis+(26)+1)*(25));
+N		}
+N		for (i = 0; i < CHAR_BODY_HEIGHT; i++){
+X		for (i = 0; i < (40); i++){
+N			TFT_Write_Rectangle_Pixel(&c_bg, x_dis + 1);
+N			TFT_Write_Rectangle_Pixel(&c_char, CHAR_BODY_WIDTH);
+X			TFT_Write_Rectangle_Pixel(&c_char, (26));
+N			//TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT);
+N		}
+N		for (i = 0; i < CHAR_LEG_HEIGHT; i++){
+X		for (i = 0; i < (10); i++){
+N			TFT_Write_Rectangle_Pixel(&c_bg, x_dis + CHAR_LEG_INSET + 1);
+X			TFT_Write_Rectangle_Pixel(&c_bg, x_dis + (5) + 1);
+N			TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+X			TFT_Write_Rectangle_Pixel(&c_char, (5));
+N			TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_GAP);
+X			TFT_Write_Rectangle_Pixel(&c_bg, ((26) - 2*(5) - 2*(5)));
+N			TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+X			TFT_Write_Rectangle_Pixel(&c_char, (5));
+N			//TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET);
+N			TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_INSET);
+X			TFT_Write_Rectangle_Pixel(&c_bg, (5));
+N		}
+N		if (ch->Vy <= 0){
+N			TFT_Write_Rectangle_Pixel(&c_bg, (x_dis+CHAR_BODY_WIDTH+1)*MAX_CHAR_DISPLACEMENT);
+X			TFT_Write_Rectangle_Pixel(&c_bg, (x_dis+(26)+1)*(-((-13))));
+N		}
 N	}
-N	for (i = 0; i < CHAR_BODY_HEIGHT; i++){
-X	for (i = 0; i < (40); i++){
-N		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + 1);
-X		TFT_Write_Rectangle_Pixel(&c_bg, (-((-13))) + 1);
-N		TFT_Write_Rectangle_Pixel(&c_char, CHAR_BODY_WIDTH);
-X		TFT_Write_Rectangle_Pixel(&c_char, (26));
-N		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT);
-X		TFT_Write_Rectangle_Pixel(&c_bg, (-((-13))));
-N	}
-N	for (i = 0; i < CHAR_LEG_HEIGHT; i++){
-X	for (i = 0; i < (10); i++){
-N		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET + 1);
-X		TFT_Write_Rectangle_Pixel(&c_bg, (-((-13))) + (5) + 1);
-N		TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
-X		TFT_Write_Rectangle_Pixel(&c_char, (5));
-N		TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_GAP);
-X		TFT_Write_Rectangle_Pixel(&c_bg, ((26) - 2*(5) - 2*(5)));
-N		TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
-X		TFT_Write_Rectangle_Pixel(&c_char, (5));
-N		TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET);
-X		TFT_Write_Rectangle_Pixel(&c_bg, (-((-13))) + (5));
-N	}
-N	if (ch->Vy <= 0){
-N		TFT_Write_Rectangle_Pixel(&c_bg, (2*MAX_CHAR_DISPLACEMENT+CHAR_BODY_WIDTH+1)*MAX_CHAR_DISPLACEMENT);
-X		TFT_Write_Rectangle_Pixel(&c_bg, (2*(-((-13)))+(26)+1)*(-((-13))));
+N	// Moving left across the screen
+N	else {
+N		if (ch->Vy >= 0){
+N			TFT_Write_Rectangle_Pixel(&c_bg, (-1*x_dis+CHAR_BODY_WIDTH+1)*TERMINAL_VELOCITY);
+X			TFT_Write_Rectangle_Pixel(&c_bg, (-1*x_dis+(26)+1)*(25));
+N		}
+N		for (i = 0; i < CHAR_BODY_HEIGHT; i++){
+X		for (i = 0; i < (40); i++){
+N			//TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + 1);
+N			TFT_Write_Rectangle_Pixel(&c_bg, 1);
+N			TFT_Write_Rectangle_Pixel(&c_char, CHAR_BODY_WIDTH);
+X			TFT_Write_Rectangle_Pixel(&c_char, (26));
+N			TFT_Write_Rectangle_Pixel(&c_bg, -1*x_dis);
+N		}
+N		for (i = 0; i < CHAR_LEG_HEIGHT; i++){
+X		for (i = 0; i < (10); i++){
+N			//TFT_Write_Rectangle_Pixel(&c_bg, MAX_CHAR_DISPLACEMENT + CHAR_LEG_INSET + 1);
+N			TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_INSET + 1);
+X			TFT_Write_Rectangle_Pixel(&c_bg, (5) + 1);
+N			TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+X			TFT_Write_Rectangle_Pixel(&c_char, (5));
+N			TFT_Write_Rectangle_Pixel(&c_bg, CHAR_LEG_GAP);
+X			TFT_Write_Rectangle_Pixel(&c_bg, ((26) - 2*(5) - 2*(5)));
+N			TFT_Write_Rectangle_Pixel(&c_char, CHAR_LEG_WIDTH);
+X			TFT_Write_Rectangle_Pixel(&c_char, (5));
+N			TFT_Write_Rectangle_Pixel(&c_bg, -1*x_dis + CHAR_LEG_INSET);
+X			TFT_Write_Rectangle_Pixel(&c_bg, -1*x_dis + (5));
+N		}
+N		if (ch->Vy <= 0){
+N			TFT_Write_Rectangle_Pixel(&c_bg, (-1*x_dis+CHAR_BODY_WIDTH+1)*MAX_CHAR_DISPLACEMENT);
+X			TFT_Write_Rectangle_Pixel(&c_bg, (-1*x_dis+(26)+1)*(-((-13))));
+N		}
 N	}
 N	os_mut_release(&LCD_mutex);
 X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
@@ -12027,28 +12106,73 @@ N	Redraw_Character(ch);
 N}
 N
 N// Detect whether the character has hit a hall, platform, or monster
-Nvoid Detect_Collision(CHARACTER_T * ch) {
+Nuint8_t Detect_Collision(CHARACTER_T * ch) {
 N	uint8_t i = 0;
-N	uint8_t index = 0;
-N	uint8_t left_of_ch = ch->loc.X;
-N	uint8_t right_of_ch = ch->loc.X + CHAR_BODY_WIDTH;
-X	uint8_t right_of_ch = ch->loc.X + (26);
-N	uint8_t bot_of_ch = ch->loc.Y + (CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT);
-X	uint8_t bot_of_ch = ch->loc.Y + ((40) + (10));
+N	uint16_t index = 0;
+N	int16_t left_of_ch = ch->loc.X;
+N	int16_t right_of_ch = ch->loc.X + CHAR_BODY_WIDTH;
+X	int16_t right_of_ch = ch->loc.X + (26);
+N	int16_t bot_of_ch = ch->loc.Y + (CHAR_BODY_HEIGHT + CHAR_LEG_HEIGHT);
+X	int16_t bot_of_ch = ch->loc.Y + ((40) + (10));
+N	
+N	// bottom of screen
+N	if (bot_of_ch >= TFT_HEIGHT - ch->Vy){		// Mr. Doodle will hit bottom in the next frame
+X	if (bot_of_ch >= (320) - ch->Vy){		
+N		// TODO - game over
+N		// for now, just bounce up
+N		ch->Vy = JUMP_VELOCITY;
+X		ch->Vy = (-13);
+N	}
+N	
+N	// side of the screen, switch Mr. Doodle's side
+N	#if 0
+S	if (left_of_ch + ch->Vx <= 0){
+S		Erase_Character(ch, &c_bg);		// need to erase first
+S		ch->loc.X = TFT_WIDTH - CHAR_BODY_WIDTH - MAX_CHAR_DISPLACEMENT;
+S	}
+S	else if (right_of_ch + ch->Vx >= TFT_WIDTH){
+S		Erase_Character(ch, &c_bg);		// need to erase first
+S		ch->loc.X = MAX_CHAR_DISPLACEMENT;
+S	}
+N	#else
+N	// alternative, stop Mr. Doodle dead in his tracks
+N	if (left_of_ch + ch->Vx <= 0){
+N		ch->Vx = 0;
+N		ch->loc.X = 0;			// lock to left wall
+N	}
+N	else if (right_of_ch + ch->Vx >= TFT_WIDTH - 1){
+X	else if (right_of_ch + ch->Vx >= (240) - 1){
+N		ch->Vx = 0;
+N		ch->loc.X = TFT_WIDTH - CHAR_BODY_WIDTH - 1;		// lock to right wall
+X		ch->loc.X = (240) - (26) - 1;		
+N	}
+N	#endif
 N	
 N	// collision with platforms, only downward
 N	if (ch->Vy >= 0) {
 N		index = platforms.first;
 N		for (i = 0; i < platforms.num; i++){
-N			uint8_t left_of_platform = platforms.platforms[index].loc.X;
-N			uint8_t top_of_platform = platforms.platforms[index].loc.Y;
+N			uint16_t left_of_platform = platforms.platforms[index].loc.X;
+N			uint16_t top_of_platform = platforms.platforms[index].loc.Y;
 N			if (left_of_ch <= left_of_platform + PLAT_WIDTH && right_of_ch >= left_of_platform ){
 X			if (left_of_ch <= left_of_platform + (50) && right_of_ch >= left_of_platform ){
 N				if (bot_of_ch >= top_of_platform && bot_of_ch <= top_of_platform + PLAT_HEIGHT) {
 X				if (bot_of_ch >= top_of_platform && bot_of_ch <= top_of_platform + (10)) {
+N					//if (os_mbx_check(plat_mbx) > 0){	// avoid double triggering which causes freezing
+N						// get location of platform landed on and put it in mailbox
+N						//uint32_t * msg = malloc(sizeof(uint32_t));
+N						//*msg = top_of_platform;
+N						//os_mbx_send(plat_mbx, (void *)msg, WAIT_FOREVER);
+N						
+N						// trigger event
+N						//os_evt_set(EV_SCROLLCAM, t_Scroll_Cam);
+N					//}
+N					// reset jump velocity of character
 N					ch->Vy = JUMP_VELOCITY;
 X					ch->Vy = (-13);
-N					break;		// only need one collision
+N					
+N					return HIT_PLATFORM;		// only need one collision
+X					return (0x01);		
 N				}
 N			}
 N			index++;
@@ -12058,19 +12182,28 @@ N				index = 0;
 N			}
 N		}
 N	}
+N	
+N	return NO_HIT;
+X	return (0x00);
 N}
 N
 N// Convert tilt to side to side movement speed
 Nvoid Convert_Tilt(CHARACTER_T * ch) {
 N	float roll_val, abs_roll_val;
 N	char buffer[16];
+N	void * msg;
 N	
-N	// get current roll value
-N	os_mut_wait(&roll_mutex, WAIT_FOREVER);
-X	_os_mut_wait((U32)rt_mut_wait,&roll_mutex,(0xffff));
-N	roll_val = roll;
-N	os_mut_release(&roll_mutex);
-X	_os_mut_release((U32)rt_mut_release,&roll_mutex);
+N	// get current roll value from mailbox, if it's there
+N	if (os_mbx_check(roll_mbx) == 0){
+X	if (_os_mbx_check((U32)rt_mbx_check,roll_mbx) == 0){
+N		os_mbx_wait(roll_mbx, &msg, WAIT_FOREVER);
+X		_os_mbx_wait((U32)rt_mbx_wait,roll_mbx,&msg,(0xffff));
+N		roll_val = *(float *)msg;
+N		free(msg);
+N	}
+N	else {
+N		return;
+N	}
 N	
 N	// write to screen (debug)
 N	sprintf(buffer, "Roll: %6.2f", roll_val);
@@ -12082,31 +12215,37 @@ X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
 N	
 N	// do conversion
 N	abs_roll_val = fabs(roll_val);
-N	if (abs_roll_val < 5){
+N	if ((ch->loc.X == 0 && roll_val < 0) || (ch->loc.X >= (TFT_WIDTH - CHAR_BODY_WIDTH - 1) && roll_val > 0)){
+X	if ((ch->loc.X == 0 && roll_val < 0) || (ch->loc.X >= ((240) - (26) - 1) && roll_val > 0)){
 N		ch->Vx = 0;
 N	}
-N	else if (abs_roll_val > 5 && abs_roll_val < 15){
-N		if (roll_val < 0){
-N			ch->Vx = -4;
+N	else {
+N		if (abs_roll_val < 5){
+N			ch->Vx = 0;
 N		}
-N		else {
-N			ch->Vx = 4;
+N		else if (abs_roll_val > 5 && abs_roll_val < 15){
+N			if (roll_val < 0){
+N				ch->Vx = -4;
+N			}
+N			else {
+N				ch->Vx = 4;
+N			}
 N		}
-N	}
-N	else if (abs_roll_val > 15 && abs_roll_val < 30){
-N		if (roll_val < 0){
-N			ch->Vx = -8;
+N		else if (abs_roll_val > 15 && abs_roll_val < 30){
+N			if (roll_val < 0){
+N				ch->Vx = -8;
+N			}
+N			else {
+N				ch->Vx = 8;
+N			}
 N		}
-N		else {
-N			ch->Vx = 8;
-N		}
-N	}
-N	else if (abs_roll_val > 30){
-N		if (roll_val < 0){
-N			ch->Vx = -12;
-N		}
-N		else {
-N			ch->Vx = 12;
+N		else if (abs_roll_val > 30){
+N			if (roll_val < 0){
+N				ch->Vx = -12;
+N			}
+N			else {
+N				ch->Vx = 12;
+N			}
 N		}
 N	}
 N}

@@ -41,6 +41,12 @@ typedef struct {		// Holds a set number of platforms
 	uint8_t num;
 } PLATFORM_FIFO_T;
 
+// Camera scroller
+#define NO_HIT						(0x00)
+#define HIT_PLATFORM			(0x01)
+#define SCROLL_DOWN_LIMIT	(25)
+#define CAM_SCROLL_SPEED	(3)
+
 
 // ****************
 // HELPER FUNCTIONS
@@ -54,5 +60,6 @@ void Draw_Platform(PLATFORM_T * p, COLOR_T * c);			// Draw platform in the selec
 void Erase_Platform(PLATFORM_T * p, COLOR_T * bg);		// Erase platform with the selected background color
 void Redraw_Platforms(void);													// Redraw all platforms to counter erased content
 void Move_Character(CHARACTER_T * ch);								// Move character based on velocity and adjust velocity
-void Detect_Collision(CHARACTER_T * ch);							// Detect whether the character has hit a hall, platform, or monster
+uint8_t Detect_Collision(CHARACTER_T * ch);						// Detect whether the character has hit a hall, platform, or monster
 void Convert_Tilt(CHARACTER_T * ch);									// Convert tilt to side to side movement speed
+void Scroll_Camera(CHARACTER_T * ch);									// Scrolls camera down
