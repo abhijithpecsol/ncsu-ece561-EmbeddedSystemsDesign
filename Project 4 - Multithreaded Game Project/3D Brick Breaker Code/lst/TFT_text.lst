@@ -503,9 +503,9 @@ N	font_header = (FONT_HEADER_T *) font;
 N	glyph_index = (GLYPH_INDEX_T *) (font + sizeof(FONT_HEADER_T));
 N	
 N	// Set default FG and BG colors
-N	fg.R = 255;
-N	fg.G = 255;
-N	fg.B = 0;
+N	fg.R = 218;
+N	fg.G = 165;
+N	fg.B = 32;
 N
 N	bg.R = 0;
 N	bg.G = 0;

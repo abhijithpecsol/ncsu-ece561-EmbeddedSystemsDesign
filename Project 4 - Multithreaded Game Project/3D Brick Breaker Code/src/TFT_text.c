@@ -42,9 +42,9 @@ void TFT_Text_Init(uint8_t font_num) {
 	glyph_index = (GLYPH_INDEX_T *) (font + sizeof(FONT_HEADER_T));
 	
 	// Set default FG and BG colors
-	fg.R = 255;
-	fg.G = 255;
-	fg.B = 0;
+	fg.R = 218;
+	fg.G = 165;
+	fg.B = 32;
 
 	bg.R = 0;
 	bg.G = 0;

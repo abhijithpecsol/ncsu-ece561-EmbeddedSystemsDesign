@@ -9887,7 +9887,7 @@ N
 N	while (1) {
 N		os_itv_wait();
 X		_os_itv_wait((U32)rt_itv_wait);
-N		//		os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
+N		//os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
 N		// make a new sound every second
 N		
 N		// Hack - temporary code until voice code is added

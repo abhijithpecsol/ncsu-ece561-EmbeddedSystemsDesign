@@ -11909,6 +11909,7 @@ L 15 "src\game.c" 2
 N
 Nextern OS_MUT LCD_mutex;
 Nextern OS_MBX tilt_mbx;
+Nextern OS_TID t_Sound_Manager;
 N
 N// Sets up the initial game state
 Nvoid Game_Init(GAME_T * g) {
@@ -11921,24 +11922,24 @@ N	g->colors.c_bg.B = 0;
 N	g->colors.c_pad.R = 255;
 N	g->colors.c_pad.G = 255;
 N	g->colors.c_pad.B = 255;
-N	g->colors.c_ball.R = 255;
-N	g->colors.c_ball.G = 255;
-N	g->colors.c_ball.B = 255;
-N	g->colors.c_brick_v_weak.R = 50;
-N	g->colors.c_brick_v_weak.G = 50;
-N	g->colors.c_brick_v_weak.B = 50;
-N	g->colors.c_brick_weak.R = 0;
-N	g->colors.c_brick_weak.G = 0;
-N	g->colors.c_brick_weak.B = 255;
-N	g->colors.c_brick_strong.R = 0;
+N	g->colors.c_ball.R = 218;
+N	g->colors.c_ball.G = 165;
+N	g->colors.c_ball.B = 32;
+N	g->colors.c_brick_v_weak.R = 25;
+N	g->colors.c_brick_v_weak.G = 25;
+N	g->colors.c_brick_v_weak.B = 25;
+N	g->colors.c_brick_weak.R = 75;
+N	g->colors.c_brick_weak.G = 75;
+N	g->colors.c_brick_weak.B = 75;
+N	g->colors.c_brick_strong.R = 255;
 N	g->colors.c_brick_strong.G = 255;
-N	g->colors.c_brick_strong.B = 0;
-N	g->colors.c_brick_v_strong.R = 255;
-N	g->colors.c_brick_v_strong.G = 0;
-N	g->colors.c_brick_v_strong.B = 0;
-N	g->colors.c_brick_invulnerable.R = 128;
-N	g->colors.c_brick_invulnerable.G = 0;
-N	g->colors.c_brick_invulnerable.B = 128;
+N	g->colors.c_brick_strong.B = 255;
+N	g->colors.c_brick_v_strong.R = 218;
+N	g->colors.c_brick_v_strong.G = 165;
+N	g->colors.c_brick_v_strong.B = 32;
+N	g->colors.c_brick_invulnerable.R = 65;
+N	g->colors.c_brick_invulnerable.G = 105;
+N	g->colors.c_brick_invulnerable.B = 225;
 N	
 N	// set positions of paddles
 N	g->paddles.bp.loc.X = (TFT_WIDTH - HORZ_PADDLE_WIDTH)/2;
@@ -12452,6 +12453,8 @@ Nvoid Calc_Bounce_Velocities(BALL_T * b, int16_t cb, int16_t cp, uint8_t paddle)
 N	int8_t parallel_vel;
 N	int8_t perpen_vel;
 N	int16_t normalized_dist;
+N	
+N	//os_evt_set(EV_PLAYSOUND, t_Sound_Manager);
 N	
 N	// adjust all paddles to common orientation
 N	if (paddle == BOTTOM_PADDLE){

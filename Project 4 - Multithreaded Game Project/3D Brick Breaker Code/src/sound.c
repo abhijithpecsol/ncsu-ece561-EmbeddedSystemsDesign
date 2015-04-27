@@ -133,7 +133,7 @@ __task void Task_Sound_Manager(void) {
 	
 	while (1) {
 		os_itv_wait();
-		//		os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
+		//os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
 		// make a new sound every second
 		
 		// Hack - temporary code until voice code is added
