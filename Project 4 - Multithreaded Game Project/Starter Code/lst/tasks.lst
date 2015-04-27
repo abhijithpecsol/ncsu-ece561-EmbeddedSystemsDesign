@@ -9085,8 +9085,8 @@ N
 N/* MKL25Z4.h, eof. */
 L 5 "src\tasks.c" 2
 N
-N#include "tft_lcd.h"
-L 1 ".\inc\tft_lcd.h" 1
+N#include "TFT_LCD.h"
+L 1 ".\inc\TFT_LCD.h" 1
 N#ifndef TFT_LCD_H
 N#define TFT_LCD_H
 N
@@ -9147,48 +9147,87 @@ N									 // Values are left aligned here
 N} COLOR_T;
 N
 N
-Nextern void TFT_Init(void);
-Nextern void TFT_Fill_Buffer(COLOR_T * color);
-Nextern void TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color);
-Nextern uint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2);
-Nextern void TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count);
+N void TFT_Init(void);
+N void TFT_Fill_Buffer(COLOR_T * color);
+N void TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color);
+N uint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2);
+N void TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count);
 N
 N
-Nextern void TFT_Plot_Pixel(PT_T * pos, COLOR_T * color);
-Nextern void TFT_Set_BL(uint8_t on);
-Nextern void TFT_Set_Brightness(uint8_t brightness);
-Nextern void TFT_Set_Backlight_Brightness(uint16_t brightness_percent);
-Nextern void TFT_Set_Colors(COLOR_T * foreground, COLOR_T * background);
+N void TFT_Plot_Pixel(PT_T * pos, COLOR_T * color);
+N void TFT_Set_BL(uint8_t on);
+N void TFT_Set_Brightness(uint8_t brightness);
+N void TFT_Set_Backlight_Brightness(uint16_t brightness_percent);
+N void TFT_Set_Colors(COLOR_T * foreground, COLOR_T * background);
 N
-Nextern void TFT_Erase(void);
-Nextern void TFT_Text_Init(uint8_t font_num);
-Nextern void TFT_Text_PrintChar(PT_T * pos, char ch);
-Nextern void TFT_Text_PrintStr(PT_T * pos, char * str);
-Nextern void TFT_Text_PrintStr_RC( uint8_t  row, uint8_t col, char *  str);
+N void TFT_Erase(void);
+N void TFT_Text_Init(uint8_t font_num);
+N void TFT_Text_PrintChar(PT_T * pos, char ch);
+N void TFT_Text_PrintStr(PT_T * pos, char * str);
+N void TFT_Text_PrintStr_RC( uint8_t  row, uint8_t col, char *  str);
 N
-Nextern void Graphics_Test(void);
-Nextern void TFT_Draw_Line(PT_T * p1, PT_T * p2, COLOR_T * color);
+N void Graphics_Test(void);
+N void TFT_Draw_Line(PT_T * p1, PT_T * p2, COLOR_T * color);
 N
 N
-Nextern void TFT_TS_Init(void);
-Nextern uint32_t TFT_TS_Read(PT_T * position);
-Nextern void TFT_TS_Test(void);
-Nextern void TFT_TS_Calibrate(void);
+N void TFT_TS_Init(void);
+N uint32_t TFT_TS_Read(PT_T * position);
+N void TFT_TS_Test(void);
+N void TFT_TS_Calibrate(void);
 N
-Nextern uint8_t G_TFT_char_width, G_TFT_char_height;
+N extern uint8_t G_TFT_char_width, G_TFT_char_height;
 N
 N
 N#endif
 L 7 "src\tasks.c" 2
+N#include "font.h"
+L 1 ".\inc\font.h" 1
+N#ifndef FONT_H
+N#define FONT_H
+N#include <stdint.h>
+N
+Ntypedef struct {
+N	uint8_t FontID;
+N	uint8_t Orientation;
+N	uint16_t FirstChar;
+N	uint16_t LastChar;
+N	uint8_t Height;
+N	uint8_t Reserved;
+N} FONT_HEADER_T;
+N
+Ntypedef struct {
+N	uint32_t Width:8; // pixels
+N	uint32_t Offset:24; // Offset from start of table
+N} GLYPH_INDEX_T;
+N
+Nextern const uint8_t Lucida_Console8x13[];
+Nextern const uint8_t Lucida_Console12x19[];
+Nextern const uint8_t Lucida_Console20x31[];
+N
+N#define CHAR_WIDTH G_TFT_char_width 
+N#define CHAR_HEIGHT G_TFT_char_height 
+N
+N#define ROW_TO_Y(r) ((r)*G_TFT_char_height)
+N#define COL_TO_X(c) ((c)*G_TFT_char_width)
+N
+N#define TFT_MAX_COLS (TFT_WIDTH/G_TFT_char_width)
+N#define TFT_MAX_ROWS (TFT_HEIGHT/G_TFT_char_height)
+N
+N
+N#endif // #ifndef FONT_H
+L 8 "src\tasks.c" 2
 N#include "tasks.h"
 L 1 ".\inc\tasks.h" 1
 N#ifndef TASKS_H
 N#define TASKS_H
+N
 N#include <RTL.h>
+N#include "TFT_LCD.h"
 N
 N#define TASK_READ_TS_PERIOD_TICKS (20)  // 1 tick/ms
-N#define TASK_READ_ACCELEROMETER_PERIOD_TICKS (250)  // 1 tick/ms
-N#define TASK_SOUND_PERIOD_TICKS (1)  // 1 tick/ms
+N#define TASK_READ_ACCELEROMETER_PERIOD_TICKS (100)  // 1 tick/ms
+N#define TASK_SOUND_PERIOD_TICKS (100)  // 1 tick/ms
+N#define TASK_UPDATE_SCREEN_PERIOD_TICKS (100)
 N
 N// Debug outputs on Port B
 N#define DEBUG_T0_POS 	0		// J10 pin 2
@@ -9196,24 +9235,37 @@ N#define DEBUG_T1_POS 	1 	// J10 pin 4
 N#define DEBUG_T2_POS 2 	// J10 pin 6
 N#define DEBUG_T3_POS 	3		// J10 pin 8
 N
-Nextern void	Init_Debug_Signals(void);
+N void	Init_Debug_Signals(void);
 N
 N#define EV_PLAYSOUND (1) 
+N#define EV_SOUND_ON (2)
+N#define EV_SOUND_OFF (4)
+N
+N#define EV_REFILL_SOUND (1)
 N
 N#define WAIT_FOREVER (0xffff)
 N
-Nextern __task void Task_Init(void);
-Xextern __declspec(noreturn) void Task_Init(void);
-Nextern __task void Task_Read_TS(void);
-Xextern __declspec(noreturn) void Task_Read_TS(void);
-Nextern __task void Task_Read_Accelerometer(void);
-Xextern __declspec(noreturn) void Task_Read_Accelerometer(void);
-Nextern __task void Task_Sound(void);
-Xextern __declspec(noreturn) void Task_Sound(void);
-N#endif
-L 8 "src\tasks.c" 2
-N#include "mma8451.h"
-L 1 ".\inc\mma8451.h" 1
+N __task void Task_Init(void);
+X __declspec(noreturn) void Task_Init(void);
+N __task void Task_Read_TS(void);
+X __declspec(noreturn) void Task_Read_TS(void);
+N __task void Task_Read_Accelerometer(void);
+X __declspec(noreturn) void Task_Read_Accelerometer(void);
+N __task void Task_Update_Screen(void);
+X __declspec(noreturn) void Task_Update_Screen(void);
+N 
+Nextern OS_TID t_Read_TS, t_Read_Accelerometer, t_Sound_Manager, t_US, t_Refill_Sound_Buffer;
+N
+N 
+N// Game Constants
+N#define PADDLE_WIDTH (40)
+N#define PADDLE_HEIGHT (15)
+N#define PADDLE_Y_POS (TFT_HEIGHT-4-PADDLE_HEIGHT)
+N 
+N#endif // TASKS_H
+L 9 "src\tasks.c" 2
+N#include "MMA8451.h"
+L 1 ".\inc\MMA8451.h" 1
 N#ifndef MMA8451_H
 N#define MMA8451_H
 N
@@ -9244,24 +9296,66 @@ Nextern float roll, pitch;
 Nextern int16_t acc_X, acc_Y, acc_Z;
 N
 N#endif
-L 9 "src\tasks.c" 2
+L 10 "src\tasks.c" 2
 N#include "sound.h"
 L 1 ".\inc\sound.h" 1
 N#ifndef SOUND_H
 N#define SOUND_H
 N
+N#include <stdint.h>
+N#include <RTL.h>
 N
 N// On Port E
 N#define AMP_ENABLE_POS (29)
 N#define DAC_POS (30)
 N#define MAX_DAC_CODE (4095)
+N#define NUM_STEPS (64)
+N#define NUM_WAVEFORM_SAMPLES (512)
 N
-Nextern void Init_DAC(void);
-Nextern void Play_Tone(void);
-Nextern void Sound_Init(void);
+N
+Ntypedef struct {
+N	uint16_t Volume;
+N	uint16_t Duration;
+N	uint16_t Frequency; 
+N	uint16_t Type; // Sine, square, triangle, white noise
+N} VOICE_T;
+N
+Nvoid DAC_Init(void);
+Nvoid Play_Tone(void);
+Nvoid Sound_Init(void);
+N
+Nvoid Sound_Enable_Amp(void);
+Nvoid Sound_Disable_Amp(void);
+N
+Nvoid Play_Tone_with_DMA(unsigned int period, unsigned int num_cycles);
+N//  void Play_Waveform_with_DMA(uint32_t sample_period_us, uint16_t * waveform, 
+N//	uint32_t num_samples);
+N
+Nvoid Sound_Refill_Buffer(uint32_t samples);
+N
+Nvoid Play_Waveform_with_DMA(void);
+N
+N __task void Task_Sound_Manager(void);
+X __declspec(noreturn) void Task_Sound_Manager(void);
+N __task void Task_Refill_Sound_Buffer(void);
+X __declspec(noreturn) void Task_Refill_Sound_Buffer(void);
 N
 N#endif // SOUND_H
-L 10 "src\tasks.c" 2
+L 11 "src\tasks.c" 2
+N#include "DMA.h"
+L 1 ".\inc\DMA.h" 1
+N#ifndef DMA_H
+N#define DMA_H
+N
+N#include <stdint.h>
+N
+Nvoid DMA_Init(void);
+Nvoid Configure_DMA_For_Playback(uint16_t * source, uint32_t count, uint32_t num_playbacks);
+Nvoid Start_DMA_Playback(void);
+N
+N#endif
+N// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
+L 12 "src\tasks.c" 2
 N#include "gpio_defs.h"
 L 1 ".\inc\gpio_defs.h" 1
 N#ifndef GPIO_DEFS_H
@@ -9276,11 +9370,12 @@ N#define BLUE_LED_POS (1)		// on port D
 N
 N#endif
 N// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
-L 11 "src\tasks.c" 2
+L 13 "src\tasks.c" 2
+N
 N
 NU64 RA_Stack[64];
 N
-NOS_TID t_Read_TS, t_Read_Accelerometer, t_Sound;
+NOS_TID t_Read_TS, t_Read_Accelerometer, t_Sound_Manager, t_US, t_Refill_Sound_Buffer;
 NOS_MUT LCD_mutex;
 NOS_MUT TS_mutex;
 N
@@ -9338,8 +9433,14 @@ N	t_Read_TS = os_tsk_create(Task_Read_TS, 4);
 X	t_Read_TS = _os_tsk_create((U32)rt_tsk_create,Task_Read_TS,4,0,0);
 N	t_Read_Accelerometer = os_tsk_create_user(Task_Read_Accelerometer, 3, RA_Stack, 512);
 X	t_Read_Accelerometer = _os_tsk_create((U32)rt_tsk_create,Task_Read_Accelerometer,3|(512<<8),RA_Stack,0);
-N	t_Sound = os_tsk_create(Task_Sound, 2);
-X	t_Sound = _os_tsk_create((U32)rt_tsk_create,Task_Sound,2,0,0);
+N	t_Sound_Manager = os_tsk_create(Task_Sound_Manager, 2);
+X	t_Sound_Manager = _os_tsk_create((U32)rt_tsk_create,Task_Sound_Manager,2,0,0);
+N	t_US = os_tsk_create(Task_Update_Screen, 5);
+X	t_US = _os_tsk_create((U32)rt_tsk_create,Task_Update_Screen,5,0,0);
+N	t_Refill_Sound_Buffer = os_tsk_create(Task_Refill_Sound_Buffer, 1);
+X	t_Refill_Sound_Buffer = _os_tsk_create((U32)rt_tsk_create,Task_Refill_Sound_Buffer,1,0,0);
+N
+N
 N  os_tsk_delete_self ();
 X  { _os_tsk_delete((U32)rt_tsk_delete, 0); for(;;); };
 N}
@@ -9356,6 +9457,11 @@ N
 N	os_itv_set(TASK_READ_TS_PERIOD_TICKS);
 X	_os_itv_set((U32)rt_itv_set,(20));
 N
+N	TFT_Text_PrintStr_RC(TFT_MAX_ROWS-3, 0, "Mute");
+X	TFT_Text_PrintStr_RC(((320)/G_TFT_char_height)-3, 0, "Mute");
+N	TFT_Text_PrintStr_RC(TFT_MAX_ROWS-3, 12, "Unmute");
+X	TFT_Text_PrintStr_RC(((320)/G_TFT_char_height)-3, 12, "Unmute");
+N	
 N	while (1) {
 N		os_itv_wait();
 X		_os_itv_wait((U32)rt_itv_wait);
@@ -9363,18 +9469,27 @@ N		PTB->PSOR = MASK(DEBUG_T1_POS);
 X		((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << (1));
 N		if (TFT_TS_Read(&p)) { 
 N			// Send message indicating screen was pressed
-N			os_evt_set(EV_PLAYSOUND, t_Sound);
-X			_os_evt_set((U32)rt_evt_set,(1),t_Sound);
-N			// Also draw on screen
-N			if ((pp.X == 0) && (pp.Y == 0)) {
+N			// os_evt_set(EV_PLAYSOUND, t_Sound);
+N
+N			if (p.Y > 240) { 
+N				if (p.X < TFT_WIDTH/2) {
+X				if (p.X < (240)/2) {
+N					Sound_Disable_Amp();
+N				} else {
+N					Sound_Enable_Amp();
+N				}
+N			} else {
+N				// Now draw on screen
+N				if ((pp.X == 0) && (pp.Y == 0)) {
+N					pp = p;
+N				}
+N				os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X				_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N				TFT_Draw_Line(&p, &pp, &c);
+N				os_mut_release(&LCD_mutex);
+X				_os_mut_release((U32)rt_mut_release,&LCD_mutex);
 N				pp = p;
-N			}
-N			os_mut_wait(&LCD_mutex, WAIT_FOREVER);
-X			_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
-N			TFT_Draw_Line(&p, &pp, &c);
-N			os_mut_release(&LCD_mutex);
-X			_os_mut_release((U32)rt_mut_release,&LCD_mutex);
-N			pp = p;
+N			} 
 N		} else {
 N			pp.X = 0;
 N			pp.Y = 0;
@@ -9389,7 +9504,7 @@ X__declspec(noreturn) void Task_Read_Accelerometer(void) {
 N	char buffer[16];
 N	
 N	os_itv_set(TASK_READ_ACCELEROMETER_PERIOD_TICKS);
-X	_os_itv_set((U32)rt_itv_set,(250));
+X	_os_itv_set((U32)rt_itv_set,(100));
 N
 N	while (1) {
 N		os_itv_wait();
@@ -9398,84 +9513,80 @@ N		PTB->PSOR = MASK(DEBUG_T0_POS);
 X		((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << (0));
 N		read_full_xyz();
 N		convert_xyz_to_roll_pitch();
-N#if 0
-S		sprintf(buffer, "X: %6d", acc_X);
-S		TFT_Text_PrintStr_RC(2, 0, buffer);
-S		sprintf(buffer, "Y: %6d", acc_Y);
-S		TFT_Text_PrintStr_RC(3, 0, buffer);
-S		sprintf(buffer, "Z: %6d", acc_Z);
-S		TFT_Text_PrintStr_RC(4, 0, buffer);
-N#else
-N		// PTB->PTOR = MASK(DEBUG_T0_POS);
-N		sprintf(buffer, "Roll: %6.2f", roll);
-N		// PTB->PTOR = MASK(DEBUG_T0_POS);
 N
+N		sprintf(buffer, "Roll: %6.2f", roll);
 N		os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X		_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
 N		TFT_Text_PrintStr_RC(2, 0, buffer);
 N		os_mut_release(&LCD_mutex);
 X		_os_mut_release((U32)rt_mut_release,&LCD_mutex);
-N		
-N		// PTB->PTOR = MASK(DEBUG_T0_POS);
-N		sprintf(buffer, "Pitch: %6.2f", pitch);
-N		// PTB->PTOR = MASK(DEBUG_T0_POS);
 N
+N		sprintf(buffer, "Pitch: %6.2f", pitch);
 N		os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X		_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
 N		TFT_Text_PrintStr_RC(3, 0, buffer);
 N		os_mut_release(&LCD_mutex);
 X		_os_mut_release((U32)rt_mut_release,&LCD_mutex);
-N#endif
+N
 N		PTB->PCOR = MASK(DEBUG_T0_POS);
 X		((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (0));
 N	}
 N}
 N
-N__task void Task_Sound(void) {
-X__declspec(noreturn) void Task_Sound(void) {
-N	uint32_t num_cycles, phase;
-N	uint16_t val, out_val;
-N	uint32_t temp_val;
+N
+N
+N
+N__task void Task_Update_Screen(void) {
+X__declspec(noreturn) void Task_Update_Screen(void) {
+N	int16_t paddle_pos=TFT_WIDTH/2;
+X	int16_t paddle_pos=(240)/2;
+N	PT_T p1, p2;
+N	COLOR_T paddle_color, black;
 N	
-N	os_itv_set(TASK_SOUND_PERIOD_TICKS);
-X	_os_itv_set((U32)rt_itv_set,(1));
+N	paddle_color.R = 100;
+N	paddle_color.G = 200;
+N	paddle_color.B = 50;
+N
+N	black.R = 0;
+N	black.G = 0;
+N	black.B = 0;
+N	
+N	os_itv_set(TASK_UPDATE_SCREEN_PERIOD_TICKS);
+X	_os_itv_set((U32)rt_itv_set,(100));
 N
 N	while (1) {
-N		os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
-X		_os_evt_wait((U32)rt_evt_wait,(1),(0xffff),1); 
-N		val = MAX_DAC_CODE/2;
-X		val = (4095)/2;
-N		out_val = 0;
-N		phase = 1;
-N		for (num_cycles = 0; num_cycles < 1000; num_cycles++) {
-N			PTB->PSOR = MASK(DEBUG_T2_POS);
-X			((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << (2));
-N#if 0
-S			out_val = MAX_DAC_CODE - out_val;	
-N#else
-N			// Generate next sample
-N			if (phase > 0) {
-N				out_val = MAX_DAC_CODE/2 + val;
-X				out_val = (4095)/2 + val;
-N			} else {
-N				out_val = MAX_DAC_CODE/2 - val;
-X				out_val = (4095)/2 - val;
-N			}
-N			phase = 1 - phase;
-N			temp_val = val * 0xFF00;
-N			val = temp_val >> 16;
-N#endif
-N			// Wait for next interval to play the sample
-N			os_itv_wait(); 
-X			_os_itv_wait((U32)rt_itv_wait); 
-N			// Send sample to DAC
-N			DAC0->DAT[0].DATH = DAC_DATH_DATA1(out_val >> 8);
-X			((DAC_Type *)(0x4003F000u))->DAT[0].DATH = (((uint8_t)(((uint8_t)(out_val >> 8))<<0))&0xFu);
-N			DAC0->DAT[0].DATL = DAC_DATL_DATA0(out_val);
-X			((DAC_Type *)(0x4003F000u))->DAT[0].DATL = (((uint8_t)(((uint8_t)(out_val))<<0))&0xFFu);
-N			PTB->PCOR = MASK(DEBUG_T2_POS);
-X			((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (2));
-N
+N		os_itv_wait();
+X		_os_itv_wait((U32)rt_itv_wait);
+N		PTB->PSOR = MASK(DEBUG_T3_POS);
+X		((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << (3));
+N		
+N		if ((roll < -2.0) || (roll > 2.0)) {
+N			p1.X = paddle_pos;
+N			p1.Y = PADDLE_Y_POS;
+X			p1.Y = ((320)-4-(15));
+N			p2.X = p1.X + PADDLE_WIDTH;
+X			p2.X = p1.X + (40);
+N			p2.Y = p1.Y + PADDLE_HEIGHT;
+X			p2.Y = p1.Y + (15);
+N			TFT_Fill_Rectangle(&p1, &p2, &black); 		
+N			
+N			paddle_pos += roll;
+N			paddle_pos = MAX(0, paddle_pos);
+X			paddle_pos = ((0)>(paddle_pos)? 0 : paddle_pos);
+N			paddle_pos = MIN(paddle_pos, TFT_WIDTH-1);
+X			paddle_pos = ((paddle_pos)<((240)-1)? paddle_pos : (240)-1);
+N			
+N			p1.X = paddle_pos;
+N			p1.Y = PADDLE_Y_POS;
+X			p1.Y = ((320)-4-(15));
+N			p2.X = p1.X + PADDLE_WIDTH;
+X			p2.X = p1.X + (40);
+N			p2.Y = p1.Y + PADDLE_HEIGHT;
+X			p2.Y = p1.Y + (15);
+N			TFT_Fill_Rectangle(&p1, &p2, &paddle_color); 		
 N		}
+N		
+N		PTB->PCOR = MASK(DEBUG_T3_POS);
+X		((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (3));
 N	}
 N}

@@ -1,6 +1,6 @@
-L 1 "src\tft_graphics.c"
-N#include "tft_lcd.h"
-L 1 ".\inc\tft_lcd.h" 1
+L 1 "src\TFT_graphics.c"
+N#include "TFT_LCD.h"
+L 1 ".\inc\TFT_LCD.h" 1
 N#ifndef TFT_LCD_H
 N#define TFT_LCD_H
 N
@@ -335,7 +335,7 @@ N
 N#endif /* __stdint_h */
 N
 N/* end of stdint.h */
-L 5 ".\inc\tft_lcd.h" 2
+L 5 ".\inc\TFT_LCD.h" 2
 N
 N#define TFT_WIDTH (240)
 N#define TFT_HEIGHT (320)
@@ -392,39 +392,39 @@ N									 // Values are left aligned here
 N} COLOR_T;
 N
 N
-Nextern void TFT_Init(void);
-Nextern void TFT_Fill_Buffer(COLOR_T * color);
-Nextern void TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color);
-Nextern uint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2);
-Nextern void TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count);
+N void TFT_Init(void);
+N void TFT_Fill_Buffer(COLOR_T * color);
+N void TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color);
+N uint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2);
+N void TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count);
 N
 N
-Nextern void TFT_Plot_Pixel(PT_T * pos, COLOR_T * color);
-Nextern void TFT_Set_BL(uint8_t on);
-Nextern void TFT_Set_Brightness(uint8_t brightness);
-Nextern void TFT_Set_Backlight_Brightness(uint16_t brightness_percent);
-Nextern void TFT_Set_Colors(COLOR_T * foreground, COLOR_T * background);
+N void TFT_Plot_Pixel(PT_T * pos, COLOR_T * color);
+N void TFT_Set_BL(uint8_t on);
+N void TFT_Set_Brightness(uint8_t brightness);
+N void TFT_Set_Backlight_Brightness(uint16_t brightness_percent);
+N void TFT_Set_Colors(COLOR_T * foreground, COLOR_T * background);
 N
-Nextern void TFT_Erase(void);
-Nextern void TFT_Text_Init(uint8_t font_num);
-Nextern void TFT_Text_PrintChar(PT_T * pos, char ch);
-Nextern void TFT_Text_PrintStr(PT_T * pos, char * str);
-Nextern void TFT_Text_PrintStr_RC( uint8_t  row, uint8_t col, char *  str);
+N void TFT_Erase(void);
+N void TFT_Text_Init(uint8_t font_num);
+N void TFT_Text_PrintChar(PT_T * pos, char ch);
+N void TFT_Text_PrintStr(PT_T * pos, char * str);
+N void TFT_Text_PrintStr_RC( uint8_t  row, uint8_t col, char *  str);
 N
-Nextern void Graphics_Test(void);
-Nextern void TFT_Draw_Line(PT_T * p1, PT_T * p2, COLOR_T * color);
+N void Graphics_Test(void);
+N void TFT_Draw_Line(PT_T * p1, PT_T * p2, COLOR_T * color);
 N
 N
-Nextern void TFT_TS_Init(void);
-Nextern uint32_t TFT_TS_Read(PT_T * position);
-Nextern void TFT_TS_Test(void);
-Nextern void TFT_TS_Calibrate(void);
+N void TFT_TS_Init(void);
+N uint32_t TFT_TS_Read(PT_T * position);
+N void TFT_TS_Test(void);
+N void TFT_TS_Calibrate(void);
 N
-Nextern uint8_t G_TFT_char_width, G_TFT_char_height;
+N extern uint8_t G_TFT_char_width, G_TFT_char_height;
 N
 N
 N#endif
-L 2 "src\tft_graphics.c" 2
+L 2 "src\TFT_graphics.c" 2
 N
 N#define STEP 8
 N

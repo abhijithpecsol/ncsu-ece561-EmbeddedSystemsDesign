@@ -8908,20 +8908,23 @@ N#define USE_PIT (0)
 N
 N#define LCD_UPDATE_PERIOD 10
 N
-Nvoid Init_PIT(unsigned period);
-Nvoid Start_PIT(void);
-Nvoid Stop_PIT(void);
+Nvoid PIT_Init(unsigned period);
+Nvoid PIT_Start(void);
+Nvoid PIT_Stop(void);
 N
-Nvoid Init_TPM(unsigned period_ms);
-Nvoid Start_TPM(void);
+Nvoid TPM_Init(unsigned period_ms);
 N
-Nvoid Init_PWM(TPM_Type * TPM, uint8_t channel_num, uint16_t period, uint16_t duty);
-Nvoid Set_PWM_Value(TPM_Type * TPM, uint8_t channel_num, uint16_t value);
+Nvoid TPM0_Init(void);
+Nvoid TPM0_Start(void);
+Nvoid Configure_TPM0_for_DMA(uint32_t period_us);
+N
+Nvoid PWM_Init(TPM_Type * TPM, uint8_t channel_num, uint16_t period, uint16_t duty);
+Nvoid PWM_Set_Value(TPM_Type * TPM, uint8_t channel_num, uint16_t value);
 N
 N
-Nvoid Init_LPTMR(void);
-Nvoid Start_LPTMR(void);
-Nvoid Stop_LPTMR(void);
+Nvoid LPTMR_Init(void);
+Nvoid LPTMR_Start(void);
+Nvoid LPTMR_Stop(void);
 N
 N#endif
 N// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
@@ -8937,10 +8940,10 @@ N	unsigned int End;
 N	char Name[24];
 N} REGION_T;
 N
-Nextern const REGION_T RegionTable[];
-Nextern const unsigned NumProfileRegions;
-Nextern volatile unsigned RegionCount[];
-Nextern unsigned SortedRegions[];
+N extern const REGION_T RegionTable[];
+N extern const unsigned NumProfileRegions;
+N extern volatile unsigned RegionCount[];
+N extern unsigned SortedRegions[];
 N
 N#endif
 L 7 "src\profile.c" 2
@@ -8957,19 +8960,19 @@ N#define ENABLE_PROFILING { profiling_enabled++;}
 N
 Nextern volatile char profiling_enabled;
 N
-Nextern void Init_Profiling(void);
+N void Init_Profiling(void);
 N
-Nextern void Disable_Profiling(void);
-Nextern void Enable_Profiling(void);
-Nextern void Sort_Profile_Regions(void);
+N void Disable_Profiling(void);
+N void Enable_Profiling(void);
+N void Sort_Profile_Regions(void);
 N
-Nextern void Display_Profile(void);
+N void Display_Profile(void);
 N
 N#endif
 L 8 "src\profile.c" 2
 N 
-N#include "tft_lcd.h"
-L 1 ".\inc\tft_lcd.h" 1
+N#include "TFT_LCD.h"
+L 1 ".\inc\TFT_LCD.h" 1
 N#ifndef TFT_LCD_H
 N#define TFT_LCD_H
 N
@@ -9030,35 +9033,35 @@ N									 // Values are left aligned here
 N} COLOR_T;
 N
 N
-Nextern void TFT_Init(void);
-Nextern void TFT_Fill_Buffer(COLOR_T * color);
-Nextern void TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color);
-Nextern uint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2);
-Nextern void TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count);
+N void TFT_Init(void);
+N void TFT_Fill_Buffer(COLOR_T * color);
+N void TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color);
+N uint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2);
+N void TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count);
 N
 N
-Nextern void TFT_Plot_Pixel(PT_T * pos, COLOR_T * color);
-Nextern void TFT_Set_BL(uint8_t on);
-Nextern void TFT_Set_Brightness(uint8_t brightness);
-Nextern void TFT_Set_Backlight_Brightness(uint16_t brightness_percent);
-Nextern void TFT_Set_Colors(COLOR_T * foreground, COLOR_T * background);
+N void TFT_Plot_Pixel(PT_T * pos, COLOR_T * color);
+N void TFT_Set_BL(uint8_t on);
+N void TFT_Set_Brightness(uint8_t brightness);
+N void TFT_Set_Backlight_Brightness(uint16_t brightness_percent);
+N void TFT_Set_Colors(COLOR_T * foreground, COLOR_T * background);
 N
-Nextern void TFT_Erase(void);
-Nextern void TFT_Text_Init(uint8_t font_num);
-Nextern void TFT_Text_PrintChar(PT_T * pos, char ch);
-Nextern void TFT_Text_PrintStr(PT_T * pos, char * str);
-Nextern void TFT_Text_PrintStr_RC( uint8_t  row, uint8_t col, char *  str);
+N void TFT_Erase(void);
+N void TFT_Text_Init(uint8_t font_num);
+N void TFT_Text_PrintChar(PT_T * pos, char ch);
+N void TFT_Text_PrintStr(PT_T * pos, char * str);
+N void TFT_Text_PrintStr_RC( uint8_t  row, uint8_t col, char *  str);
 N
-Nextern void Graphics_Test(void);
-Nextern void TFT_Draw_Line(PT_T * p1, PT_T * p2, COLOR_T * color);
+N void Graphics_Test(void);
+N void TFT_Draw_Line(PT_T * p1, PT_T * p2, COLOR_T * color);
 N
 N
-Nextern void TFT_TS_Init(void);
-Nextern uint32_t TFT_TS_Read(PT_T * position);
-Nextern void TFT_TS_Test(void);
-Nextern void TFT_TS_Calibrate(void);
+N void TFT_TS_Init(void);
+N uint32_t TFT_TS_Read(PT_T * position);
+N void TFT_TS_Test(void);
+N void TFT_TS_Calibrate(void);
 N
-Nextern uint8_t G_TFT_char_width, G_TFT_char_height;
+N extern uint8_t G_TFT_char_width, G_TFT_char_height;
 N
 N
 N#endif
@@ -9113,8 +9116,8 @@ N	  RegionCount[i]=0;
 N  }
 N	
 N	// Initialize and start timer
-N	Init_PIT(2399); // 24 MHz/(23999+1) = 1000 samples per second
-N	Start_PIT();
+N	PIT_Init(2399); // 24 MHz/(23999+1) = 1000 samples per second
+N	PIT_Start();
 N}
 N
 Nvoid Disable_Profiling(void) {

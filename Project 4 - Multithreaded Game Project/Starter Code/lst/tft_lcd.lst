@@ -1,4 +1,6 @@
-L 1 "src\tft_lcd.c"
+L 1 "src\TFT_lcd.c"
+N/* Code for configuring and controlling TFT LCD using ILI9341 controller. */
+N
 N#include <stdint.h>
 L 1 "C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h" 1
 N/* Copyright (C) ARM Ltd., 1999,2014 */
@@ -330,7 +332,7 @@ N
 N#endif /* __stdint_h */
 N
 N/* end of stdint.h */
-L 2 "src\tft_lcd.c" 2
+L 4 "src\TFT_lcd.c" 2
 N#include <stdio.h>
 L 1 "C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h" 1
 N/* stdio.h: ANSI 'C' (X3J11 Oct 88) library header, section 4.9 */
@@ -1399,7 +1401,7 @@ N#endif /* ndef __stdio_h */
 N
 N/* end of stdio.h */
 N
-L 3 "src\tft_lcd.c" 2
+L 5 "src\TFT_lcd.c" 2
 N#include "MKL25Z4.h"
 L 1 "C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h" 1
 N/*
@@ -8346,9 +8348,9 @@ N
 N#endif  /* #if !defined(MKL25Z4_H_) */
 N
 N/* MKL25Z4.h, eof. */
-L 4 "src\tft_lcd.c" 2
-N#include "tft_lcd.h"
-L 1 ".\inc\tft_lcd.h" 1
+L 6 "src\TFT_lcd.c" 2
+N#include "TFT_LCD.h"
+L 1 ".\inc\TFT_LCD.h" 1
 N#ifndef TFT_LCD_H
 N#define TFT_LCD_H
 N
@@ -8409,39 +8411,39 @@ N									 // Values are left aligned here
 N} COLOR_T;
 N
 N
-Nextern void TFT_Init(void);
-Nextern void TFT_Fill_Buffer(COLOR_T * color);
-Nextern void TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color);
-Nextern uint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2);
-Nextern void TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count);
+N void TFT_Init(void);
+N void TFT_Fill_Buffer(COLOR_T * color);
+N void TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color);
+N uint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2);
+N void TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count);
 N
 N
-Nextern void TFT_Plot_Pixel(PT_T * pos, COLOR_T * color);
-Nextern void TFT_Set_BL(uint8_t on);
-Nextern void TFT_Set_Brightness(uint8_t brightness);
-Nextern void TFT_Set_Backlight_Brightness(uint16_t brightness_percent);
-Nextern void TFT_Set_Colors(COLOR_T * foreground, COLOR_T * background);
+N void TFT_Plot_Pixel(PT_T * pos, COLOR_T * color);
+N void TFT_Set_BL(uint8_t on);
+N void TFT_Set_Brightness(uint8_t brightness);
+N void TFT_Set_Backlight_Brightness(uint16_t brightness_percent);
+N void TFT_Set_Colors(COLOR_T * foreground, COLOR_T * background);
 N
-Nextern void TFT_Erase(void);
-Nextern void TFT_Text_Init(uint8_t font_num);
-Nextern void TFT_Text_PrintChar(PT_T * pos, char ch);
-Nextern void TFT_Text_PrintStr(PT_T * pos, char * str);
-Nextern void TFT_Text_PrintStr_RC( uint8_t  row, uint8_t col, char *  str);
+N void TFT_Erase(void);
+N void TFT_Text_Init(uint8_t font_num);
+N void TFT_Text_PrintChar(PT_T * pos, char ch);
+N void TFT_Text_PrintStr(PT_T * pos, char * str);
+N void TFT_Text_PrintStr_RC( uint8_t  row, uint8_t col, char *  str);
 N
-Nextern void Graphics_Test(void);
-Nextern void TFT_Draw_Line(PT_T * p1, PT_T * p2, COLOR_T * color);
+N void Graphics_Test(void);
+N void TFT_Draw_Line(PT_T * p1, PT_T * p2, COLOR_T * color);
 N
 N
-Nextern void TFT_TS_Init(void);
-Nextern uint32_t TFT_TS_Read(PT_T * position);
-Nextern void TFT_TS_Test(void);
-Nextern void TFT_TS_Calibrate(void);
+N void TFT_TS_Init(void);
+N uint32_t TFT_TS_Read(PT_T * position);
+N void TFT_TS_Test(void);
+N void TFT_TS_Calibrate(void);
 N
-Nextern uint8_t G_TFT_char_width, G_TFT_char_height;
+N extern uint8_t G_TFT_char_width, G_TFT_char_height;
 N
 N
 N#endif
-L 5 "src\tft_lcd.c" 2
+L 7 "src\TFT_lcd.c" 2
 N#include "gpio_defs.h"
 L 1 ".\inc\gpio_defs.h" 1
 N#ifndef GPIO_DEFS_H
@@ -8456,7 +8458,7 @@ N#define BLUE_LED_POS (1)		// on port D
 N
 N#endif
 N// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
-L 6 "src\tft_lcd.c" 2
+L 8 "src\TFT_lcd.c" 2
 N#include "timers.h"
 L 1 ".\inc\timers.h" 1
 N#ifndef TIMERS_H
@@ -8467,24 +8469,27 @@ N#define USE_PIT (0)
 N
 N#define LCD_UPDATE_PERIOD 10
 N
-Nvoid Init_PIT(unsigned period);
-Nvoid Start_PIT(void);
-Nvoid Stop_PIT(void);
+Nvoid PIT_Init(unsigned period);
+Nvoid PIT_Start(void);
+Nvoid PIT_Stop(void);
 N
-Nvoid Init_TPM(unsigned period_ms);
-Nvoid Start_TPM(void);
+Nvoid TPM_Init(unsigned period_ms);
 N
-Nvoid Init_PWM(TPM_Type * TPM, uint8_t channel_num, uint16_t period, uint16_t duty);
-Nvoid Set_PWM_Value(TPM_Type * TPM, uint8_t channel_num, uint16_t value);
+Nvoid TPM0_Init(void);
+Nvoid TPM0_Start(void);
+Nvoid Configure_TPM0_for_DMA(uint32_t period_us);
+N
+Nvoid PWM_Init(TPM_Type * TPM, uint8_t channel_num, uint16_t period, uint16_t duty);
+Nvoid PWM_Set_Value(TPM_Type * TPM, uint8_t channel_num, uint16_t value);
 N
 N
-Nvoid Init_LPTMR(void);
-Nvoid Start_LPTMR(void);
-Nvoid Stop_LPTMR(void);
+Nvoid LPTMR_Init(void);
+Nvoid LPTMR_Start(void);
+Nvoid LPTMR_Stop(void);
 N
 N#endif
 N// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
-L 7 "src\tft_lcd.c" 2
+L 9 "src\TFT_lcd.c" 2
 N#include "font.h"
 L 1 ".\inc\font.h" 1
 N#ifndef FONT_H
@@ -8520,12 +8525,11 @@ N#define TFT_MAX_ROWS (TFT_HEIGHT/G_TFT_char_height)
 N
 N
 N#endif // #ifndef FONT_H
-L 8 "src\tft_lcd.c" 2
-N
+L 10 "src\TFT_lcd.c" 2
 N
 Nextern void Delay(uint32_t);
 N
-N
+N/* Is set to one if touchscreen been calibrated. */
 Nuint8_t TFT_TS_Calibrated = 1;
 Nuint32_t TFT_TS_X_Scale=209, TFT_TS_X_Offset=6648;
 Nuint32_t TFT_TS_Y_Scale=159, TFT_TS_Y_Offset=6689;
@@ -8533,7 +8537,7 @@ N
 NPT_T TS_Min;
 NPT_T TS_Max;
 N
-N/**************************************************************/
+N/* Initialize GPIO ports for communicating with TFT LCD controller. */
 Nvoid TFT_GPIO_Init(void) {
 N	unsigned i;
 N	
@@ -8595,23 +8599,24 @@ N	FPTC->PDOR |= MASK(TFT_NRST_POS);
 X	((FGPIO_Type *)(0xF80FF080u))->PDOR |= (1UL << ((17)));
 N}
 N
-N/**************************************************************/
-Nextern void Old_Init_PWM(void);
+N void Old_Init_PWM(void);
 N
+N/* Initialize hardware for LCD backlight control and set to default value. */
 Nvoid TFT_Init_Backlight(void) {
 N	// Init_PWM(TFT_BL_TPM, TFT_BL_TPM_CHANNEL, 10000 /* TFT_BL_PERIOD*/, 5000 /* TFT_BL_PERIOD/2*/);	
 N	Old_Init_PWM();
 N	// TFT_Set_Backlight_Brightness(100);
 N}
 N
+N/* Set backlight brightness for LCD via duty cycle. Function is currently broken. */
 Nvoid TFT_Set_Backlight_Brightness(uint16_t brightness_percent){
-N	Set_PWM_Value(TFT_BL_TPM, TFT_BL_TPM_CHANNEL, (brightness_percent*100)/TFT_BL_PERIOD);
-X	Set_PWM_Value((((TPM_Type *)(0x40039000u))), (0), (brightness_percent*100)/((SystemCoreClock)/(2*((200)))));
+N	PWM_Set_Value(TFT_BL_TPM, TFT_BL_TPM_CHANNEL, (brightness_percent*100)/TFT_BL_PERIOD);
+X	PWM_Set_Value((((TPM_Type *)(0x40039000u))), (0), (brightness_percent*100)/((SystemCoreClock)/(2*((200)))));
 N}
 N
 N
-N/**************************************************************/
-Nvoid TFT_24S_Write_Command(int command)
+N/* Write one byte as a command to the TFT LCD controller. */
+Nvoid TFT_24S_Write_Command(uint8_t command)
 N{
 N	GPIO_ResetBit(TFT_D_NC_POS);
 X	(((FGPIO_Type *)(0xF80FF080u))->PCOR = (1UL << ((12))));
@@ -8622,7 +8627,9 @@ X	(((FGPIO_Type *)(0xF80FF080u))->PCOR = (1UL << ((13))));
 N	GPIO_SetBit(TFT_NWR_POS);
 X	(((FGPIO_Type *)(0xF80FF080u))->PSOR = (1UL << ((13))));
 N}
-Nvoid TFT_24S_Write_Data(int data)
+N
+N/* Write one byte as data to the TFT LCD Controller. */
+Nvoid TFT_24S_Write_Data(uint8_t data)
 N{
 N	GPIO_SetBit(TFT_D_NC_POS);
 X	(((FGPIO_Type *)(0xF80FF080u))->PSOR = (1UL << ((12))));
@@ -8634,7 +8641,8 @@ N	GPIO_SetBit(TFT_NWR_POS);
 X	(((FGPIO_Type *)(0xF80FF080u))->PSOR = (1UL << ((13))));
 N}
 N
-N/**************************************************************/
+N/* Initialize the relevant peripherals (GPIO, TPM, ADC) and the display
+Ncomponents (TFT LCD controller, touch screen and backlight controller). */ 
 Nvoid TFT_Init()
 N{
 N	TFT_GPIO_Init();
@@ -8689,8 +8697,11 @@ N	TFT_24S_Write_Data(0x003E);
 N	TFT_24S_Write_Command(0x00C7); //VCOM control 2
 N	TFT_24S_Write_Data(0x00BE);
 N	TFT_24S_Write_Command(0x0036); //memory access control = BGR
-N	//	TFT_24S_Write_Data(0x0088);
-N	TFT_24S_Write_Data(0x0008); // Don't mirror Y axis
+N#if 1
+N	TFT_24S_Write_Data(0x0008); // Portrait mode
+N#else
+S	TFT_24S_Write_Data(0x00A8); // Landscape mode
+N#endif
 N	TFT_24S_Write_Command(0x00B1); //frame rate control
 N	TFT_24S_Write_Data(0x0000);
 N	TFT_24S_Write_Data(0x0010);
@@ -8716,12 +8727,13 @@ N	TFT_24S_Write_Data(0x003F); //end 0x013F
 N	TFT_24S_Write_Command(0x0029); //Display ON
 N}
 N
+N/* Set the pixel at pos to the given color. */
 Nvoid TFT_Plot_Pixel(PT_T * pos, COLOR_T * color) {
 N	uint8_t b1, b2;
 N
 N	// Column address set 0x2a
 N	TFT_24S_Write_Command(0x002A); //column address set
-N	TFT_24S_Write_Data(0x0000);
+N	TFT_24S_Write_Data(0);
 N	TFT_24S_Write_Data(pos->X & 0xff); //start 
 N	TFT_24S_Write_Data(0x0000);
 N	TFT_24S_Write_Data(0x00EF); //end 0x00EF
@@ -8743,8 +8755,7 @@ N	TFT_24S_Write_Data(b1);
 N	TFT_24S_Write_Data(b2);
 N}
 N
-N
-N
+N/* Fill the entire display buffer with the given color. */
 Nvoid TFT_Fill_Buffer(COLOR_T * color) {
 N	uint32_t x, y;
 N	uint8_t b1, b2;
@@ -8774,92 +8785,96 @@ N			TFT_24S_Write_Data(b2);
 N		}
 N	}		
 N}
-N
+N/* Draw a rectangle from p1 to p2 filled with specified color. */
 Nvoid TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color) {
-N    uint32_t n;
-N    uint8_t b1, b2;
-N    uint16_t c_min, c_max, r_min, r_max;
-N    
-N    c_min = MIN(p1->X, p2->X);
-X    c_min = ((p1->X)<(p2->X)? p1->X : p2->X);
-N    c_max = MAX(p1->X, p2->X);
-X    c_max = ((p1->X)>(p2->X)? p1->X : p2->X);
-N    c_max = MIN(c_max, TFT_WIDTH-1);
-X    c_max = ((c_max)<((240)-1)? c_max : (240)-1);
-N    
-N    r_min = MIN(p1->Y, p2->Y);
-X    r_min = ((p1->Y)<(p2->Y)? p1->Y : p2->Y);
-N    r_max = MAX(p1->Y, p2->Y);
-X    r_max = ((p1->Y)>(p2->Y)? p1->Y : p2->Y);
-N    r_max = MIN(r_max, TFT_HEIGHT-1);
-X    r_max = ((r_max)<((320)-1)? r_max : (320)-1);
-N    
-N    // Enable access to full screen, reset write pointer to origin
-N    TFT_24S_Write_Command(0x002A); //column address set
-N    TFT_24S_Write_Data(c_min >> 8);
-N    TFT_24S_Write_Data(c_min & 0xff); //start 
-N    TFT_24S_Write_Data(c_max >> 8);
-N    TFT_24S_Write_Data(c_max & 0xff); //end 
-N    TFT_24S_Write_Command(0x002B); //page address set
-N    TFT_24S_Write_Data(r_min >> 8);
-N    TFT_24S_Write_Data(r_min & 0xff); //start 
-N    TFT_24S_Write_Data(r_max >> 8);
-N    TFT_24S_Write_Data(r_max & 0xff); //end 
-N    
-N    // Memory Write 0x2c
-N    // 16 bpp, 5-6-5. Assume color channel data is left-aligned
-N    b1 = (color->R&0xf8) | ((color->G&0xe0)>>5);
-N    b2 = ((color->G&0x1c)<<3) | ((color->B&0xf8)>>3);
-N    
-N    TFT_24S_Write_Command(0x002c);
-N    
-N    n = (c_max - c_min + 1)*(r_max - r_min + 1);
-N    while (n-- > 0) {
-N        TFT_24S_Write_Data(b1);
-N        TFT_24S_Write_Data(b2);
-N    }    
+N	uint32_t n;
+N	uint8_t b1, b2;
+N	uint16_t c_min, c_max, r_min, r_max;
+N	
+N	c_min = MIN(p1->X, p2->X);
+X	c_min = ((p1->X)<(p2->X)? p1->X : p2->X);
+N	c_max = MAX(p1->X, p2->X);
+X	c_max = ((p1->X)>(p2->X)? p1->X : p2->X);
+N	c_max = MIN(c_max, TFT_WIDTH-1);
+X	c_max = ((c_max)<((240)-1)? c_max : (240)-1);
+N	
+N	r_min = MIN(p1->Y, p2->Y);
+X	r_min = ((p1->Y)<(p2->Y)? p1->Y : p2->Y);
+N	r_max = MAX(p1->Y, p2->Y);
+X	r_max = ((p1->Y)>(p2->Y)? p1->Y : p2->Y);
+N	r_max = MIN(r_max, TFT_HEIGHT-1);
+X	r_max = ((r_max)<((320)-1)? r_max : (320)-1);
+N	
+N	// Enable access to full screen, reset write pointer to origin
+N	TFT_24S_Write_Command(0x002A); //column address set
+N	TFT_24S_Write_Data(c_min >> 8);
+N	TFT_24S_Write_Data(c_min & 0xff); //start 
+N	TFT_24S_Write_Data(c_max >> 8);
+N	TFT_24S_Write_Data(c_max & 0xff); //end 
+N	TFT_24S_Write_Command(0x002B); //page address set
+N	TFT_24S_Write_Data(r_min >> 8);
+N	TFT_24S_Write_Data(r_min & 0xff); //start 
+N	TFT_24S_Write_Data(r_max >> 8);
+N	TFT_24S_Write_Data(r_max & 0xff); //end 
+N	
+N	// Memory Write 0x2c
+N	// 16 bpp, 5-6-5. Assume color channel data is left-aligned
+N	b1 = (color->R&0xf8) | ((color->G&0xe0)>>5);
+N	b2 = ((color->G&0x1c)<<3) | ((color->B&0xf8)>>3);
+N	
+N	TFT_24S_Write_Command(0x002c);
+N	
+N	n = (c_max - c_min + 1)*(r_max - r_min + 1);
+N	while (n-- > 0) {
+N		TFT_24S_Write_Data(b1);
+N		TFT_24S_Write_Data(b2);
+N	}	
 N}
 N
-N/** Prepare LCD controller draw rectangle using upcoming pixels. Returns number of pixels expected. 
+N/* Prepare LCD controller draw rectangle from p1 to p2 using future pixels provided 
+Nby calls to TFT_Write_Rectangle_pixel. 
+NReturn value is number of pixels expected. 
 N*/
 Nuint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2) {
-N    uint16_t c_min, c_max, r_min, r_max;
-N    
-N    // Find bounds of rectangle
-N    c_min = MIN(p1->X, p2->X);
-X    c_min = ((p1->X)<(p2->X)? p1->X : p2->X);
-N    c_max = MAX(p1->X, p2->X);
-X    c_max = ((p1->X)>(p2->X)? p1->X : p2->X);
-N    
-N    r_min = MIN(p1->Y, p2->Y);
-X    r_min = ((p1->Y)<(p2->Y)? p1->Y : p2->Y);
-N    r_max = MAX(p1->Y, p2->Y);
-X    r_max = ((p1->Y)>(p2->Y)? p1->Y : p2->Y);
+N	uint16_t c_min, c_max, r_min, r_max;
+N	
+N	// Find bounds of rectangle
+N	c_min = MIN(p1->X, p2->X);
+X	c_min = ((p1->X)<(p2->X)? p1->X : p2->X);
+N	c_max = MAX(p1->X, p2->X);
+X	c_max = ((p1->X)>(p2->X)? p1->X : p2->X);
+N	
+N	r_min = MIN(p1->Y, p2->Y);
+X	r_min = ((p1->Y)<(p2->Y)? p1->Y : p2->Y);
+N	r_max = MAX(p1->Y, p2->Y);
+X	r_max = ((p1->Y)>(p2->Y)? p1->Y : p2->Y);
 N
-N    // Clip to display size
-N    c_max = MIN(c_max, TFT_WIDTH-1);
-X    c_max = ((c_max)<((240)-1)? c_max : (240)-1);
-N    r_max = MIN(r_max, TFT_HEIGHT-1);
-X    r_max = ((r_max)<((320)-1)? r_max : (320)-1);
-N    
-N    // Enable access to full screen, reset write pointer to origin
-N    TFT_24S_Write_Command(0x002A); //column address set
-N    TFT_24S_Write_Data(c_min >> 8);
-N    TFT_24S_Write_Data(c_min & 0xff); //start 
-N    TFT_24S_Write_Data(c_max >> 8);
-N    TFT_24S_Write_Data(c_max & 0xff); //end 
-N    TFT_24S_Write_Command(0x002B); //page address set
-N    TFT_24S_Write_Data(r_min >> 8);
-N    TFT_24S_Write_Data(r_min & 0xff); //start 
-N    TFT_24S_Write_Data(r_max >> 8);
-N    TFT_24S_Write_Data(r_max & 0xff); //end 
-N    
-N    // Memory Write 0x2c
-N    TFT_24S_Write_Command(0x002c);
-N    
-N    return (c_max - c_min + 1)*(r_max - r_min + 1);
+N	// Clip to display size
+N	c_max = MIN(c_max, TFT_WIDTH-1);
+X	c_max = ((c_max)<((240)-1)? c_max : (240)-1);
+N	r_max = MIN(r_max, TFT_HEIGHT-1);
+X	r_max = ((r_max)<((320)-1)? r_max : (320)-1);
+N	
+N	// Enable access to full screen, reset write pointer to origin
+N	TFT_24S_Write_Command(0x002A); //column address set
+N	TFT_24S_Write_Data(c_min >> 8);
+N	TFT_24S_Write_Data(c_min & 0xff); //start 
+N	TFT_24S_Write_Data(c_max >> 8);
+N	TFT_24S_Write_Data(c_max & 0xff); //end 
+N	TFT_24S_Write_Command(0x002B); //page address set
+N	TFT_24S_Write_Data(r_min >> 8);
+N	TFT_24S_Write_Data(r_min & 0xff); //start 
+N	TFT_24S_Write_Data(r_max >> 8);
+N	TFT_24S_Write_Data(r_max & 0xff); //end 
+N	
+N	// Memory Write 0x2c
+N	TFT_24S_Write_Command(0x002c);
+N	
+N	return (c_max - c_min + 1)*(r_max - r_min + 1);
 N}
 N
+N/* Plot this pixel in the next location as defined by TFT_Start_Rectangle. You must 
+Nhave called TFT_Write_Rectangle before calling this function. */
 Nvoid TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count) {
 N	uint8_t b1, b2;
 N
@@ -8872,18 +8887,17 @@ N		TFT_24S_Write_Data(b2);
 N	}
 N}
 N
-N/***********************************************/
-N
+N/* Enable (on > 0) or disable LED backlight via LCD controller. */
 Nvoid TFT_Set_BL(uint8_t on) {
 N	TFT_24S_Write_Command(0x53);
 N	TFT_24S_Write_Data(0x28 | (on? 4 : 0));
 N}
 N
+N/* Set brightness via LCD controller. */
 Nvoid TFT_Set_Brightness(uint8_t brightness) {
 N	TFT_24S_Write_Command(0x51);
 N	TFT_24S_Write_Data(brightness);
 N}
-N/***************************************************/
 N
 Nvoid Init_ADC(void) {
 N	
@@ -8896,18 +8910,18 @@ X	((ADC_Type *)(0x4003B000u))->SC2 = 0;
 N}
 N
 N
+N/* Initialize touchscreen hardware (ADC). */
 Nvoid TFT_TS_Init(void) {
 N	// Configure ADC
 N	Init_ADC();
-N	
-N	// Configure GPIO? Done in Read function
 N}
 N
 N
 Nstatic uint16_t xl=0, yu=0;
 N
+N/* Read touch screen. Returns 1 if touched, and updates position. Else returns 0 leaving 
+Nposition unchanged. */
 Nuint32_t TFT_TS_Read(PT_T * position) {
-N	// Return 1 if valid touch, update position. Else return 0
 N	uint32_t x, y;
 N	uint32_t b;
 N
@@ -9063,6 +9077,7 @@ N		return 1;
 N	}
 N}
 N
+N/* Test touchscreen by printing touch coordinates and drawing lines where touched. */
 Nvoid TFT_TS_Test(void) {
 N	PT_T p, bp, pp;
 N	COLOR_T c;
@@ -9116,6 +9131,7 @@ N		}
 N	}
 N}
 N
+N/* Calibrate touchscreen. */
 Nvoid TFT_TS_Calibrate(void) {
 N	PT_T p, bp, p_bound;
 N	uint32_t i;

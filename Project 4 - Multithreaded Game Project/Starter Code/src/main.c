@@ -10,8 +10,9 @@
 #include "LEDs.h"
 #include "timers.h"
 #include "sound.h"
+#include "DMA.h"
 
-#include "i2c.h"
+#include "I2C.h"
 #include "mma8451.h"
 #include "delay.h"
 #include "profile.h"
@@ -30,18 +31,19 @@ int main (void) {
 	Init_Debug_Signals();
 	Init_RGB_LEDs();
 	Sound_Init();	
-
+	// Sound_Disable_Amp();
+	Play_Tone();
+	
 	TFT_Init();
 	TFT_Text_Init(1);
 	TFT_Erase();
 	TFT_Text_PrintStr_RC(0,0, "Test Code");
-	
+
 /*
 	Graphics_Test();
 	while (1) 
 		;
 */
-	
 	
 //	TFT_TS_Calibrate();
 //	TFT_TS_Test();
@@ -55,6 +57,8 @@ int main (void) {
 			;
 	}
 	TFT_Text_PrintStr_RC(1,9, "Done");
+
+	Play_Waveform_with_DMA();
 
 	Delay(70);
 

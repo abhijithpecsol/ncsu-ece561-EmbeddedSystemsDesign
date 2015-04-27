@@ -1,0 +1,12 @@
+.\obj\dma.o: src\DMA.c
+.\obj\dma.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\obj\dma.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h
+.\obj\dma.o: C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h
+.\obj\dma.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h
+.\obj\dma.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h
+.\obj\dma.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h
+.\obj\dma.o: C:\Keil_v5\ARM\RV31\INC\RTL.h
+.\obj\dma.o: .\inc\timers.h
+.\obj\dma.o: .\inc\LEDs.h
+.\obj\dma.o: .\inc\tasks.h
+.\obj\dma.o: .\inc\TFT_LCD.h

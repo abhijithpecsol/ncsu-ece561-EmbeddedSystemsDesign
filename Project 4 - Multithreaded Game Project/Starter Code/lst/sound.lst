@@ -7278,31 +7278,2469 @@ N#endif  /* #if !defined(MKL25Z4_H_) */
 N
 N/* MKL25Z4.h, eof. */
 L 3 "src\sound.c" 2
+N#include <math.h>
+L 1 "C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h" 1
+N/*
+N * math.h: ANSI 'C' (X3J11 Oct 88) library header, section 4.5
+N * Copyright (C) Codemist Ltd., 1988
+N * Copyright 1991-1998,2004-2006,2014 ARM Limited. All rights reserved
+N */
+N
+N/*
+N * RCS $Revision: 185525 $ Codemist 0.03
+N * Checkin $Date: 2014-05-29 12:44:48 +0100 (Thu, 29 May 2014) $
+N * Revising $Author: statham $
+N */
+N
+N/*
+N * Parts of this file are based upon fdlibm:
+N *
+N * ====================================================
+N * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+N *
+N * Developed at SunSoft, a Sun Microsystems, Inc. business.
+N * Permission to use, copy, modify, and distribute this
+N * software is freely granted, provided that this notice
+N * is preserved.
+N * ====================================================
+N */
+N
+N#ifndef __math_h
+N#define __math_h
+N#define __ARMCLIB_VERSION 5050106
+N
+N#if defined(__clang__) || (defined(__ARMCC_VERSION) && !defined(__STRICT_ANSI__))
+X#if 0L || (1L && !0L)
+N  /* armclang and non-strict armcc allow 'long long' in system headers */
+N  #define __LONGLONG long long
+N#else
+S  /* strict armcc has '__int64' */
+S  #define __LONGLONG __int64
+N#endif
+N
+N/*
+N * Some of these declarations are new in C99.  To access them in C++
+N * you can use -D__USE_C99_MATH (or -D__USE_C99_ALL).
+N */
+N#ifndef __USE_C99_MATH
+N  #if defined(__USE_C99_ALL) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__)
+X  #if 0L || (1L && 199901L <= 199409L)
+S    #define __USE_C99_MATH 1
+N  #endif
+N#endif
+N
+N#define _ARMABI __declspec(__nothrow)
+N#ifdef __TARGET_ARCH_AARCH64
+S# define _ARMABI_SOFTFP __declspec(__nothrow)
+N#else
+N# define _ARMABI_SOFTFP __declspec(__nothrow) __attribute__((__pcs__("aapcs")))
+N# define __HAVE_LONGDOUBLE 1
+N#endif
+N#define _ARMABI_PURE __declspec(__nothrow) __attribute__((const))
+N#ifdef __FP_FENV_EXCEPTIONS
+S# define _ARMABI_FPEXCEPT _ARMABI
+N#else
+N# define _ARMABI_FPEXCEPT _ARMABI __attribute__((const))
+N#endif
+N
+N#ifdef __cplusplus
+S#define _ARMABI_INLINE inline
+S#define _ARMABI_INLINE_DEF inline
+S#elif defined __GNUC__ || defined _USE_STATIC_INLINE
+X#elif 0L || 0L
+S#define _ARMABI_INLINE static __inline
+S#define _ARMABI_INLINE_DEF static __inline
+S#elif (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__)
+X#elif (1L && 199901L <= 199409L)
+S#define _ARMABI_INLINE inline
+S#define _ARMABI_INLINE_DEF static inline
+N#else
+N#define _ARMABI_INLINE __inline
+N#define _ARMABI_INLINE_DEF __inline
+N#endif
+N
+N#ifdef __TARGET_ARCH_AARCH64
+S#  define _SOFTFP
+N#else
+N#  define _SOFTFP __attribute__((__pcs__("aapcs")))
+N#endif
+N
+N   /*
+N    * If the compiler supports signalling nans as per N965 then it
+N    * will define __SUPPORT_SNAN__, in which case a user may define
+N    * _WANT_SNAN in order to obtain the nans function, as well as the
+N    * FP_NANS and FP_NANQ classification macros.
+N    */
+N#if defined(__SUPPORT_SNAN__) && defined(_WANT_SNAN)
+X#if 0L && 0L
+S#pragma import(__use_snan)
+N#endif
+N
+N/*
+N * Macros for our inline functions down below.
+N * unsigned& __FLT(float x) - returns the bit pattern of x
+N * unsigned& __HI(double x) - returns the bit pattern of the high part of x
+N *                            (high part has exponent & sign bit in it)
+N * unsigned& __LO(double x) - returns the bit pattern of the low part of x
+N *
+N * We can assign to __FLT, __HI, and __LO and the appropriate bits get set in
+N * the floating point variable used.
+N *
+N * __HI & __LO are affected by the endianness and the target FPU.
+N */
+N#define __FLT(x) (*(unsigned *)&(x))
+N#if defined(__ARM_BIG_ENDIAN) || defined(__BIG_ENDIAN)
+X#if 0L || 0L
+S#  define __LO(x) (*(1 + (unsigned *)&(x)))
+S#  define __HI(x) (*(unsigned *)&(x))
+N#else /* !defined(__ARM_BIG_ENDIAN) && !defined(__BIG_ENDIAN) */
+N#  define __HI(x) (*(1 + (unsigned *)&(x)))
+N#  define __LO(x) (*(unsigned *)&(x))
+N#endif /* !defined(__ARM_BIG_ENDIAN) && !defined(__BIG_ENDIAN) */
+N
+N#   ifndef __MATH_DECLS
+N#   define __MATH_DECLS
+N
+N
+N/*
+N * A set of functions that we don't actually want to put in the standard
+N * namespace ever.  These are all called by the C99 macros.  As they're
+N * not specified by any standard they can't belong in ::std::.  The
+N * macro #defines are below amongst the standard function declarations.
+N * We only include these if we actually need them later on
+N */
+N#if !defined(__STRICT_ANSI__) || defined(__USE_C99_MATH)
+X#if !0L || 0L
+N#   ifdef __cplusplus
+S      extern "C" {
+N#   endif /* __cplusplus */
+N
+Nextern _SOFTFP unsigned __ARM_dcmp4(double /*x*/, double /*y*/);
+Xextern __attribute__((__pcs__("aapcs"))) unsigned __ARM_dcmp4(double  , double  );
+Nextern _SOFTFP unsigned __ARM_fcmp4(float /*x*/, float /*y*/);
+Xextern __attribute__((__pcs__("aapcs"))) unsigned __ARM_fcmp4(float  , float  );
+N    /*
+N     * Compare x and y and return the CPSR in r0.  These means we can test for
+N     * result types with bit pattern matching.
+N     *
+N     * These are a copy of the declarations in rt_fp.h keep in sync.
+N     */
+N
+Nextern _ARMABI_SOFTFP int __ARM_fpclassifyf(float /*x*/);
+Xextern __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_fpclassifyf(float  );
+Nextern _ARMABI_SOFTFP int __ARM_fpclassify(double /*x*/);
+Xextern __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_fpclassify(double  );
+N    /* Classify x into NaN, infinite, normal, subnormal, zero */
+N    /* Used by fpclassify macro */
+N
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_isfinitef(float __x)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isfinitef(float __x)
+N{
+N    return ((__FLT(__x) >> 23) & 0xff) != 0xff;
+X    return (((*(unsigned *)&(__x)) >> 23) & 0xff) != 0xff;
+N}
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_isfinite(double __x)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isfinite(double __x)
+N{
+N    return ((__HI(__x) >> 20) & 0x7ff) != 0x7ff;
+X    return (((*(1 + (unsigned *)&(__x))) >> 20) & 0x7ff) != 0x7ff;
+N}
+N    /* Return 1 if __x is finite, 0 otherwise */
+N    /* Used by isfinite macro */
+N
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_isinff(float __x)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isinff(float __x)
+N{
+N    return (__FLT(__x) << 1) == 0xff000000;
+X    return ((*(unsigned *)&(__x)) << 1) == 0xff000000;
+N}
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_isinf(double __x)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isinf(double __x)
+N{
+N    return ((__HI(__x) << 1) == 0xffe00000) && (__LO(__x) == 0);
+X    return (((*(1 + (unsigned *)&(__x))) << 1) == 0xffe00000) && ((*(unsigned *)&(__x)) == 0);
+N}
+N    /* Return 1 if __x is infinite, 0 otherwise */
+N    /* Used by isinf macro */
+N
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_islessgreaterf(float __x, float __y)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_islessgreaterf(float __x, float __y)
+N{
+N    unsigned __f = __ARM_fcmp4(__x, __y) >> 28;
+N    return (__f == 8) || (__f == 2); /* Just N set or Just Z set */
+N}
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_islessgreater(double __x, double __y)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_islessgreater(double __x, double __y)
+N{
+N    unsigned __f = __ARM_dcmp4(__x, __y) >> 28;
+N    return (__f == 8) || (__f == 2); /* Just N set or Just Z set */
+N}
+N    /*
+N     * Compare __x and __y and return 1 if __x < __y or __x > __y, 0 otherwise
+N     * Used by islessgreater macro
+N     */
+N
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_isnanf(float __x)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isnanf(float __x)
+N{
+N    return (0x7f800000 - (__FLT(__x) & 0x7fffffff)) >> 31;
+X    return (0x7f800000 - ((*(unsigned *)&(__x)) & 0x7fffffff)) >> 31;
+N}
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_isnan(double __x)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isnan(double __x)
+N{
+N    unsigned __xf = __HI(__x) | ((__LO(__x) == 0) ? 0 : 1);
+X    unsigned __xf = (*(1 + (unsigned *)&(__x))) | (((*(unsigned *)&(__x)) == 0) ? 0 : 1);
+N    return (0x7ff00000 - (__xf & 0x7fffffff)) >> 31;
+N}
+N    /* Return 1 if __x is a NaN, 0 otherwise */
+N    /* Used by isnan macro */
+N
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_isnormalf(float __x)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isnormalf(float __x)
+N{
+N    unsigned __xe = (__FLT(__x) >> 23) & 0xff;
+X    unsigned __xe = ((*(unsigned *)&(__x)) >> 23) & 0xff;
+N    return (__xe != 0xff) && (__xe != 0);
+N}
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_isnormal(double __x)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_isnormal(double __x)
+N{
+N    unsigned __xe = (__HI(__x) >> 20) & 0x7ff;
+X    unsigned __xe = ((*(1 + (unsigned *)&(__x))) >> 20) & 0x7ff;
+N    return (__xe != 0x7ff) && (__xe != 0);
+N}
+N    /* Return 1 if __x is a normalised number, 0 otherwise */
+N    /* used by isnormal macro */
+N
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_signbitf(float __x)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_signbitf(float __x)
+N{
+N    return __FLT(__x) >> 31;
+X    return (*(unsigned *)&(__x)) >> 31;
+N}
+N_ARMABI_INLINE_DEF _ARMABI_SOFTFP int __ARM_signbit(double __x)
+X__inline __declspec(__nothrow) __attribute__((__pcs__("aapcs"))) int __ARM_signbit(double __x)
+N{
+N    return __HI(__x) >> 31;
+X    return (*(1 + (unsigned *)&(__x))) >> 31;
+N}
+N    /* Return signbit of __x */
+N    /* Used by signbit macro */
+N
+N#   ifdef __cplusplus
+S      } /* extern "C" */
+N#   endif /* __cplusplus */
+N#endif /* Strict ANSI */
+N
+N#   undef __CLIBNS
+N
+N#   ifdef __cplusplus
+S      namespace std {
+S#       define __CLIBNS ::std::
+S        extern "C" {
+N#   else
+N#       define __CLIBNS
+N#   endif  /* __cplusplus */
+N
+N
+N#ifndef __has_builtin
+N  #define __has_builtin(x) 0
+N#endif
+N
+N#if !defined(__STRICT_ANSI__) || defined(__USE_C99_MATH)
+X#if !0L || 0L
+N  /* C99 additions */
+N  typedef float float_t;
+N  typedef double double_t;
+N#if __has_builtin(__builtin_inf)
+X#if 0
+S#   define HUGE_VALF __builtin_inff()
+S#   define HUGE_VALL __builtin_infl()
+S#   define INFINITY __builtin_inff()
+S#   define NAN __builtin_nanf("")
+N# else
+N#   define HUGE_VALF ((float)__INFINITY__)
+N#   define HUGE_VALL ((long double)__INFINITY__)
+N#   define INFINITY ((float)__INFINITY__)
+N#   define NAN (__ESCAPE__(0f_7FC00000))
+N#endif
+N
+N#   define MATH_ERRNO 1
+N#   define MATH_ERREXCEPT 2
+Nextern const int math_errhandling;
+N#endif
+N#if __has_builtin(__builtin_inf)
+X#if 0
+S# define HUGE_VAL __builtin_inf()
+N#else
+N# define HUGE_VAL ((double)__INFINITY__)
+N#endif
+N
+Nextern _ARMABI double acos(double /*x*/);
+Xextern __declspec(__nothrow) double acos(double  );
+N   /* computes the principal value of the arc cosine of x */
+N   /* a domain error occurs for arguments not in the range -1 to 1 */
+N   /* Returns: the arc cosine in the range 0 to Pi. */
+Nextern _ARMABI double asin(double /*x*/);
+Xextern __declspec(__nothrow) double asin(double  );
+N   /* computes the principal value of the arc sine of x */
+N   /* a domain error occurs for arguments not in the range -1 to 1 */
+N   /* and -HUGE_VAL is returned. */
+N   /* Returns: the arc sine in the range -Pi/2 to Pi/2. */
+N
+Nextern _ARMABI_PURE double atan(double /*x*/);
+Xextern __declspec(__nothrow) __attribute__((const)) double atan(double  );
+N   /* computes the principal value of the arc tangent of x */
+N   /* Returns: the arc tangent in the range -Pi/2 to Pi/2. */
+N
+Nextern _ARMABI double atan2(double /*y*/, double /*x*/);
+Xextern __declspec(__nothrow) double atan2(double  , double  );
+N   /* computes the principal value of the arc tangent of y/x, using the */
+N   /* signs of both arguments to determine the quadrant of the return value */
+N   /* a domain error occurs if both args are zero, and -HUGE_VAL returned. */
+N   /* Returns: the arc tangent of y/x, in the range -Pi to Pi. */
+N
+Nextern _ARMABI double cos(double /*x*/);
+Xextern __declspec(__nothrow) double cos(double  );
+N   /* computes the cosine of x (measured in radians). A large magnitude */
+N   /* argument may yield a result with little or no significance. */
+N   /* a domain error occurs for infinite input (C 7.12.1 footnote 196). */
+N   /* Returns: the cosine value. */
+Nextern _ARMABI double sin(double /*x*/);
+Xextern __declspec(__nothrow) double sin(double  );
+N   /* computes the sine of x (measured in radians). A large magnitude */
+N   /* argument may yield a result with little or no significance. */
+N   /* a domain error occurs for infinite input (C 7.12.1 footnote 196). */
+N   /* Returns: the sine value. */
+N
+Nextern void __use_accurate_range_reduction(void);
+N   /* reference this to select the larger, slower, but more accurate */
+N   /* range reduction in sin, cos and tan */
+N
+Nextern _ARMABI double tan(double /*x*/);
+Xextern __declspec(__nothrow) double tan(double  );
+N   /* computes the tangent of x (measured in radians). A large magnitude */
+N   /* argument may yield a result with little or no significance */
+N   /* Returns: the tangent value. */
+N   /*          if range error; returns HUGE_VAL. */
+N
+Nextern _ARMABI double cosh(double /*x*/);
+Xextern __declspec(__nothrow) double cosh(double  );
+N   /* computes the hyperbolic cosine of x. A range error occurs if the */
+N   /* magnitude of x is too large. */
+N   /* Returns: the hyperbolic cosine value. */
+N   /*          if range error; returns HUGE_VAL. */
+Nextern _ARMABI double sinh(double /*x*/);
+Xextern __declspec(__nothrow) double sinh(double  );
+N   /* computes the hyperbolic sine of x. A range error occurs if the */
+N   /* magnitude of x is too large. */
+N   /* Returns: the hyperbolic sine value. */
+N   /*          if range error; returns -HUGE_VAL or HUGE_VAL depending */
+N   /*          on the sign of the argument */
+N
+Nextern _ARMABI_PURE double tanh(double /*x*/);
+Xextern __declspec(__nothrow) __attribute__((const)) double tanh(double  );
+N   /* computes the hyperbolic tangent of x. */
+N   /* Returns: the hyperbolic tangent value. */
+N
+Nextern _ARMABI double exp(double /*x*/);
+Xextern __declspec(__nothrow) double exp(double  );
+N   /* computes the exponential function of x. A range error occurs if the */
+N   /* magnitude of x is too large. */
+N   /* Returns: the exponential value. */
+N   /*          if underflow range error; 0 is returned. */
+N   /*          if overflow range error; HUGE_VAL is returned. */
+N
+Nextern _ARMABI double frexp(double /*value*/, int * /*exp*/) __attribute__((__nonnull__(2)));
+Xextern __declspec(__nothrow) double frexp(double  , int *  ) __attribute__((__nonnull__(2)));
+N   /* breaks a floating-point number into a normalised fraction and an */
+N   /* integral power of 2. It stores the integer in the int object pointed */
+N   /* to by exp. */
+N   /* Returns: the value x, such that x is a double with magnitude in the */
+N   /* interval 0.5 to 1.0 or zero, and value equals x times 2 raised to the */
+N   /* power *exp. If value is zero, both parts of the result are zero. */
+N
+Nextern _ARMABI double ldexp(double /*x*/, int /*exp*/);
+Xextern __declspec(__nothrow) double ldexp(double  , int  );
+N   /* multiplies a floating-point number by an integral power of 2. */
+N   /* A range error may occur. */
+N   /* Returns: the value of x times 2 raised to the power of exp. */
+N   /*          if range error; HUGE_VAL is returned. */
+Nextern _ARMABI double log(double /*x*/);
+Xextern __declspec(__nothrow) double log(double  );
+N   /* computes the natural logarithm of x. A domain error occurs if the */
+N   /* argument is negative, and -HUGE_VAL is returned. A range error occurs */
+N   /* if the argument is zero. */
+N   /* Returns: the natural logarithm. */
+N   /*          if range error; -HUGE_VAL is returned. */
+Nextern _ARMABI double log10(double /*x*/);
+Xextern __declspec(__nothrow) double log10(double  );
+N   /* computes the base-ten logarithm of x. A domain error occurs if the */
+N   /* argument is negative. A range error occurs if the argument is zero. */
+N   /* Returns: the base-ten logarithm. */
+Nextern _ARMABI double modf(double /*value*/, double * /*iptr*/) __attribute__((__nonnull__(2)));
+Xextern __declspec(__nothrow) double modf(double  , double *  ) __attribute__((__nonnull__(2)));
+N   /* breaks the argument value into integral and fraction parts, each of */
+N   /* which has the same sign as the argument. It stores the integral part */
+N   /* as a double in the object pointed to by iptr. */
+N   /* Returns: the signed fractional part of value. */
+N
+Nextern _ARMABI double pow(double /*x*/, double /*y*/);
+Xextern __declspec(__nothrow) double pow(double  , double  );
+N   /* computes x raised to the power of y. A domain error occurs if x is */
+N   /* zero and y is less than or equal to zero, or if x is negative and y */
+N   /* is not an integer, and -HUGE_VAL returned. A range error may occur. */
+N   /* Returns: the value of x raised to the power of y. */
+N   /*          if underflow range error; 0 is returned. */
+N   /*          if overflow range error; HUGE_VAL is returned. */
+Nextern _ARMABI double sqrt(double /*x*/);
+Xextern __declspec(__nothrow) double sqrt(double  );
+N   /* computes the non-negative square root of x. A domain error occurs */
+N   /* if the argument is negative, and -HUGE_VAL returned. */
+N   /* Returns: the value of the square root. */
+N
+N#if defined(__TARGET_FPU_VFP_DOUBLE) && !defined(__TARGET_FPU_SOFTVFP)
+X#if 0L && !1L
+S    _ARMABI_INLINE double _sqrt(double __x) { return __sqrt(__x); }
+N#else
+N    _ARMABI_INLINE double _sqrt(double __x) { return sqrt(__x); }
+X    __inline double _sqrt(double __x) { return sqrt(__x); }
+N#endif
+N#if defined(__TARGET_FPU_VFP_SINGLE) && !defined(__TARGET_FPU_SOFTVFP)
+X#if 0L && !1L
+S    _ARMABI_INLINE float _sqrtf(float __x) { return __sqrtf(__x); }
+N#else
+N    _ARMABI_INLINE float _sqrtf(float __x) { return (float)sqrt(__x); }
+X    __inline float _sqrtf(float __x) { return (float)sqrt(__x); }
+N#endif
+N    /* With VFP, _sqrt and _sqrtf should expand inline as the native VFP square root
+N     * instructions. They will not behave like the C sqrt() function, because
+N     * they will report unusual values as IEEE exceptions (in fpmodes which
+N     * support IEEE exceptions) rather than in errno. These function names
+N     * are not specified in any standard. */
+N
+Nextern _ARMABI_PURE double ceil(double /*x*/);
+Xextern __declspec(__nothrow) __attribute__((const)) double ceil(double  );
+N   /* computes the smallest integer not less than x. */
+N   /* Returns: the smallest integer not less than x, expressed as a double. */
+Nextern _ARMABI_PURE double fabs(double /*x*/);
+Xextern __declspec(__nothrow) __attribute__((const)) double fabs(double  );
+N   /* computes the absolute value of the floating-point number x. */
+N   /* Returns: the absolute value of x. */
+N
+Nextern _ARMABI_PURE double floor(double /*d*/);
+Xextern __declspec(__nothrow) __attribute__((const)) double floor(double  );
+N   /* computes the largest integer not greater than x. */
+N   /* Returns: the largest integer not greater than x, expressed as a double */
+N
+Nextern _ARMABI double fmod(double /*x*/, double /*y*/);
+Xextern __declspec(__nothrow) double fmod(double  , double  );
+N   /* computes the floating-point remainder of x/y. */
+N   /* Returns: the value x - i * y, for some integer i such that, if y is */
+N   /*          nonzero, the result has the same sign as x and magnitude */
+N   /*          less than the magnitude of y. If y is zero, a domain error */
+N   /*          occurs and -HUGE_VAL is returned. */
+N
+N    /* Additional Mathlib functions not defined by the ANSI standard.
+N     * Not guaranteed, and not necessarily very well tested.
+N     * C99 requires the user to include <math.h> to use these functions
+N     * declaring them "by hand" is not sufficient
+N     *
+N     * The above statement is not completely true now.  Some of the above
+N     * C99 functionality has been added as per the Standard, and (where
+N     * necessary) old Mathlib functionality withdrawn/changed.  Before
+N     * including this header #define __ENABLE_MATHLIB_LEGACY if you want to
+N     * re-enable the legacy functionality.
+N     */
+N
+N#if !defined(__STRICT_ANSI__) || defined(__USE_C99_MATH)
+X#if !0L || 0L
+N
+Nextern _ARMABI double acosh(double /*x*/);
+Xextern __declspec(__nothrow) double acosh(double  );
+N    /*
+N     * Inverse cosh. EDOM if argument < 1.0
+N     */
+Nextern _ARMABI double asinh(double /*x*/);
+Xextern __declspec(__nothrow) double asinh(double  );
+N    /*
+N     * Inverse sinh.
+N     */
+Nextern _ARMABI double atanh(double /*x*/);
+Xextern __declspec(__nothrow) double atanh(double  );
+N    /*
+N     * Inverse tanh. EDOM if |argument| > 1.0
+N     */
+Nextern _ARMABI double cbrt(double /*x*/);
+Xextern __declspec(__nothrow) double cbrt(double  );
+N    /*
+N     * Cube root.
+N     */
+N_ARMABI_INLINE _ARMABI_PURE double copysign(double __x, double __y)
+X__inline __declspec(__nothrow) __attribute__((const)) double copysign(double __x, double __y)
+N    /*
+N     * Returns x with sign bit replaced by sign of y.
+N     */
+N{
+N    __HI(__x) = (__HI(__x) & 0x7fffffff) | (__HI(__y) & 0x80000000);
+X    (*(1 + (unsigned *)&(__x))) = ((*(1 + (unsigned *)&(__x))) & 0x7fffffff) | ((*(1 + (unsigned *)&(__y))) & 0x80000000);
+N    return __x;
+N}
+N_ARMABI_INLINE _ARMABI_PURE float copysignf(float __x, float __y)
+X__inline __declspec(__nothrow) __attribute__((const)) float copysignf(float __x, float __y)
+N    /*
+N     * Returns x with sign bit replaced by sign of y.
+N     */
+N{
+N    __FLT(__x) = (__FLT(__x) & 0x7fffffff) | (__FLT(__y) & 0x80000000);
+X    (*(unsigned *)&(__x)) = ((*(unsigned *)&(__x)) & 0x7fffffff) | ((*(unsigned *)&(__y)) & 0x80000000);
+N    return __x;
+N}
+Nextern _ARMABI double erf(double /*x*/);
+Xextern __declspec(__nothrow) double erf(double  );
+N    /*
+N     * Error function. (2/sqrt(pi)) * integral from 0 to x of exp(-t*t) dt.
+N     */
+Nextern _ARMABI double erfc(double /*x*/);
+Xextern __declspec(__nothrow) double erfc(double  );
+N    /*
+N     * 1-erf(x). (More accurate than just coding 1-erf(x), for large x.)
+N     */
+Nextern _ARMABI double expm1(double /*x*/);
+Xextern __declspec(__nothrow) double expm1(double  );
+N    /*
+N     * exp(x)-1. (More accurate than just coding exp(x)-1, for small x.)
+N     */
+N#define fpclassify(x) \
+N    ((sizeof(x) == sizeof(float)) ? \
+N        __ARM_fpclassifyf(x) : __ARM_fpclassify(x))
+X#define fpclassify(x)     ((sizeof(x) == sizeof(float)) ?         __ARM_fpclassifyf(x) : __ARM_fpclassify(x))
+N    /*
+N     * Classify a floating point number into one of the following values:
+N     */
+N#define FP_ZERO         (0)
+N#define FP_SUBNORMAL    (4)
+N#define FP_NORMAL       (5)
+N#define FP_INFINITE     (3)
+N#define FP_NAN          (7)
+N
+N#if defined(_WANT_SNAN) && defined(__SUPPORT_SNAN__)
+X#if 0L && 0L
+S/* 
+S * Note that we'll never classify a number as FP_NAN, as all NaNs will 
+S * be either FP_NANQ or FP_NANS
+S */
+S#  define FP_NANQ       (8)
+S#  define FP_NANS       (9)
+N#endif
+N
+N
+Nextern _ARMABI double hypot(double /*x*/, double /*y*/);
+Xextern __declspec(__nothrow) double hypot(double  , double  );
+N    /*
+N     * sqrt(x*x+y*y), ie the length of the vector (x,y) or the
+N     * hypotenuse of a right triangle whose other two sides are x
+N     * and y. Won't overflow unless the _answer_ is too big, even
+N     * if the intermediate x*x+y*y is too big.
+N     */
+Nextern _ARMABI int ilogb(double /*x*/);
+Xextern __declspec(__nothrow) int ilogb(double  );
+N    /*
+N     * Exponent of x (returns 0 for 1.0, 1 for 2.0, -1 for 0.5, etc.)
+N     */
+Nextern _ARMABI int ilogbf(float /*x*/);
+Xextern __declspec(__nothrow) int ilogbf(float  );
+N    /*
+N     * Like ilogb but takes a float
+N     */
+Nextern _ARMABI int ilogbl(long double /*x*/);
+Xextern __declspec(__nothrow) int ilogbl(long double  );
+N    /*
+N     * Exponent of x (returns 0 for 1.0, 1 for 2.0, -1 for 0.5, etc.)
+N     */
+N#define FP_ILOGB0   (-0x7fffffff) /* ilogb(0) == -INT_MAX */
+N#define FP_ILOGBNAN ( 0x80000000) /* ilogb(NAN) == INT_MIN */
+N
+N#define isfinite(x) \
+N    ((sizeof(x) == sizeof(float)) \
+N        ? __ARM_isfinitef(x) \
+N        : __ARM_isfinite(x))
+X#define isfinite(x)     ((sizeof(x) == sizeof(float))         ? __ARM_isfinitef(x)         : __ARM_isfinite(x))
+N    /*
+N     * Returns true if x is a finite number, size independent.
+N     */
+N
+N#define isgreater(x, y) \
+N    (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float))) \
+N        ? ((__ARM_fcmp4((x), (y)) & 0xf0000000) == 0x20000000) \
+N        : ((__ARM_dcmp4((x), (y)) & 0xf0000000) == 0x20000000))
+X#define isgreater(x, y)     (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float)))         ? ((__ARM_fcmp4((x), (y)) & 0xf0000000) == 0x20000000)         : ((__ARM_dcmp4((x), (y)) & 0xf0000000) == 0x20000000))
+N    /*
+N     * Returns true if x > y, throws no exceptions except on Signaling NaNs
+N     *
+N     * We want the C not set but the Z bit clear, V must be clear
+N     */
+N
+N#define isgreaterequal(x, y) \
+N    (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float))) \
+N        ? ((__ARM_fcmp4((x), (y)) & 0x30000000) == 0x20000000) \
+N        : ((__ARM_dcmp4((x), (y)) & 0x30000000) == 0x20000000))
+X#define isgreaterequal(x, y)     (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float)))         ? ((__ARM_fcmp4((x), (y)) & 0x30000000) == 0x20000000)         : ((__ARM_dcmp4((x), (y)) & 0x30000000) == 0x20000000))
+N    /*
+N     * Returns true if x >= y, throws no exceptions except on Signaling NaNs
+N     *
+N     * We just need to see if the C bit is set or not and ensure V clear
+N     */
+N
+N#define isinf(x) \
+N    ((sizeof(x) == sizeof(float)) \
+N        ? __ARM_isinff(x) \
+N        : __ARM_isinf(x))
+X#define isinf(x)     ((sizeof(x) == sizeof(float))         ? __ARM_isinff(x)         : __ARM_isinf(x))
+N    /*
+N     * Returns true if x is an infinity, size independent.
+N     */
+N
+N#define isless(x, y)  \
+N    (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float))) \
+N        ? ((__ARM_fcmp4((x), (y)) & 0xf0000000) == 0x80000000) \
+N        : ((__ARM_dcmp4((x), (y)) & 0xf0000000) == 0x80000000))
+X#define isless(x, y)      (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float)))         ? ((__ARM_fcmp4((x), (y)) & 0xf0000000) == 0x80000000)         : ((__ARM_dcmp4((x), (y)) & 0xf0000000) == 0x80000000))
+N    /*
+N     * Returns true if x < y, throws no exceptions except on Signaling NaNs
+N     *
+N     * We're less than if N is set, V clear
+N     */
+N
+N#define islessequal(x, y) \
+N    (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float))) \
+N        ? ((__ARM_fcmp4((x), (y)) & 0xc0000000) != 0) \
+N        : ((__ARM_dcmp4((x), (y)) & 0xc0000000) != 0))
+X#define islessequal(x, y)     (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float)))         ? ((__ARM_fcmp4((x), (y)) & 0xc0000000) != 0)         : ((__ARM_dcmp4((x), (y)) & 0xc0000000) != 0))
+N    /*
+N     * Returns true if x <= y, throws no exceptions except on Signaling NaNs
+N     *
+N     * We're less than or equal if one of N or Z is set, V clear
+N     */
+N
+N#define islessgreater(x, y) \
+N    (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float))) \
+N        ? __ARM_islessgreaterf((x), (y)) \
+N        : __ARM_islessgreater((x), (y)))
+X#define islessgreater(x, y)     (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float)))         ? __ARM_islessgreaterf((x), (y))         : __ARM_islessgreater((x), (y)))
+N    /*
+N     * Returns true if x <> y, throws no exceptions except on Signaling NaNs
+N     * Unfortunately this test is too complicated to do in a macro without
+N     * evaluating x & y twice.  Shame really...
+N     */
+N
+N#define isnan(x) \
+N    ((sizeof(x) == sizeof(float)) \
+N        ? __ARM_isnanf(x) \
+N        : __ARM_isnan(x))
+X#define isnan(x)     ((sizeof(x) == sizeof(float))         ? __ARM_isnanf(x)         : __ARM_isnan(x))
+N    /*
+N     * Returns TRUE if x is a NaN.
+N     */
+N
+N#define isnormal(x) \
+N    ((sizeof(x) == sizeof(float)) \
+N        ? __ARM_isnormalf(x) \
+N        : __ARM_isnormal(x))
+X#define isnormal(x)     ((sizeof(x) == sizeof(float))         ? __ARM_isnormalf(x)         : __ARM_isnormal(x))
+N    /*
+N     * Returns TRUE if x is a NaN.
+N     */
+N
+N#define isunordered(x, y) \
+N    (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float))) \
+N        ? ((__ARM_fcmp4((x), (y)) & 0x10000000) == 0x10000000) \
+N        : ((__ARM_dcmp4((x), (y)) & 0x10000000) == 0x10000000))
+X#define isunordered(x, y)     (((sizeof(x) == sizeof(float)) && (sizeof(y) == sizeof(float)))         ? ((__ARM_fcmp4((x), (y)) & 0x10000000) == 0x10000000)         : ((__ARM_dcmp4((x), (y)) & 0x10000000) == 0x10000000))
+N    /*
+N     * Returns true if x ? y, throws no exceptions except on Signaling NaNs
+N     * Unordered occurs if and only if the V bit is set
+N     */
+N
+Nextern _ARMABI double lgamma (double /*x*/);
+Xextern __declspec(__nothrow) double lgamma (double  );
+N    /*
+N     * The log of the absolute value of the gamma function of x. The sign
+N     * of the gamma function of x is returned in the global `signgam'.
+N     */
+Nextern _ARMABI double log1p(double /*x*/);
+Xextern __declspec(__nothrow) double log1p(double  );
+N    /*
+N     * log(1+x). (More accurate than just coding log(1+x), for small x.)
+N     */
+Nextern _ARMABI double logb(double /*x*/);
+Xextern __declspec(__nothrow) double logb(double  );
+N    /*
+N     * Like ilogb but returns a double.
+N     */
+Nextern _ARMABI float logbf(float /*x*/);
+Xextern __declspec(__nothrow) float logbf(float  );
+N    /*
+N     * Like logb but takes and returns float
+N     */
+Nextern _ARMABI long double logbl(long double /*x*/);
+Xextern __declspec(__nothrow) long double logbl(long double  );
+N    /*
+N     * Like logb but takes and returns long double
+N     */
+Nextern _ARMABI double nextafter(double /*x*/, double /*y*/);
+Xextern __declspec(__nothrow) double nextafter(double  , double  );
+N    /*
+N     * Returns the next representable number after x, in the
+N     * direction toward y.
+N     */
+Nextern _ARMABI float nextafterf(float /*x*/, float /*y*/);
+Xextern __declspec(__nothrow) float nextafterf(float  , float  );
+N    /*
+N     * Returns the next representable number after x, in the
+N     * direction toward y.
+N     */
+Nextern _ARMABI long double nextafterl(long double /*x*/, long double /*y*/);
+Xextern __declspec(__nothrow) long double nextafterl(long double  , long double  );
+N    /*
+N     * Returns the next representable number after x, in the
+N     * direction toward y.
+N     */
+Nextern _ARMABI double nexttoward(double /*x*/, long double /*y*/);
+Xextern __declspec(__nothrow) double nexttoward(double  , long double  );
+N    /*
+N     * Returns the next representable number after x, in the
+N     * direction toward y.
+N     */
+Nextern _ARMABI float nexttowardf(float /*x*/, long double /*y*/);
+Xextern __declspec(__nothrow) float nexttowardf(float  , long double  );
+N    /*
+N     * Returns the next representable number after x, in the
+N     * direction toward y.
+N     */
+Nextern _ARMABI long double nexttowardl(long double /*x*/, long double /*y*/);
+Xextern __declspec(__nothrow) long double nexttowardl(long double  , long double  );
+N    /*
+N     * Returns the next representable number after x, in the
+N     * direction toward y.
+N     */
+Nextern _ARMABI double remainder(double /*x*/, double /*y*/);
+Xextern __declspec(__nothrow) double remainder(double  , double  );
+N    /*
+N     * Returns the remainder of x by y, in the IEEE 754 sense.
+N     */
+Nextern _ARMABI_FPEXCEPT double rint(double /*x*/);
+Xextern __declspec(__nothrow) __attribute__((const)) double rint(double  );
+N    /*
+N     * Rounds x to an integer, in the IEEE 754 sense.
+N     */
+Nextern _ARMABI double scalbln(double /*x*/, long int /*n*/);
+Xextern __declspec(__nothrow) double scalbln(double  , long int  );
+N    /*
+N     * Compute x times 2^n quickly.
+N     */
+Nextern _ARMABI float scalblnf(float /*x*/, long int /*n*/);
+Xextern __declspec(__nothrow) float scalblnf(float  , long int  );
+N    /*
+N     * Compute x times 2^n quickly.
+N     */
+Nextern _ARMABI long double scalblnl(long double /*x*/, long int /*n*/);
+Xextern __declspec(__nothrow) long double scalblnl(long double  , long int  );
+N    /*
+N     * Compute x times 2^n quickly.
+N     */
+Nextern _ARMABI double scalbn(double /*x*/, int /*n*/);
+Xextern __declspec(__nothrow) double scalbn(double  , int  );
+N    /*
+N     * Compute x times 2^n quickly.
+N     */
+Nextern _ARMABI float scalbnf(float /*x*/, int /*n*/);
+Xextern __declspec(__nothrow) float scalbnf(float  , int  );
+N    /*
+N     * Compute x times 2^n quickly.
+N     */
+Nextern _ARMABI long double scalbnl(long double /*x*/, int /*n*/);
+Xextern __declspec(__nothrow) long double scalbnl(long double  , int  );
+N    /*
+N     * Compute x times 2^n quickly.
+N     */
+N#define signbit(x) \
+N    ((sizeof(x) == sizeof(float)) \
+N        ? __ARM_signbitf(x) \
+N        : __ARM_signbit(x))
+X#define signbit(x)     ((sizeof(x) == sizeof(float))         ? __ARM_signbitf(x)         : __ARM_signbit(x))
+N    /*
+N     * Returns the signbit of x, size independent macro
+N     */
+N#endif
+N
+N/* C99 float versions of functions.  math.h has always reserved these
+N   identifiers for this purpose (7.13.4). */
+Nextern _ARMABI_PURE float _fabsf(float); /* old ARM name */
+Xextern __declspec(__nothrow) __attribute__((const)) float _fabsf(float);  
+N_ARMABI_INLINE _ARMABI_PURE float fabsf(float __f) { return _fabsf(__f); }
+X__inline __declspec(__nothrow) __attribute__((const)) float fabsf(float __f) { return _fabsf(__f); }
+Nextern _ARMABI float sinf(float /*x*/);
+Xextern __declspec(__nothrow) float sinf(float  );
+Nextern _ARMABI float cosf(float /*x*/);
+Xextern __declspec(__nothrow) float cosf(float  );
+Nextern _ARMABI float tanf(float /*x*/);
+Xextern __declspec(__nothrow) float tanf(float  );
+Nextern _ARMABI float acosf(float /*x*/);
+Xextern __declspec(__nothrow) float acosf(float  );
+Nextern _ARMABI float asinf(float /*x*/);
+Xextern __declspec(__nothrow) float asinf(float  );
+Nextern _ARMABI float atanf(float /*x*/);
+Xextern __declspec(__nothrow) float atanf(float  );
+Nextern _ARMABI float atan2f(float /*y*/, float /*x*/);
+Xextern __declspec(__nothrow) float atan2f(float  , float  );
+Nextern _ARMABI float sinhf(float /*x*/);
+Xextern __declspec(__nothrow) float sinhf(float  );
+Nextern _ARMABI float coshf(float /*x*/);
+Xextern __declspec(__nothrow) float coshf(float  );
+Nextern _ARMABI float tanhf(float /*x*/);
+Xextern __declspec(__nothrow) float tanhf(float  );
+Nextern _ARMABI float expf(float /*x*/);
+Xextern __declspec(__nothrow) float expf(float  );
+Nextern _ARMABI float logf(float /*x*/);
+Xextern __declspec(__nothrow) float logf(float  );
+Nextern _ARMABI float log10f(float /*x*/);
+Xextern __declspec(__nothrow) float log10f(float  );
+Nextern _ARMABI float powf(float /*x*/, float /*y*/);
+Xextern __declspec(__nothrow) float powf(float  , float  );
+Nextern _ARMABI float sqrtf(float /*x*/);
+Xextern __declspec(__nothrow) float sqrtf(float  );
+Nextern _ARMABI float ldexpf(float /*x*/, int /*exp*/);
+Xextern __declspec(__nothrow) float ldexpf(float  , int  );
+Nextern _ARMABI float frexpf(float /*value*/, int * /*exp*/) __attribute__((__nonnull__(2)));
+Xextern __declspec(__nothrow) float frexpf(float  , int *  ) __attribute__((__nonnull__(2)));
+Nextern _ARMABI_PURE float ceilf(float /*x*/);
+Xextern __declspec(__nothrow) __attribute__((const)) float ceilf(float  );
+Nextern _ARMABI_PURE float floorf(float /*x*/);
+Xextern __declspec(__nothrow) __attribute__((const)) float floorf(float  );
+Nextern _ARMABI float fmodf(float /*x*/, float /*y*/);
+Xextern __declspec(__nothrow) float fmodf(float  , float  );
+Nextern _ARMABI float modff(float /*value*/, float * /*iptr*/) __attribute__((__nonnull__(2)));
+Xextern __declspec(__nothrow) float modff(float  , float *  ) __attribute__((__nonnull__(2)));
+N
+N/* C99 long double versions of functions. */
+N/* (also need to have 'using' declarations below) */
+N#define _ARMDEFLD1(f) \
+N    _ARMABI long double f##l(long double /*x*/)
+X#define _ARMDEFLD1(f)     _ARMABI long double f##l(long double  )
+N
+N#define _ARMDEFLD1P(f, T) \
+N    _ARMABI long double f##l(long double /*x*/, T /*p*/)
+X#define _ARMDEFLD1P(f, T)     _ARMABI long double f##l(long double  , T  )
+N
+N#define _ARMDEFLD2(f) \
+N    _ARMABI long double f##l(long double /*x*/, long double /*y*/)
+X#define _ARMDEFLD2(f)     _ARMABI long double f##l(long double  , long double  )
+N
+N/*
+N * Long double versions of C89 functions can be defined
+N * unconditionally, because C89 reserved these names in "future
+N * library directions".
+N */
+N_ARMDEFLD1(acos);
+X__declspec(__nothrow) long double acosl(long double );
+N_ARMDEFLD1(asin);
+X__declspec(__nothrow) long double asinl(long double );
+N_ARMDEFLD1(atan);
+X__declspec(__nothrow) long double atanl(long double );
+N_ARMDEFLD2(atan2);
+X__declspec(__nothrow) long double atan2l(long double , long double );
+N_ARMDEFLD1(ceil);
+X__declspec(__nothrow) long double ceill(long double );
+N_ARMDEFLD1(cos);
+X__declspec(__nothrow) long double cosl(long double );
+N_ARMDEFLD1(cosh);
+X__declspec(__nothrow) long double coshl(long double );
+N_ARMDEFLD1(exp);
+X__declspec(__nothrow) long double expl(long double );
+N_ARMDEFLD1(fabs);
+X__declspec(__nothrow) long double fabsl(long double );
+N_ARMDEFLD1(floor);
+X__declspec(__nothrow) long double floorl(long double );
+N_ARMDEFLD2(fmod);
+X__declspec(__nothrow) long double fmodl(long double , long double );
+N_ARMDEFLD1P(frexp, int*) __attribute__((__nonnull__(2)));
+X__declspec(__nothrow) long double frexpl(long double , int* ) __attribute__((__nonnull__(2)));
+N_ARMDEFLD1P(ldexp, int);
+X__declspec(__nothrow) long double ldexpl(long double , int );
+N_ARMDEFLD1(log);
+X__declspec(__nothrow) long double logl(long double );
+N_ARMDEFLD1(log10);
+X__declspec(__nothrow) long double log10l(long double );
+N_ARMABI long double modfl(long double /*x*/, long double * /*p*/) __attribute__((__nonnull__(2)));
+X__declspec(__nothrow) long double modfl(long double  , long double *  ) __attribute__((__nonnull__(2)));
+N_ARMDEFLD2(pow);
+X__declspec(__nothrow) long double powl(long double , long double );
+N_ARMDEFLD1(sin);
+X__declspec(__nothrow) long double sinl(long double );
+N_ARMDEFLD1(sinh);
+X__declspec(__nothrow) long double sinhl(long double );
+N_ARMDEFLD1(sqrt);
+X__declspec(__nothrow) long double sqrtl(long double );
+N_ARMDEFLD1(tan);
+X__declspec(__nothrow) long double tanl(long double );
+N_ARMDEFLD1(tanh);
+X__declspec(__nothrow) long double tanhl(long double );
+N
+N#if !defined(__STRICT_ANSI__) || defined(__USE_C99_MATH)
+X#if !0L || 0L
+N
+N/*
+N * C99 float and long double versions of extra-C89 functions.
+N */
+Nextern _ARMABI float acoshf(float /*x*/);
+Xextern __declspec(__nothrow) float acoshf(float  );
+N_ARMDEFLD1(acosh);
+X__declspec(__nothrow) long double acoshl(long double );
+Nextern _ARMABI float asinhf(float /*x*/);
+Xextern __declspec(__nothrow) float asinhf(float  );
+N_ARMDEFLD1(asinh);
+X__declspec(__nothrow) long double asinhl(long double );
+Nextern _ARMABI float atanhf(float /*x*/);
+Xextern __declspec(__nothrow) float atanhf(float  );
+N_ARMDEFLD1(atanh);
+X__declspec(__nothrow) long double atanhl(long double );
+N_ARMDEFLD2(copysign);
+X__declspec(__nothrow) long double copysignl(long double , long double );
+Nextern _ARMABI float cbrtf(float /*x*/);
+Xextern __declspec(__nothrow) float cbrtf(float  );
+N_ARMDEFLD1(cbrt);
+X__declspec(__nothrow) long double cbrtl(long double );
+Nextern _ARMABI float erff(float /*x*/);
+Xextern __declspec(__nothrow) float erff(float  );
+N_ARMDEFLD1(erf);
+X__declspec(__nothrow) long double erfl(long double );
+Nextern _ARMABI float erfcf(float /*x*/);
+Xextern __declspec(__nothrow) float erfcf(float  );
+N_ARMDEFLD1(erfc);
+X__declspec(__nothrow) long double erfcl(long double );
+Nextern _ARMABI float expm1f(float /*x*/);
+Xextern __declspec(__nothrow) float expm1f(float  );
+N_ARMDEFLD1(expm1);
+X__declspec(__nothrow) long double expm1l(long double );
+Nextern _ARMABI float log1pf(float /*x*/);
+Xextern __declspec(__nothrow) float log1pf(float  );
+N_ARMDEFLD1(log1p);
+X__declspec(__nothrow) long double log1pl(long double );
+Nextern _ARMABI float hypotf(float /*x*/, float /*y*/);
+Xextern __declspec(__nothrow) float hypotf(float  , float  );
+N_ARMDEFLD2(hypot);
+X__declspec(__nothrow) long double hypotl(long double , long double );
+Nextern _ARMABI float lgammaf(float /*x*/);
+Xextern __declspec(__nothrow) float lgammaf(float  );
+N_ARMDEFLD1(lgamma);
+X__declspec(__nothrow) long double lgammal(long double );
+Nextern _ARMABI float remainderf(float /*x*/, float /*y*/);
+Xextern __declspec(__nothrow) float remainderf(float  , float  );
+N_ARMDEFLD2(remainder);
+X__declspec(__nothrow) long double remainderl(long double , long double );
+Nextern _ARMABI float rintf(float /*x*/);
+Xextern __declspec(__nothrow) float rintf(float  );
+N_ARMDEFLD1(rint);
+X__declspec(__nothrow) long double rintl(long double );
+N
+N#endif
+N
+N#ifdef __USE_C99_MATH
+S/*
+S * Functions new in C99.
+S */
+Sextern _ARMABI double exp2(double /*x*/); /* * 2.^x. */
+Sextern _ARMABI float exp2f(float /*x*/);
+S_ARMDEFLD1(exp2);
+Sextern _ARMABI double fdim(double /*x*/, double /*y*/);
+Sextern _ARMABI float fdimf(float /*x*/, float /*y*/);
+S_ARMDEFLD2(fdim);
+S#ifdef __FP_FAST_FMA
+S#define FP_FAST_FMA
+S#endif
+S#ifdef __FP_FAST_FMAF
+S#define FP_FAST_FMAF
+S#endif
+S#ifdef __FP_FAST_FMAL
+S#define FP_FAST_FMAL
+S#endif
+Sextern _ARMABI double fma(double /*x*/, double /*y*/, double /*z*/);
+Sextern _ARMABI float fmaf(float /*x*/, float /*y*/, float /*z*/);
+S#ifdef __HAVE_LONGDOUBLE
+S_ARMABI_INLINE _ARMABI long double fmal(long double __x, long double __y, long double __z) \
+S    { return (long double)fma((double)__x, (double)__y, (double)__z); }
+X_ARMABI_INLINE _ARMABI long double fmal(long double __x, long double __y, long double __z)     { return (long double)fma((double)__x, (double)__y, (double)__z); }
+S#endif
+Sextern _ARMABI_FPEXCEPT double fmax(double /*x*/, double /*y*/);
+Sextern _ARMABI_FPEXCEPT float fmaxf(float /*x*/, float /*y*/);
+S_ARMDEFLD2(fmax);
+Sextern _ARMABI_FPEXCEPT double fmin(double /*x*/, double /*y*/);
+Sextern _ARMABI_FPEXCEPT float fminf(float /*x*/, float /*y*/);
+S_ARMDEFLD2(fmin);
+Sextern _ARMABI double log2(double /*x*/); /* * log base 2 of x. */
+Sextern _ARMABI float log2f(float /*x*/);
+S_ARMDEFLD1(log2);
+Sextern _ARMABI long lrint(double /*x*/);
+Sextern _ARMABI long lrintf(float /*x*/);
+S#ifdef __HAVE_LONGDOUBLE
+S_ARMABI_INLINE _ARMABI long lrintl(long double __x) \
+S    { return lrint((double)__x); }
+X_ARMABI_INLINE _ARMABI long lrintl(long double __x)     { return lrint((double)__x); }
+S#endif
+Sextern _ARMABI __LONGLONG llrint(double /*x*/);
+Sextern _ARMABI __LONGLONG llrintf(float /*x*/);
+S#ifdef __HAVE_LONGDOUBLE
+S_ARMABI_INLINE _ARMABI __LONGLONG llrintl(long double __x) \
+S    { return llrint((double)__x); }
+X_ARMABI_INLINE _ARMABI __LONGLONG llrintl(long double __x)     { return llrint((double)__x); }
+S#endif
+Sextern _ARMABI long lround(double /*x*/);
+Sextern _ARMABI long lroundf(float /*x*/);
+S#ifdef __HAVE_LONGDOUBLE
+S_ARMABI_INLINE _ARMABI long lroundl(long double __x) \
+S    { return lround((double)__x); }
+X_ARMABI_INLINE _ARMABI long lroundl(long double __x)     { return lround((double)__x); }
+S#endif
+Sextern _ARMABI __LONGLONG llround(double /*x*/);
+Sextern _ARMABI __LONGLONG llroundf(float /*x*/);
+S#ifdef __HAVE_LONGDOUBLE
+S_ARMABI_INLINE _ARMABI __LONGLONG llroundl(long double __x) \
+S    { return llround((double)__x); }
+X_ARMABI_INLINE _ARMABI __LONGLONG llroundl(long double __x)     { return llround((double)__x); }
+S#endif
+Sextern _ARMABI_PURE double nan(const char */*tagp*/);
+Sextern _ARMABI_PURE float nanf(const char */*tagp*/);
+S#ifdef __HAVE_LONGDOUBLE
+S_ARMABI_INLINE _ARMABI_PURE long double nanl(const char *__t) \
+S    { return (long double)nan(__t); }
+X_ARMABI_INLINE _ARMABI_PURE long double nanl(const char *__t)     { return (long double)nan(__t); }
+S#endif
+S#if defined(_WANT_SNAN) && defined(__SUPPORT_SNAN__)
+Sextern _ARMABI_PURE double nans(const char */*tagp*/);
+Sextern _ARMABI_PURE float nansf(const char */*tagp*/);
+S#ifdef __HAVE_LONGDOUBLE
+S_ARMABI_INLINE _ARMABI_FPEXCEPT long double nansl(const char *__t) \
+S    { return (long double)nans(__t); }
+X_ARMABI_INLINE _ARMABI_FPEXCEPT long double nansl(const char *__t)     { return (long double)nans(__t); }
+S#endif
+S#endif 
+Sextern _ARMABI_FPEXCEPT double nearbyint(double /*x*/);
+Sextern _ARMABI_FPEXCEPT float nearbyintf(float /*x*/);
+S_ARMDEFLD1(nearbyint);
+Sextern  double remquo(double /*x*/, double /*y*/, int */*quo*/);
+Sextern  float remquof(float /*x*/, float /*y*/, int */*quo*/);
+S#ifdef __HAVE_LONGDOUBLE
+S_ARMABI_INLINE long double remquol(long double __x, long double __y, int *__q) \
+S    { return (long double)remquo((double)__x, (double)__y, __q); }
+X_ARMABI_INLINE long double remquol(long double __x, long double __y, int *__q)     { return (long double)remquo((double)__x, (double)__y, __q); }
+S#endif
+Sextern _ARMABI_FPEXCEPT double round(double /*x*/);
+Sextern _ARMABI_FPEXCEPT float roundf(float /*x*/);
+S_ARMDEFLD1(round);
+Sextern _ARMABI double tgamma(double /*x*/); /* * The gamma function of x. */
+Sextern _ARMABI float tgammaf(float /*x*/);
+S_ARMDEFLD1(tgamma);
+Sextern _ARMABI_FPEXCEPT double trunc(double /*x*/);
+Sextern _ARMABI_FPEXCEPT float truncf(float /*x*/);
+S_ARMDEFLD1(trunc);
+N#endif
+N
+N#undef _ARMDEFLD1
+N#undef _ARMDEFLD1P
+N#undef _ARMDEFLD2
+N
+N#ifdef __cplusplus
+S  extern "C++" {
+S    inline float abs(float __x)   { return fabsf(__x); }
+S    inline float acos(float __x)  { return acosf(__x); }
+S    inline float asin(float __x)  { return asinf(__x); }
+S    inline float atan(float __x)  { return atanf(__x); }
+S    inline float atan2(float __y, float __x)    { return atan2f(__y,__x); }
+S    inline float ceil(float __x)  { return ceilf(__x); }
+S    inline float cos(float __x)   { return cosf(__x); }
+S    inline float cosh(float __x)  { return coshf(__x); }
+S    inline float exp(float __x)   { return expf(__x); }
+S    inline float fabs(float __x)  { return fabsf(__x); }
+S    inline float floor(float __x) { return floorf(__x); }
+S    inline float fmod(float __x, float __y)     { return fmodf(__x, __y); }
+S    float frexp(float __x, int* __exp) __attribute__((__nonnull__(2)));
+S    inline float frexp(float __x, int* __exp)   { return frexpf(__x, __exp); }
+S    inline float ldexp(float __x, int __exp)    { return ldexpf(__x, __exp);}
+S    inline float log(float __x)   { return logf(__x); }
+S    inline float log10(float __x) { return log10f(__x); }
+S    float modf(float __x, float* __iptr) __attribute__((__nonnull__(2)));
+S    inline float modf(float __x, float* __iptr) { return modff(__x, __iptr); }
+S    inline float pow(float __x, float __y)      { return powf(__x,__y); }
+S    inline float pow(float __x, int __y)     { return powf(__x, (float)__y); }
+S    inline float sin(float __x)   { return sinf(__x); }
+S    inline float sinh(float __x)  { return sinhf(__x); }
+S    inline float sqrt(float __x)  { return sqrtf(__x); }
+S    inline float _sqrt(float __x) { return _sqrtf(__x); }
+S    inline float tan(float __x)   { return tanf(__x); }
+S    inline float tanh(float __x)  { return tanhf(__x); }
+S
+S    inline double abs(double __x) { return fabs(__x); }
+S    inline double pow(double __x, int __y)
+S                { return pow(__x, (double) __y); }
+S
+S#ifdef __HAVE_LONGDOUBLE
+S    inline long double abs(long double __x)
+S                { return (long double)fabsl(__x); }
+S    inline long double acos(long double __x)
+S                { return (long double)acosl(__x); }
+S    inline long double asin(long double __x)
+S                { return (long double)asinl(__x); }
+S    inline long double atan(long double __x)
+S                { return (long double)atanl(__x); }
+S    inline long double atan2(long double __y, long double __x)
+S                { return (long double)atan2l(__y, __x); }
+S    inline long double ceil(long double __x)
+S                { return (long double)ceill( __x); }
+S    inline long double cos(long double __x)
+S                { return (long double)cosl(__x); }
+S    inline long double cosh(long double __x)
+S                { return (long double)coshl(__x); }
+S    inline long double exp(long double __x)
+S                { return (long double)expl(__x); }
+S    inline long double fabs(long double __x)
+S                { return (long double)fabsl(__x); }
+S    inline long double floor(long double __x)
+S                { return (long double)floorl(__x); }
+S    inline long double fmod(long double __x, long double __y)
+S                { return (long double)fmodl(__x, __y); }
+S    long double frexp(long double __x, int* __p) __attribute__((__nonnull__(2)));
+S    inline long double frexp(long double __x, int* __p)
+S                { return (long double)frexpl(__x, __p); }
+S    inline long double ldexp(long double __x, int __exp)
+S                { return (long double)ldexpl(__x, __exp); }
+S    inline long double log(long double __x)
+S                { return (long double)logl(__x); }
+S    inline long double log10(long double __x)
+S                { return (long double)log10l(__x); }
+S    long double modf(long double __x, long double* __p) __attribute__((__nonnull__(2)));
+S    inline long double modf(long double __x, long double* __p)
+S                { return (long double)modfl(__x, __p); }
+S    inline long double pow(long double __x, long double __y)
+S                { return (long double)powl(__x, __y); }
+S    inline long double pow(long double __x, int __y)
+S                { return (long double)powl(__x, __y); }
+S    inline long double sin(long double __x)
+S                { return (long double)sinl(__x); }
+S    inline long double sinh(long double __x)
+S                { return (long double)sinhl(__x); }
+S    inline long double sqrt(long double __x)
+S                { return (long double)sqrtl(__x); }
+S    inline long double _sqrt(long double __x)
+S                { return (long double)_sqrt((double) __x); }
+S    inline long double tan(long double __x)
+S                { return (long double)tanl(__x); }
+S    inline long double tanh(long double __x)
+S                { return (long double)tanhl(__x); }
+S#endif
+S
+S#if !defined(__STRICT_ANSI__) || defined(__USE_C99_MATH)
+S    inline float acosh(float __x) { return acoshf(__x); }
+S    inline float asinh(float __x) { return asinhf(__x); }
+S    inline float atanh(float __x) { return atanhf(__x); }
+S    inline float cbrt(float __x) { return cbrtf(__x); }
+S    inline float erf(float __x) { return erff(__x); }
+S    inline float erfc(float __x) { return erfcf(__x); }
+S    inline float expm1(float __x) { return expm1f(__x); }
+S    inline float log1p(float __x) { return log1pf(__x); }
+S    inline float hypot(float __x, float __y) { return hypotf(__x, __y); }
+S    inline float lgamma(float __x) { return lgammaf(__x); }
+S    inline float remainder(float __x, float __y) { return remainderf(__x, __y); }
+S    inline float rint(float __x) { return rintf(__x); }
+S#endif
+S
+S#ifdef __USE_C99_MATH
+S    inline float exp2(float __x) { return exp2f(__x); }
+S    inline float fdim(float __x, float __y) { return fdimf(__x, __y); }
+S    inline float fma(float __x, float __y, float __z) { return fmaf(__x, __y, __z); }
+S    inline float fmax(float __x, float __y) { return fmaxf(__x, __y); }
+S    inline float fmin(float __x, float __y) { return fminf(__x, __y); }
+S    inline float log2(float __x) { return log2f(__x); }
+S    inline _ARMABI long lrint(float __x) { return lrintf(__x); }
+S    inline _ARMABI __LONGLONG llrint(float __x) { return llrintf(__x); }
+S    inline _ARMABI long lround(float __x) { return lroundf(__x); }
+S    inline _ARMABI __LONGLONG llround(float __x) { return llroundf(__x); }
+S    inline _ARMABI_FPEXCEPT float nearbyint(float __x) { return nearbyintf(__x); }
+S    inline float remquo(float __x, float __y, int *__q) { return remquof(__x, __y, __q); }
+S    inline _ARMABI_FPEXCEPT float round(float __x) { return roundf(__x); }
+S    inline float tgamma(float __x) { return tgammaf(__x); }
+S    inline _ARMABI_FPEXCEPT float trunc(float __x) { return truncf(__x); }
+S
+S#ifdef __HAVE_LONGDOUBLE
+S    inline long double acosh(long double __x) { return acoshl(__x); }
+S    inline long double asinh(long double __x) { return asinhl(__x); }
+S    inline long double atanh(long double __x) { return atanhl(__x); }
+S    inline long double cbrt(long double __x) { return cbrtl(__x); }
+S    inline long double erf(long double __x) { return erfl(__x); }
+S    inline long double erfc(long double __x) { return erfcl(__x); }
+S    inline long double expm1(long double __x) { return expm1l(__x); }
+S    inline long double log1p(long double __x) { return log1pl(__x); }
+S    inline long double hypot(long double __x, long double __y) { return hypotl(__x, __y); }
+S    inline long double lgamma(long double __x) { return lgammal(__x); }
+S    inline long double remainder(long double __x, long double __y) { return remainderl(__x, __y); }
+S    inline long double rint(long double __x) { return rintl(__x); }
+S    inline long double exp2(long double __x) { return exp2l(__x); }
+S    inline long double fdim(long double __x, long double __y) { return fdiml(__x, __y); }
+S    inline long double fma(long double __x, long double __y, long double __z) { return fmal(__x, __y, __z); }
+S    inline long double fmax(long double __x, long double __y) { return fmaxl(__x, __y); }
+S    inline long double fmin(long double __x, long double __y) { return fminl(__x, __y); }
+S    inline long double log2(long double __x) { return log2l(__x); }
+S    inline _ARMABI long lrint(long double __x) { return lrintl(__x); }
+S    inline _ARMABI __LONGLONG llrint(long double __x) { return llrintl(__x); }
+S    inline _ARMABI long lround(long double __x) { return lroundl(__x); }
+S    inline _ARMABI __LONGLONG llround(long double __x) { return llroundl(__x); }
+S    inline _ARMABI_FPEXCEPT long double nearbyint(long double __x) { return nearbyintl(__x); }
+S    inline long double remquo(long double __x, long double __y, int *__q) { return remquol(__x, __y, __q); }
+S    inline _ARMABI_FPEXCEPT long double round(long double __x) { return roundl(__x); }
+S    inline long double tgamma(long double __x) { return tgammal(__x); }
+S    inline _ARMABI_FPEXCEPT long double trunc(long double __x) { return truncl(__x); }
+S#endif
+S#endif
+S
+S  }
+N#endif
+N
+N    #ifdef __cplusplus
+S        }  /* extern "C" */
+S      }  /* namespace std */
+N    #endif
+N  #endif /* __MATH_DECLS */
+N
+N  #if _AEABI_PORTABILITY_LEVEL != 0 && !defined _AEABI_PORTABLE
+X  #if _AEABI_PORTABILITY_LEVEL != 0 && !0L
+S    #define _AEABI_PORTABLE
+N  #endif
+N
+N  #if defined(__cplusplus) && !defined(__MATH_NO_EXPORTS)
+X  #if 0L && !0L
+S    using ::std::__use_accurate_range_reduction;
+S    using ::std::abs;
+S    using ::std::acos;
+S    using ::std::asin;
+S    using ::std::atan2;
+S    using ::std::atan;
+S    using ::std::ceil;
+S    using ::std::cos;
+S    using ::std::cosh;
+S    using ::std::exp;
+S    using ::std::fabs;
+S    using ::std::floor;
+S    using ::std::fmod;
+S    using ::std::frexp;
+S    using ::std::ldexp;
+S    using ::std::log10;
+S    using ::std::log;
+S    using ::std::modf;
+S    using ::std::pow;
+S    using ::std::sin;
+S    using ::std::sinh;
+S    using ::std::sqrt;
+S    using ::std::_sqrt;
+S    using ::std::_sqrtf;
+S    using ::std::tan;
+S    using ::std::tanh;
+S    using ::std::_fabsf;
+S    /* C99 float and long double versions in already-C89-reserved namespace */
+S    using ::std::acosf;
+S    using ::std::acosl;
+S    using ::std::asinf;
+S    using ::std::asinl;
+S    using ::std::atan2f;
+S    using ::std::atan2l;
+S    using ::std::atanf;
+S    using ::std::atanl;
+S    using ::std::ceilf;
+S    using ::std::ceill;
+S    using ::std::cosf;
+S    using ::std::coshf;
+S    using ::std::coshl;
+S    using ::std::cosl;
+S    using ::std::expf;
+S    using ::std::expl;
+S    using ::std::fabsf;
+S    using ::std::fabsl;
+S    using ::std::floorf;
+S    using ::std::floorl;
+S    using ::std::fmodf;
+S    using ::std::fmodl;
+S    using ::std::frexpf;
+S    using ::std::frexpl;
+S    using ::std::ldexpf;
+S    using ::std::ldexpl;
+S    using ::std::log10f;
+S    using ::std::log10l;
+S    using ::std::logf;
+S    using ::std::logl;
+S    using ::std::modff;
+S    using ::std::modfl;
+S    using ::std::powf;
+S    using ::std::powl;
+S    using ::std::sinf;
+S    using ::std::sinhf;
+S    using ::std::sinhl;
+S    using ::std::sinl;
+S    using ::std::sqrtf;
+S    using ::std::sqrtl;
+S    using ::std::tanf;
+S    using ::std::tanhf;
+S    using ::std::tanhl;
+S    using ::std::tanl;
+S    #if !defined(__STRICT_ANSI__) || defined(__USE_C99_MATH)
+S      /* C99 additions which for historical reasons appear in non-strict mode */
+S      using ::std::acosh;
+S      using ::std::asinh;
+S      using ::std::atanh;
+S      using ::std::cbrt;
+S      using ::std::copysign;
+S      using ::std::copysignf;
+S      using ::std::erf;
+S      using ::std::erfc;
+S      using ::std::expm1;
+S      using ::std::hypot;
+S      using ::std::ilogb;
+S      using ::std::ilogbf;
+S      using ::std::ilogbl;
+S      using ::std::lgamma;
+S      using ::std::log1p;
+S      using ::std::logb;
+S      using ::std::logbf;
+S      using ::std::logbl;
+S      using ::std::nextafter;
+S      using ::std::nextafterf;
+S      using ::std::nextafterl;
+S      using ::std::nexttoward;
+S      using ::std::nexttowardf;
+S      using ::std::nexttowardl;
+S      using ::std::remainder;
+S      using ::std::rint;
+S      using ::std::scalbln;
+S      using ::std::scalblnf;
+S      using ::std::scalblnl;
+S      using ::std::scalbn;
+S      using ::std::scalbnf;
+S      using ::std::scalbnl;
+S      using ::std::math_errhandling;
+S      using ::std::acoshf;
+S      using ::std::acoshl;
+S      using ::std::asinhf;
+S      using ::std::asinhl;
+S      using ::std::atanhf;
+S      using ::std::atanhl;
+S      using ::std::copysignl;
+S      using ::std::cbrtf;
+S      using ::std::cbrtl;
+S      using ::std::erff;
+S      using ::std::erfl;
+S      using ::std::erfcf;
+S      using ::std::erfcl;
+S      using ::std::expm1f;
+S      using ::std::expm1l;
+S      using ::std::log1pf;
+S      using ::std::log1pl;
+S      using ::std::hypotf;
+S      using ::std::hypotl;
+S      using ::std::lgammaf;
+S      using ::std::lgammal;
+S      using ::std::remainderf;
+S      using ::std::remainderl;
+S      using ::std::rintf;
+S      using ::std::rintl;
+S    #endif
+S    #if !defined(__STRICT_ANSI__) || defined(__USE_C99_MATH)
+S      /* C99 additions which appear in C99 or non-strict mode */
+S      using ::std::float_t;
+S      using ::std::double_t;
+S    #endif
+S    #ifdef __USE_C99_MATH
+S      /* Functions new in C99. */
+S      using ::std::exp2;
+S      using ::std::exp2f;
+S      using ::std::exp2l;
+S      using ::std::fdim;
+S      using ::std::fdimf;
+S      using ::std::fdiml;
+S      using ::std::fma;
+S      using ::std::fmaf;
+S#ifdef __HAVE_LONGDOUBLE
+S      using ::std::fmal;
+S#endif
+S      using ::std::fmax;
+S      using ::std::fmaxf;
+S      using ::std::fmaxl;
+S      using ::std::fmin;
+S      using ::std::fminf;
+S      using ::std::fminl;
+S      using ::std::log2;
+S      using ::std::log2f;
+S      using ::std::log2l;
+S      using ::std::lrint;
+S      using ::std::lrintf;
+S#ifdef __HAVE_LONGDOUBLE
+S      using ::std::lrintl;
+S#endif
+S      using ::std::llrint;
+S      using ::std::llrintf;
+S#ifdef __HAVE_LONGDOUBLE
+S      using ::std::llrintl;
+S#endif
+S      using ::std::lround;
+S      using ::std::lroundf;
+S#ifdef __HAVE_LONGDOUBLE
+S      using ::std::lroundl;
+S#endif
+S      using ::std::llround;
+S      using ::std::llroundf;
+S#ifdef __HAVE_LONGDOUBLE
+S      using ::std::llroundl;
+S#endif
+S      using ::std::nan;
+S      using ::std::nanf;
+S#ifdef __HAVE_LONGDOUBLE
+S      using ::std::nanl;
+S#endif
+S      using ::std::nearbyint;
+S      using ::std::nearbyintf;
+S      using ::std::nearbyintl;
+S      using ::std::remquo;
+S      using ::std::remquof;
+S#ifdef __HAVE_LONGDOUBLE
+S      using ::std::remquol;
+S#endif
+S      using ::std::round;
+S      using ::std::roundf;
+S      using ::std::roundl;
+S      using ::std::tgamma;
+S      using ::std::tgammaf;
+S      using ::std::tgammal;
+S      using ::std::trunc;
+S      using ::std::truncf;
+S      using ::std::truncl;
+S    #endif
+N  #endif
+N
+N#undef __LONGLONG
+N
+N#endif /* __math_h */
+N
+N/* end of math.h */
+L 4 "src\sound.c" 2
+N#include <RTL.h>
+L 1 "C:\Keil_v5\ARM\RV31\INC\RTL.h" 1
+N/*----------------------------------------------------------------------------
+N *      RL-ARM - A P I 
+N *----------------------------------------------------------------------------
+N *      Name:    RTL.H 
+N *      Purpose: Application Programming Interface 
+N *      Rev.:    V4.73
+N *----------------------------------------------------------------------------
+N *      This code is part of the RealView Run-Time Library.
+N *      Copyright (c) 2004-2014 KEIL - An ARM Company. All rights reserved.
+N *---------------------------------------------------------------------------*/
+N
+N#ifndef __RTL_H__
+N#define __RTL_H__
+N
+N/* RL-ARM version number. */
+N#define __RL_ARM_VER    473
+N 
+N#define __task          __declspec(noreturn)
+N#define __used          __attribute__((used))
+N
+N#ifndef NULL
+N #ifdef __cplusplus
+S  #define NULL          0
+N #else
+N  #define NULL          ((void *) 0)
+N #endif
+N#endif
+N
+N#ifndef EOF
+N #define EOF            (-1)
+N#endif
+N
+N#ifndef __size_t
+N #define __size_t       1
+N typedef unsigned int   size_t;
+N#endif
+N
+Ntypedef signed char     S8;
+Ntypedef unsigned char   U8;
+Ntypedef short           S16;
+Ntypedef unsigned short  U16;
+Ntypedef int             S32;
+Ntypedef unsigned int    U32;
+Ntypedef long long       S64;
+Ntypedef unsigned long long U64;
+Ntypedef unsigned char   BIT;
+Ntypedef unsigned int    BOOL;
+N
+N#ifndef __TRUE
+N #define __TRUE         1
+N#endif
+N#ifndef __FALSE
+N #define __FALSE        0
+N#endif
+N
+N#ifdef __BIG_ENDIAN
+S #define U32_LE(v)      (U32)(__rev(v))
+S #define U16_LE(v)      (U16)(__rev(v) >> 16)
+S #define U32_BE(v)      (U32)(v)
+S #define U16_BE(v)      (U16)(v)
+N#else
+N #define U32_BE(v)      (U32)(__rev(v))
+N #define U16_BE(v)      (U16)(__rev(v) >> 16)
+N #define U32_LE(v)      (U32)(v)
+N #define U16_LE(v)      (U16)(v)
+N#endif
+N#define ntohs(v)        U16_BE(v)
+N#define ntohl(v)        U32_BE(v)
+N#define htons(v)        ntohs(v)
+N#define htonl(v)        ntohl(v)
+N
+N/*----------------------------------------------------------------------------
+N *                             RTX Kernel API
+N *---------------------------------------------------------------------------*/
+N
+N#ifdef __cplusplus
+Sextern "C"  {
+N#endif
+N
+N/* Definition of Semaphore type */
+Ntypedef U32 OS_SEM[2];
+N
+N/* Definition of Mailbox type */
+N#define os_mbx_declare(name,cnt)    U32 name [4 + cnt]
+Ntypedef U32 OS_MBX[];
+N
+N/* Definition of Mutex type */
+Ntypedef U32 OS_MUT[4];
+N
+N/* Task Identification number. */
+Ntypedef U32 OS_TID;
+N
+N/* Function return of system calls returning an object identification */
+Ntypedef void *OS_ID;
+N
+N/* Function return of system calls indicating an event or completion state */
+Ntypedef U32 OS_RESULT;
+N
+N/* Return codes */
+N#define OS_R_TMO        0x01
+N#define OS_R_EVT        0x02
+N#define OS_R_SEM        0x03
+N#define OS_R_MBX        0x04
+N#define OS_R_MUT        0x05
+N
+N#define OS_R_OK         0x00
+N#define OS_R_NOK        0xff
+N
+N#define OS_TCB_SIZE     56
+N#define OS_TMR_SIZE     8
+N
+N/* Error Codes */
+N#define OS_ERR_STK_OVF  1
+N#define OS_ERR_FIFO_OVF 2
+N#define OS_ERR_MBX_OVF  3
+N
+N#if !(__TARGET_ARCH_6S_M || __TARGET_ARCH_7_M || __TARGET_ARCH_7E_M)
+X#if !(1 || __TARGET_ARCH_7_M || __TARGET_ARCH_7E_M)
+S
+S/*----------------------------------------------------------------------------
+S *      Functions ARM
+S *---------------------------------------------------------------------------*/
+S
+S/* Task Management */
+S#define os_sys_init(tsk)              os_sys_init0(tsk,0,NULL)
+S#define os_sys_init_prio(tsk,prio)    os_sys_init0(tsk,prio,NULL)
+S#define os_sys_init_user(tsk,prio,stk,size)                                   \
+S                                      os_sys_init0(tsk,prio|(size<<8),stk)
+X#define os_sys_init_user(tsk,prio,stk,size)                                                                         os_sys_init0(tsk,prio|(size<<8),stk)
+S#define os_tsk_create(tsk,prio)       os_tsk_create0(tsk,prio,NULL,NULL)
+S#define os_tsk_create_user(tsk,prio,stk,size)                                 \
+S                                      os_tsk_create0(tsk,prio|(size<<8),stk,NULL)
+X#define os_tsk_create_user(tsk,prio,stk,size)                                                                       os_tsk_create0(tsk,prio|(size<<8),stk,NULL)
+S#define os_tsk_create_ex(tsk,prio,argv) os_tsk_create_ex0(tsk,prio,NULL,argv)
+S#define os_tsk_create_user_ex(tsk,prio,stk,size,argv)                         \
+S                                      os_tsk_create_ex0(tsk,prio|(size<<8),stk,argv)
+X#define os_tsk_create_user_ex(tsk,prio,stk,size,argv)                                                               os_tsk_create_ex0(tsk,prio|(size<<8),stk,argv)
+S#define os_tsk_delete_self()          { os_tsk_delete(0); for(;;); }
+S#define os_tsk_prio_self(prio)        os_tsk_prio(0,prio)
+S#define isr_tsk_get()                 os_tsk_self()
+S
+Sextern void      os_sys_init0 (void (*task)(void), U32 prio_stksz, void *stk);
+Sextern OS_TID    os_tsk_create0 (void (*task)(void), U32 prio_stksz, 
+S                                 void *stk, void *argv);
+Sextern OS_TID    os_tsk_create_ex0 (void (*task)(void *), U32 prio_stksz, 
+S                                    void *stk, void *argv);
+Sextern OS_TID    os_tsk_self (void);
+Sextern void      os_tsk_pass (void);
+Sextern OS_RESULT os_tsk_prio (OS_TID task_id, U8 new_prio);
+Sextern OS_RESULT os_tsk_delete (OS_TID task_id);
+S
+S/* Event flag Management */
+S#define os_evt_wait_or(wflags,tmo)      os_evt_wait(wflags,tmo,__FALSE)
+S#define os_evt_wait_and(wflags,tmo)     os_evt_wait(wflags,tmo,__TRUE)
+S
+Sextern OS_RESULT os_evt_wait (U16 wait_flags, U16 timeout, BOOL and_wait);
+Sextern void      os_evt_set (U16 event_flags, OS_TID task_id);
+Sextern void      os_evt_clr (U16 clear_flags, OS_TID task_id);
+Sextern void      isr_evt_set (U16 event_flags, OS_TID task_id);
+Sextern U16       os_evt_get (void);
+S
+S/* Semaphore Management */
+Sextern void      os_sem_init (OS_ID semaphore, U16 token_count);
+Sextern OS_RESULT os_sem_send (OS_ID semaphore);
+Sextern OS_RESULT os_sem_wait (OS_ID semaphore, U16 timeout);
+Sextern void      isr_sem_send (OS_ID semaphore);
+S
+S/* Mailbox Management */
+S#define isr_mbx_check(mbx)              os_mbx_check(mbx)
+S
+Sextern void      os_mbx_init (OS_ID mailbox, U16 mbx_size);
+Sextern OS_RESULT os_mbx_send (OS_ID mailbox, void *message_ptr, U16 timeout);
+Sextern OS_RESULT os_mbx_wait (OS_ID mailbox, void  **message, U16 timeout);
+Sextern OS_RESULT os_mbx_check (OS_ID mailbox);
+Sextern void      isr_mbx_send (OS_ID mailbox, void *message_ptr);
+Sextern OS_RESULT isr_mbx_receive (OS_ID mailbox, void **message);
+S
+S/* Mutex Management */
+Sextern void      os_mut_init (OS_ID mutex);
+Sextern OS_RESULT os_mut_release (OS_ID mutex);
+Sextern OS_RESULT os_mut_wait (OS_ID mutex, U16 timeout);
+S
+S/* Time Management */
+Sextern U32       os_time_get (void);
+Sextern void      os_dly_wait (U16 delay_time);
+Sextern void      os_itv_set (U16 interval_time);
+Sextern void      os_itv_wait (void);
+S
+S/* User Timer Management */
+Sextern OS_ID     os_tmr_create (U16 tcnt, U16 info);
+Sextern OS_ID     os_tmr_kill (OS_ID timer);
+S
+S/* System Functions */
+Sextern U32       os_suspend (void);
+Sextern void      os_resume (U32 sleep_time);
+Sextern void      tsk_lock (void) __swi (5);
+Sextern void      tsk_unlock (void);
+S
+S/* Fixed Memory Block Management Functions */
+Sextern int       _init_box (void *box_mem, U32 box_size, U32 blk_size);
+Sextern void     *_alloc_box (void *box_mem) __swi (1);
+Sextern void     *_calloc_box (void *box_mem);
+Sextern int       _free_box (void *box_mem, void *box) __swi (2);
+S
+N#else
+N
+N/*----------------------------------------------------------------------------
+N *      Functions Cortex-M
+N *---------------------------------------------------------------------------*/
+N
+N#define __SVC_0         __svc_indirect(0)
+N
+N/* Task Management */
+Nextern void      os_set_env    (void);
+Nextern void      rt_sys_init   (void (*task)(void), U8 priority, void *stk);
+Nextern void      rt_tsk_pass   (void);
+Nextern OS_TID    rt_tsk_self   (void);
+Nextern OS_RESULT rt_tsk_prio   (OS_TID task_id, U8 new_prio);
+Nextern OS_TID    rt_tsk_create (void (*task)(void), U8 priority, void *stk, void *argv);
+Nextern OS_RESULT rt_tsk_delete (OS_TID task_id);
+N
+N#define os_sys_init(tsk)              os_set_env();                           \
+N                                      _os_sys_init((U32)rt_sys_init,tsk,0,NULL)
+X#define os_sys_init(tsk)              os_set_env();                                                                 _os_sys_init((U32)rt_sys_init,tsk,0,NULL)
+N#define os_sys_init_user(tsk,prio,stk,size)                                   \
+N                                      os_set_env();                           \
+N                                      _os_sys_init((U32)rt_sys_init,tsk,prio|(size<<8),stk)
+X#define os_sys_init_user(tsk,prio,stk,size)                                                                         os_set_env();                                                                 _os_sys_init((U32)rt_sys_init,tsk,prio|(size<<8),stk)
+N#define os_sys_init_prio(tsk,prio)    os_set_env();                           \
+N                                      _os_sys_init((U32)rt_sys_init,tsk,prio,NULL)
+X#define os_sys_init_prio(tsk,prio)    os_set_env();                                                                 _os_sys_init((U32)rt_sys_init,tsk,prio,NULL)
+N#define os_tsk_create(tsk,prio)       _os_tsk_create((U32)rt_tsk_create,tsk,prio,NULL,NULL)
+N#define os_tsk_create_user(tsk,prio,stk,size)                                 \
+N                                      _os_tsk_create((U32)rt_tsk_create,tsk,prio|(size<<8),stk,NULL)
+X#define os_tsk_create_user(tsk,prio,stk,size)                                                                       _os_tsk_create((U32)rt_tsk_create,tsk,prio|(size<<8),stk,NULL)
+N#define os_tsk_create_ex(tsk,prio,argv) _os_tsk_create_ex((U32)rt_tsk_create,tsk,prio,NULL,argv)
+N#define os_tsk_create_user_ex(tsk,prio,stk,size,argv)                         \
+N                                      _os_tsk_create_ex((U32)rt_tsk_create,tsk,prio|(size<<8),stk,argv)
+X#define os_tsk_create_user_ex(tsk,prio,stk,size,argv)                                                               _os_tsk_create_ex((U32)rt_tsk_create,tsk,prio|(size<<8),stk,argv)
+N#define os_tsk_self()                 _os_tsk_self((U32)rt_tsk_self)
+N#define os_tsk_pass()                 _os_tsk_pass((U32)rt_tsk_pass)
+N#define os_tsk_prio(task_id,new_prio) _os_tsk_prio((U32)rt_tsk_prio,task_id,new_prio)
+N#define os_tsk_prio_self(prio)        _os_tsk_prio((U32)rt_tsk_prio,0,prio)
+N#define os_tsk_delete(task_id)        _os_tsk_delete((U32)rt_tsk_delete,task_id)
+N#define os_tsk_delete_self()          { _os_tsk_delete((U32)rt_tsk_delete, 0); for(;;); }
+N#define isr_tsk_get()                 rt_tsk_self()
+N
+Nextern void      _os_sys_init(U32 p, void (*task)(void), U32 prio_stksz,
+N                                     void *stk)                        __SVC_0;
+X                                     void *stk)                        __svc_indirect(0);
+Nextern OS_TID    _os_tsk_create (U32 p, void (*task)(void), U32 prio_stksz,
+N                                        void *stk, void *argv)         __SVC_0;
+X                                        void *stk, void *argv)         __svc_indirect(0);
+Nextern OS_TID    _os_tsk_create_ex (U32 p, void (*task)(void *), U32 prio_stksz,
+N                                           void *stk, void *argv)      __SVC_0;
+X                                           void *stk, void *argv)      __svc_indirect(0);
+Nextern OS_TID    _os_tsk_self (U32 p)                                  __SVC_0;
+Xextern OS_TID    _os_tsk_self (U32 p)                                  __svc_indirect(0);
+Nextern void      _os_tsk_pass (U32 p)                                  __SVC_0;
+Xextern void      _os_tsk_pass (U32 p)                                  __svc_indirect(0);
+Nextern OS_RESULT _os_tsk_prio (U32 p, OS_TID task_id, U8 new_prio)     __SVC_0;
+Xextern OS_RESULT _os_tsk_prio (U32 p, OS_TID task_id, U8 new_prio)     __svc_indirect(0);
+Nextern OS_RESULT _os_tsk_delete (U32 p, OS_TID task_id)                __SVC_0;
+Xextern OS_RESULT _os_tsk_delete (U32 p, OS_TID task_id)                __svc_indirect(0);
+N
+N/* Event flag Management */
+Nextern OS_RESULT rt_evt_wait (U16 wait_flags,  U16 timeout, BOOL and_wait);
+Nextern void      rt_evt_set  (U16 event_flags, OS_TID task_id);
+Nextern void      rt_evt_clr  (U16 clear_flags, OS_TID task_id);
+Nextern U16       rt_evt_get  (void);
+N
+N#define os_evt_wait_or(wflags,tmo)    _os_evt_wait((U32)rt_evt_wait,wflags,tmo,__FALSE)
+N#define os_evt_wait_and(wflags,tmo)   _os_evt_wait((U32)rt_evt_wait,wflags,tmo,__TRUE)
+N#define os_evt_set(evt_flags,task_id) _os_evt_set((U32)rt_evt_set,evt_flags,task_id)
+N#define os_evt_clr(clr_flags,task_id) _os_evt_clr((U32)rt_evt_clr,clr_flags,task_id)
+N#define os_evt_get()                  _os_evt_get((U32)rt_evt_get)
+N
+Nextern OS_RESULT _os_evt_wait(U32 p, U16 wait_flags, U16 timeout,
+N                                     BOOL and_wait)                    __SVC_0;
+X                                     BOOL and_wait)                    __svc_indirect(0);
+Nextern void      _os_evt_set (U32 p, U16 event_flags, OS_TID task_id)  __SVC_0;
+Xextern void      _os_evt_set (U32 p, U16 event_flags, OS_TID task_id)  __svc_indirect(0);
+Nextern void      _os_evt_clr (U32 p, U16 clear_flags, OS_TID task_id)  __SVC_0;
+Xextern void      _os_evt_clr (U32 p, U16 clear_flags, OS_TID task_id)  __svc_indirect(0);
+Nextern U16       _os_evt_get (U32 p)                                   __SVC_0;
+Xextern U16       _os_evt_get (U32 p)                                   __svc_indirect(0);
+Nextern void      isr_evt_set (U16 event_flags, OS_TID task_id);
+N
+N/* Semaphore Management */
+Nextern void      rt_sem_init (OS_ID semaphore, U16 token_count);
+Nextern OS_RESULT rt_sem_send (OS_ID semaphore);
+Nextern OS_RESULT rt_sem_wait (OS_ID semaphore, U16 timeout);
+N
+N#define os_sem_init(sem,t_count)     _os_sem_init((U32)rt_sem_init,sem,t_count)
+N#define os_sem_send(sem)             _os_sem_send((U32)rt_sem_send,sem)
+N#define os_sem_wait(sem,tmo)         _os_sem_wait((U32)rt_sem_wait,sem,tmo)
+N
+Nextern void      _os_sem_init (U32 p, OS_ID semaphore, 
+N                                      U16 token_count)                 __SVC_0;
+X                                      U16 token_count)                 __svc_indirect(0);
+Nextern OS_RESULT _os_sem_send (U32 p, OS_ID semaphore)                 __SVC_0;
+Xextern OS_RESULT _os_sem_send (U32 p, OS_ID semaphore)                 __svc_indirect(0);
+Nextern OS_RESULT _os_sem_wait (U32 p, OS_ID semaphore, U16 timeout)    __SVC_0;
+Xextern OS_RESULT _os_sem_wait (U32 p, OS_ID semaphore, U16 timeout)    __svc_indirect(0);
+Nextern void      isr_sem_send (OS_ID semaphore);
+N
+N/* Mailbox Management */
+Nextern void      rt_mbx_init  (OS_ID mailbox, U16 mbx_size);
+Nextern OS_RESULT rt_mbx_send  (OS_ID mailbox, void *p_msg,    U16 timeout);
+Nextern OS_RESULT rt_mbx_wait  (OS_ID mailbox, void **message, U16 timeout);
+Nextern OS_RESULT rt_mbx_check (OS_ID mailbox);
+N
+N#define os_mbx_init(mbx,mbx_size)     _os_mbx_init((U32)rt_mbx_init,mbx,mbx_size)
+N#define os_mbx_send(mbx,p_msg,tmo)    _os_mbx_send((U32)rt_mbx_send,mbx,p_msg,tmo)
+N#define os_mbx_wait(mbx,message,tmo)  _os_mbx_wait((U32)rt_mbx_wait,mbx,message,tmo)
+N#define os_mbx_check(mbx)             _os_mbx_check((U32)rt_mbx_check,mbx)
+N#define isr_mbx_check(mbx)            rt_mbx_check(mbx)
+N
+Nextern void      _os_mbx_init (U32 p, OS_ID mailbox, U16 mbx_size)     __SVC_0;
+Xextern void      _os_mbx_init (U32 p, OS_ID mailbox, U16 mbx_size)     __svc_indirect(0);
+Nextern OS_RESULT _os_mbx_send (U32 p, OS_ID mailbox, void *message_ptr,
+N                                      U16 timeout)                     __SVC_0;
+X                                      U16 timeout)                     __svc_indirect(0);
+Nextern OS_RESULT _os_mbx_wait (U32 p, OS_ID mailbox, void  **message,
+N                                      U16 timeout)                     __SVC_0;
+X                                      U16 timeout)                     __svc_indirect(0);
+Nextern OS_RESULT _os_mbx_check (U32 p, OS_ID mailbox)                  __SVC_0;
+Xextern OS_RESULT _os_mbx_check (U32 p, OS_ID mailbox)                  __svc_indirect(0);
+Nextern void      isr_mbx_send (OS_ID mailbox, void *message_ptr);
+Nextern OS_RESULT isr_mbx_receive (OS_ID mailbox, void **message);
+N
+N/* Mutex Management */
+Nextern void      rt_mut_init    (OS_ID mutex);
+Nextern OS_RESULT rt_mut_release (OS_ID mutex);
+Nextern OS_RESULT rt_mut_wait    (OS_ID mutex, U16 timeout);
+N
+N#define os_mut_init(mutex)         _os_mut_init((U32)rt_mut_init,mutex)
+N#define os_mut_release(mutex)      _os_mut_release((U32)rt_mut_release,mutex)
+N#define os_mut_wait(mutex,timeout) _os_mut_wait((U32)rt_mut_wait,mutex,timeout)
+N
+Nextern void      _os_mut_init (U32 p, OS_ID mutex)                     __SVC_0;
+Xextern void      _os_mut_init (U32 p, OS_ID mutex)                     __svc_indirect(0);
+Nextern OS_RESULT _os_mut_release (U32 p, OS_ID mutex)                  __SVC_0;
+Xextern OS_RESULT _os_mut_release (U32 p, OS_ID mutex)                  __svc_indirect(0);
+Nextern OS_RESULT _os_mut_wait (U32 p, OS_ID mutex, U16 timeout)        __SVC_0;
+Xextern OS_RESULT _os_mut_wait (U32 p, OS_ID mutex, U16 timeout)        __svc_indirect(0);
+N
+N/* Time Management */
+Nextern U32       rt_time_get (void);
+Nextern void      rt_dly_wait (U16 delay_time);
+Nextern void      rt_itv_set  (U16 interval_time);
+Nextern void      rt_itv_wait (void);
+N
+N#define os_time_get()              _os_time_get((U32)rt_time_get)
+N#define os_dly_wait(delay_time)    _os_dly_wait((U32)rt_dly_wait,delay_time)
+N#define os_itv_set(interval_time)  _os_itv_set((U32)rt_itv_set,interval_time)
+N#define os_itv_wait()              _os_itv_wait((U32)rt_itv_wait)
+N
+Nextern U32       _os_time_get (U32 p)                                  __SVC_0;
+Xextern U32       _os_time_get (U32 p)                                  __svc_indirect(0);
+Nextern void      _os_dly_wait (U32 p, U16 delay_time)                  __SVC_0;
+Xextern void      _os_dly_wait (U32 p, U16 delay_time)                  __svc_indirect(0);
+Nextern void      _os_itv_set (U32 p, U16 interval_time)                __SVC_0;
+Xextern void      _os_itv_set (U32 p, U16 interval_time)                __svc_indirect(0);
+Nextern void      _os_itv_wait (U32 p)                                  __SVC_0;
+Xextern void      _os_itv_wait (U32 p)                                  __svc_indirect(0);
+N
+N/* User Timer Management */
+Nextern OS_ID     rt_tmr_create (U16 tcnt, U16 info);
+Nextern OS_ID     rt_tmr_kill   (OS_ID timer);
+N
+N#define os_tmr_create(tcnt,info)   _os_tmr_create((U32)rt_tmr_create,tcnt,info)
+N#define os_tmr_kill(timer)         _os_tmr_kill((U32)rt_tmr_kill,timer)
+N
+Nextern OS_ID     _os_tmr_create (U32 p, U16 tcnt, U16 info)            __SVC_0;
+Xextern OS_ID     _os_tmr_create (U32 p, U16 tcnt, U16 info)            __svc_indirect(0);
+Nextern OS_ID     _os_tmr_kill (U32 p, OS_ID timer)                     __SVC_0;
+Xextern OS_ID     _os_tmr_kill (U32 p, OS_ID timer)                     __svc_indirect(0);
+N
+N/* System Functions */
+Nextern U32       rt_suspend    (void);
+Nextern void      rt_resume     (U32 sleep_time);
+Nextern void      rt_tsk_lock   (void);
+Nextern void      rt_tsk_unlock (void);
+N
+N#define os_suspend()               _os_suspend((U32)rt_suspend)
+N#define os_resume(sleep_time)      _os_resume((U32)rt_resume,sleep_time)
+N#define tsk_lock()                 _os_tsk_lock((U32)rt_tsk_lock)
+N#define tsk_unlock()               _os_tsk_unlock((U32)rt_tsk_unlock)
+N
+Nextern U32       _os_suspend (U32 p)                                   __SVC_0;
+Xextern U32       _os_suspend (U32 p)                                   __svc_indirect(0);
+Nextern void      _os_resume (U32 p, U32 sleep_time)                    __SVC_0;
+Xextern void      _os_resume (U32 p, U32 sleep_time)                    __svc_indirect(0);
+Nextern void      _os_tsk_lock (U32 p)                                  __SVC_0;
+Xextern void      _os_tsk_lock (U32 p)                                  __svc_indirect(0);
+Nextern void      _os_tsk_unlock (U32 p)                                __SVC_0;
+Xextern void      _os_tsk_unlock (U32 p)                                __svc_indirect(0);
+N
+N/* Fixed Memory Block Management Functions */
+Nextern int       _init_box (void *box_mem, U32 box_size, U32 blk_size);
+Nextern void     *_alloc_box (void *box_mem);
+Nextern void     *_calloc_box (void *box_mem);
+Nextern int       _free_box (void *box_mem, void *box);
+N
+N#endif
+N
+N#define BOX_ALIGN_8     0x80000000
+N#define _declare_box(pool,size,cnt)   U32 pool[(((size)+3)/4)*(cnt) + 3]
+N#define _declare_box8(pool,size,cnt)  U64 pool[(((size)+7)/8)*(cnt) + 2]
+N#define _init_box8(pool,size,bsize)   _init_box (pool,size,bsize | BOX_ALIGN_8)
+N
+N/* For compatibility with older configurations.*/
+N#define os_stk_overflow         os_error
+N
+N/*----------------------------------------------------------------------------
+N *                        Flash File System API
+N *---------------------------------------------------------------------------*/
+N
+N/* File System Type */
+Ntypedef enum _FS_TYPE {
+N  FS_TYPE_NONE = 0,                     /* No file system (volume unformatted)*/
+N  FS_TYPE_UNKNOWN,                      /* File system type is unknown       */
+N  FS_TYPE_FAT12,                        /* File system type is FAT12         */
+N  FS_TYPE_FAT16,                        /* File system type is FAT16         */
+N  FS_TYPE_FAT32,                        /* File system type is FAT32         */
+N  FS_TYPE_EFS                           /* File system type is EFS           */
+N} FS_TYPE;
+N
+Ntypedef struct {                        /* RL Time format (FFS, TCPnet)      */
+N  U8  hr;                               /* Hours    [0..23]                  */
+N  U8  min;                              /* Minutes  [0..59]                  */
+N  U8  sec;                              /* Seconds  [0..59]                  */
+N  U8  day;                              /* Day      [1..31]                  */
+N  U8  mon;                              /* Month    [1..12]                  */
+N  U16 year;                             /* Year     [1980..2107]             */
+N} RL_TIME;
+N
+Ntypedef struct {                        /* Search info record                */
+N  S8  name[256];                        /* Name                              */
+N  U32 size;                             /* File size in bytes                */
+N  U16 fileID;                           /* System Identification             */
+N  U8  attrib;                           /* Attributes                        */
+N  RL_TIME time;                         /* Create/Modify Time                */
+N} FINFO;
+N
+N/* Drive information */
+Ntypedef struct {
+N  FS_TYPE fs_type;                      /* Drives file system type           */
+N  U64     capacity;                     /* Drives capacity in bytes          */
+N} Drive_INFO;
+N
+Nextern int finit (const char *drive);
+Nextern int funinit (const char *drive);
+Nextern int fdelete (const char *filename);
+Nextern int frename (const char *oldname, const char *newname);
+Nextern int ffind (const char *pattern, FINFO *info);
+Nextern U64 ffree (const char *drive);
+Nextern int fformat (const char *drive);
+Nextern int fanalyse (const char *drive);
+Nextern int fcheck (const char *drive);
+Nextern int fdefrag (const char *drive);
+Nextern int fattrib (const char *par, const char *path);
+Nextern int fvol    (const char *drive, char *buf);
+Nextern int finfo   (const char *drive, Drive_INFO *info);
+N
+N/* The following macros provide for common functions */
+N#define unlink(fn)      fdelete(fn);
+N
+N/*----------------------------------------------------------------------------
+N *                             TCPnet API
+N *---------------------------------------------------------------------------*/
+N
+N/* UDP Options */
+N#define UDP_OPT_SEND_CS    0x01   /* Calculate Checksum for UDP send frames  */
+N#define UDP_OPT_CHK_CS     0x02   /* Verify Checksum for received UDP frames */
+N
+N/* TCP Socket Types */
+N#define TCP_TYPE_SERVER    0x01   /* Socket Type Server (open for listening) */
+N#define TCP_TYPE_CLIENT    0x02   /* Socket Type Client (initiate connect)   */
+N#define TCP_TYPE_DELAY_ACK 0x04   /* Socket Type Delayed Acknowledge         */
+N#define TCP_TYPE_FLOW_CTRL 0x08   /* Socket Type Flow Control                */
+N#define TCP_TYPE_KEEP_ALIVE 0x10  /* Socket Type Keep Alive                  */
+N#define TCP_TYPE_CLIENT_SERVER (TCP_TYPE_SERVER | TCP_TYPE_CLIENT)
+N
+N/* TCP Callback Events */
+N#define TCP_EVT_CONREQ     0      /* Connect request received event          */
+N#define TCP_EVT_CONNECT    1      /* Connection established event            */
+N#define TCP_EVT_CLOSE      2      /* Connection was properly closed          */
+N#define TCP_EVT_ABORT      3      /* Connection is for some reason aborted   */
+N#define TCP_EVT_ACK        4      /* Previously send data acknowledged       */
+N#define TCP_EVT_DATA       5      /* Data received event                     */
+N
+N/* TCP States */
+N#define TCP_STATE_FREE     0      /* Entry is free and unused                */
+N#define TCP_STATE_CLOSED   1      /* Entry allocated, socket still closed    */
+N#define TCP_STATE_LISTEN   2      /* Socket waiting for incoming connection  */
+N#define TCP_STATE_SYN_REC  3      /* SYN frame received                      */
+N#define TCP_STATE_SYN_SENT 4      /* SYN packet sent to establish a connect. */
+N#define TCP_STATE_FINW1    5      /* Tcp_close started FIN packet was sent   */
+N#define TCP_STATE_FINW2    6      /* Our FIN ack-ed, waiting for remote FIN  */
+N#define TCP_STATE_CLOSING  7      /* Received FIN independently of our FIN   */
+N#define TCP_STATE_LAST_ACK 8      /* Waiting for last ACK for our FIN        */
+N#define TCP_STATE_TWAIT    9      /* Timed waiting for 2MSL                  */
+N#define TCP_STATE_CONNECT  10     /* TCP Connection established              */
+N
+N/* BSD Socket Address Family */
+N#define AF_UNSPEC          0      /* Unspecified                             */
+N#define AF_INET            1      /* Internet Address Family (UDP, TCP)      */
+N#define AF_NETBIOS         2      /* NetBios-style addresses                 */
+N
+N/* BSD Protocol families, same as address families */
+N#define PF_UNSPEC          AF_UNSPEC
+N#define PF_INET            AF_INET
+N#define PF_NETBIOS         AF_NETBIOS
+N
+N/* BSD Socket Type */
+N#define SOCK_STREAM        1      /* Stream Socket (Connection oriented)     */
+N#define SOCK_DGRAM         2      /* Datagram Socket (Connectionless)        */
+N
+N/* BSD Socket Protocol */
+N#define IPPROTO_TCP        1      /* TCP Protocol                            */
+N#define IPPROTO_UDP        2      /* UDP Protocol                            */
+N
+N/* BSD Internet Addresses */
+N#define INADDR_ANY     0x00000000 /* All IP addresses accepted               */
+N#define INADDR_NONE    0xffffffff /* No IP address accepted                  */
+N
+N/* BSD Socket Return values */
+N#define SCK_SUCCESS         0     /* Success                                 */
+N#define SCK_ERROR         (-1)    /* General Error                           */
+N#define SCK_EINVALID      (-2)    /* Invalid socket descriptor               */
+N#define SCK_EINVALIDPARA  (-3)    /* Invalid parameter                       */
+N#define SCK_EWOULDBLOCK   (-4)    /* It would have blocked.                  */
+N#define SCK_EMEMNOTAVAIL  (-5)    /* Not enough memory in memory pool        */
+N#define SCK_ECLOSED       (-6)    /* Connection is closed or aborted         */
+N#define SCK_ELOCKED       (-7)    /* Socket is locked in RTX environment     */
+N#define SCK_ETIMEOUT      (-8)    /* Socket, Host Resolver timeout           */
+N#define SCK_EINPROGRESS   (-9)    /* Host Name resolving in progress         */
+N#define SCK_ENONAME       (-10)   /* Host Name not existing                  */
+N
+N/* BSD Socket flags parameter */
+N#define MSG_DONTWAIT       0x01   /* Enables non-blocking operation          */
+N#define MSG_PEEK           0x02   /* Peeks at the incoming data              */
+N
+N/* BSD Socket ioctl commands */
+N#define FIONBIO            1      /* Set mode (blocking/non-blocking)        */
+N#define FIO_DELAY_ACK      2      /* Set DELAY_ACK mode for stream socket    */
+N#define FIO_KEEP_ALIVE     3      /* Set KEEP_ALIVE mode for stream socket   */
+N#define FIO_FLOW_CTRL      4      /* Set FLOW_CTRL mode for stream socket    */
+N
+N/* ICMP (ping) Callback Events */
+N#define ICMP_EVT_SUCCESS   0      /* Pinged Host responded                   */
+N#define ICMP_EVT_TIMEOUT   1      /* Timeout, no ping response received      */
+N
+N/* DNS Client Callback Events */
+N#define DNS_EVT_SUCCESS    0      /* Host name successfully resolved         */
+N#define DNS_EVT_NONAME     1      /* DNS Error, no such name                 */
+N#define DNS_EVT_TIMEOUT    2      /* Timeout resolving host                  */
+N#define DNS_EVT_ERROR      3      /* Erroneous response packet               */
+N
+N/* DNS 'get_host_by_name()' result codes */
+N#define DNS_RES_OK         0      /* Resolver successfully started           */
+N#define DNS_ERROR_BUSY     1      /* Resolver busy, can't process request    */
+N#define DNS_ERROR_LABEL    2      /* Label in Hostname not valid             */
+N#define DNS_ERROR_NAME     3      /* Entire Hostname not valid               */
+N#define DNS_ERROR_NOSRV    4      /* Prim. DNS server not specified (0.0.0.0)*/
+N#define DNS_ERROR_PARAM    5      /* Invalid parameter                       */
+N
+N/* SMTP Client Callback Events */
+N#define SMTP_EVT_SUCCESS   0      /* Email successfully sent                 */
+N#define SMTP_EVT_TIMEOUT   1      /* Timeout sending email                   */
+N#define SMTP_EVT_ERROR     2      /* Error when sending email                */
+N
+N/* FTP Client Commands */
+N#define FTPC_CMD_PUT       0      /* Puts a file on FTP server               */
+N#define FTPC_CMD_GET       1      /* Retrieves a file from FTP server        */
+N#define FTPC_CMD_APPEND    2      /* Append file on FTP server (with create) */
+N#define FTPC_CMD_DELETE    3      /* Deletes a file on FTP server            */
+N#define FTPC_CMD_LIST      4      /* Lists files stored on FTP server        */
+N#define FTPC_CMD_RENAME    5      /* Renames a file on FTP server            */
+N#define FTPC_CMD_MKDIR     6      /* Makes a directory on FTP server         */
+N#define FTPC_CMD_RMDIR     7      /* Removes an empty directory on FTP server*/
+N#define FTPC_CMD_NLIST     8      /* Lists file names only (short format)    */
+N
+N/* FTP Client Callback Events */
+N#define FTPC_EVT_SUCCESS   0      /* File operation successful               */
+N#define FTPC_EVT_TIMEOUT   1      /* Timeout on file operation               */
+N#define FTPC_EVT_LOGINFAIL 2      /* Login error, username/passw invalid     */
+N#define FTPC_EVT_NOACCESS  3      /* File access not allowed                 */
+N#define FTPC_EVT_NOTFOUND  4      /* File not found                          */
+N#define FTPC_EVT_NOPATH    5      /* Working directory path not found        */
+N#define FTPC_EVT_ERRLOCAL  6      /* Local file open error                   */
+N#define FTPC_EVT_ERROR     7      /* Generic FTP client error                */
+N
+N/* TFTP Client Callback Events */
+N#define TFTPC_EVT_SUCCESS  0      /* File operation successful               */
+N#define TFTPC_EVT_TIMEOUT  1      /* Timeout on file operation               */
+N#define TFTPC_EVT_NOACCESS 2      /* File access not allowed                 */
+N#define TFTPC_EVT_NOTFOUND 3      /* File not found                          */
+N#define TFTPC_EVT_DISKFULL 4      /* Disk full (local or remote)             */
+N#define TFTPC_EVT_ERROR    5      /* Generic TFTP client error               */
+N
+N/* FTP Server Notification events */
+N#define FTP_EVT_LOGIN      0      /* User logged in, session is busy         */
+N#define FTP_EVT_LOGOUT     1      /* User logged out, session is idle        */
+N#define FTP_EVT_LOGFAIL    2      /* User login failed (invalid credentials) */
+N#define FTP_EVT_DOWNLOAD   3      /* File download ended                     */
+N#define FTP_EVT_UPLOAD     4      /* File upload ended                       */
+N#define FTP_EVT_DELETE     5      /* File deleted                            */
+N#define FTP_EVT_RENAME     6      /* File or directory renamed               */
+N#define FTP_EVT_MKDIR      7      /* Directory created                       */
+N#define FTP_EVT_RMDIR      8      /* Directory removed                       */
+N#define FTP_EVT_ERRLOCAL   9      /* Local file operation error              */
+N#define FTP_EVT_DENIED     10     /* Requested file operation denied         */
+N#define FTP_EVT_ERROR      11     /* Generic file operation error            */
+N
+N/* ARP Cache Entry types */
+N#define ARP_FIXED_IP       0      /* Fixed IP adrs is refreshed after tout   */
+N#define ARP_TEMP_IP        1      /* Temp adrs is removed after timeout      */
+N
+N/* BSD Socket typedef's */
+Ntypedef struct sockaddr {         /* << Generic Socket Address structure >>  */
+N  U16  sa_family;                 /* Address family                          */
+N  char sa_data[14];               /* Direct address (up to 14 bytes)         */
+N} SOCKADDR;
+N
+N#pragma push
+N#pragma anon_unions
+N
+Ntypedef struct in_addr {          /* << Generic IPv4 Address structure >>    */
+N  union {
+N    struct {
+N      U8 s_b1,s_b2,s_b3,s_b4;     /* IP address, byte access                 */
+N    };
+N    struct {
+N      U16 s_w1,s_w2;              /* IP address, short int access            */
+N    };
+N    U32 s_addr;                   /* IP address in network byte order        */
+N  };
+N} IN_ADDR;
+N#pragma pop
+N
+Ntypedef struct sockaddr_in {      /* << IPv4 Socket Address structure >>     */
+N  S16 sin_family;                 /* Socket domain                           */
+N  U16 sin_port;                   /* Port                                    */
+N  IN_ADDR sin_addr;               /* IP address                              */
+N  S8  sin_zero[8];                /* reserved                                */
+N} SOCKADDR_IN;
+N
+Ntypedef struct hostent {          /* << BSD Host Entry structure >>          */
+N  char *h_name;                   /* Official name of host                   */
+N  char **h_aliases;               /* Pointer to an array of alias names      */
+N  S16  h_addrtype;                /* Address Type: AF_INET, AF_NETBIOS       */
+N  S16  h_length;                  /* Length of address in bytes              */
+N  char **h_addr_list;             /* Pointer to an array of IPv4 addresses   */
+N} HOSTENT;
+N
+Nextern void init_TcpNet (void);
+Nextern BOOL main_TcpNet (void);
+Nextern void timer_tick (void);
+Nextern U8   udp_get_socket (U8 tos, U8 opt, 
+N                            U16 (*listener)(U8 socket, U8 *remip, U16 port, U8 *buf, U16 len));
+Nextern BOOL udp_release_socket (U8 socket);
+Nextern BOOL udp_open (U8 socket, U16 locport);
+Nextern BOOL udp_close (U8 socket);
+Nextern BOOL udp_mcast_ttl (U8 socket, U8 ttl);
+Nextern U8  *udp_get_buf (U16 size);
+Nextern BOOL udp_send (U8 socket, U8 *remip, U16 remport, U8 *buf, U16 dlen);
+Nextern U8   tcp_get_socket (U8 type, U8 tos, U16 tout,
+N                            U16 (*listener)(U8 socket, U8 event, U8 *buf, U16 len));
+Nextern BOOL tcp_release_socket (U8 socket);
+Nextern BOOL tcp_listen (U8 socket, U16 locport);
+Nextern BOOL tcp_connect (U8 socket, U8 *remip, U16 remport, U16 locport);
+Nextern U8  *tcp_get_buf (U16 size);
+Nextern U16  tcp_max_dsize (U8 socket);
+Nextern BOOL tcp_check_send (U8 socket);
+Nextern U8   tcp_get_state (U8 socket);
+Nextern BOOL tcp_send (U8 socket, U8 *buf, U16 dlen);
+Nextern BOOL tcp_close (U8 socket);
+Nextern BOOL tcp_abort (U8 socket);
+Nextern void tcp_reset_window (U8 socket);
+Nextern BOOL arp_cache_ip (U8 *ipadr, U8 type);
+Nextern BOOL arp_cache_mac (U8 *hwadr);
+Nextern void ppp_listen (const char *user, const char *passw);
+Nextern void ppp_connect (const char *dialnum, const char *user, const char *passw);
+Nextern void ppp_close (void);
+Nextern BOOL ppp_is_up (void);
+Nextern void slip_listen (void);
+Nextern void slip_connect (const char *dialnum);
+Nextern void slip_close (void);
+Nextern BOOL slip_is_up (void);
+Nextern U8   get_host_by_name (U8 *hostn, void (*cbfunc)(U8 event, U8 *host_ip));
+Nextern BOOL smtp_connect (U8 *ipadr, U16 port, void (*cbfunc)(U8 event));
+Nextern void dhcp_disable (void);
+Nextern BOOL igmp_join (U8 *group_ip);
+Nextern BOOL igmp_leave (U8 *group_ip);
+Nextern BOOL snmp_trap (U8 *manager_ip, U8 gen_trap, U8 spec_trap, U16 *obj_list);
+Nextern BOOL snmp_set_community (const char *community);
+Nextern BOOL icmp_ping (U8 *remip, void (*cbfunc)(U8 event));
+Nextern BOOL ftpc_connect (U8 *ipadr, U16 port, U8 command, void (*cbfunc)(U8 event));
+Nextern BOOL tftpc_put (U8 *ipadr, U16 port,
+N                       const char *src, const char *dst, void (*cbfunc)(U8 event));
+Nextern BOOL tftpc_get (U8 *ipadr, U16 port, 
+N                       const char *src, const char *dst, void (*cbfunc)(U8 event));
+Nextern BOOL sntp_get_time (U8 *ipadr, void (*cbfunc)(U32 utc_time));
+Nextern void ftp_evt_notify (U8 evt);
+N
+N/* BSD Socket API */
+Nextern int  socket (int family, int type, int protocol);
+Nextern int  bind (int sock, const SOCKADDR *addr, int addrlen);
+Nextern int  listen (int sock, int backlog);
+Nextern int  accept (int sock, SOCKADDR *addr, int *addrlen);
+Nextern int  connect (int sock, SOCKADDR *addr, int addrlen);
+Nextern int  send (int sock, const char *buf, int len, int flags);
+Nextern int  sendto (int sock, const char *buf, int len, int flags, SOCKADDR *to, int tolen);
+Nextern int  recv (int sock, char *buf, int len, int flags);
+Nextern int  recvfrom (int sock, char *buf, int len, int flags, SOCKADDR *from, int *fromlen);
+Nextern int  closesocket (int sock);
+Nextern int  getpeername (int sock, SOCKADDR *name, int *namelen);
+Nextern int  getsockname (int sock, SOCKADDR *name, int *namelen);
+Nextern int  ioctlsocket (int sock, long cmd, unsigned long *argp);
+Nextern HOSTENT *gethostbyname (const char *name, int *err);
+N
+N#ifdef __cplusplus
+S}
+N#endif
+N
+N/*----------------------------------------------------------------------------
+N * end of file
+N *---------------------------------------------------------------------------*/
+N
+N#endif
+N 
+L 5 "src\sound.c" 2
+N
 N#include "sound.h"
 L 1 ".\inc\sound.h" 1
 N#ifndef SOUND_H
 N#define SOUND_H
 N
+N#include <stdint.h>
+N#include <RTL.h>
 N
 N// On Port E
 N#define AMP_ENABLE_POS (29)
 N#define DAC_POS (30)
 N#define MAX_DAC_CODE (4095)
+N#define NUM_STEPS (64)
+N#define NUM_WAVEFORM_SAMPLES (512)
 N
-Nextern void Init_DAC(void);
-Nextern void Play_Tone(void);
-Nextern void Sound_Init(void);
+N
+Ntypedef struct {
+N	uint16_t Volume;
+N	uint16_t Duration;
+N	uint16_t Frequency; 
+N	uint16_t Type; // Sine, square, triangle, white noise
+N} VOICE_T;
+N
+Nvoid DAC_Init(void);
+Nvoid Play_Tone(void);
+Nvoid Sound_Init(void);
+N
+Nvoid Sound_Enable_Amp(void);
+Nvoid Sound_Disable_Amp(void);
+N
+Nvoid Play_Tone_with_DMA(unsigned int period, unsigned int num_cycles);
+N//  void Play_Waveform_with_DMA(uint32_t sample_period_us, uint16_t * waveform, 
+N//	uint32_t num_samples);
+N
+Nvoid Sound_Refill_Buffer(uint32_t samples);
+N
+Nvoid Play_Waveform_with_DMA(void);
+N
+N __task void Task_Sound_Manager(void);
+X __declspec(noreturn) void Task_Sound_Manager(void);
+N __task void Task_Refill_Sound_Buffer(void);
+X __declspec(noreturn) void Task_Refill_Sound_Buffer(void);
 N
 N#endif // SOUND_H
-L 4 "src\sound.c" 2
+L 7 "src\sound.c" 2
+N#include "delay.h"
+L 1 ".\inc\delay.h" 1
+N#ifndef DELAY_H
+N#define DELAY_H
+N#include <stdint.h>
 N
-Nvoid Init_DAC(void) {
+Nextern void Delay(uint32_t dlyTicks);
+Nextern void ShortDelay(uint32_t dlyTicks);
+N#endif
+N// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
+L 8 "src\sound.c" 2
+N#include "gpio_defs.h"
+L 1 ".\inc\gpio_defs.h" 1
+N#ifndef GPIO_DEFS_H
+N#define GPIO_DEFS_H
+N
+N#define MASK(x) (1UL << (x))
+N
+N// Freedom KL25Z LEDs
+N#define RED_LED_POS (18)		// on port B
+N#define GREEN_LED_POS (19)	// on port B
+N#define BLUE_LED_POS (1)		// on port D
+N
+N#endif
+N// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
+L 9 "src\sound.c" 2
+N#include "timers.h"
+L 1 ".\inc\timers.h" 1
+N#ifndef TIMERS_H
+N#define TIMERS_H
+N#include "MKL25Z4.h"
+N
+N#define USE_PIT (0)
+N
+N#define LCD_UPDATE_PERIOD 10
+N
+Nvoid PIT_Init(unsigned period);
+Nvoid PIT_Start(void);
+Nvoid PIT_Stop(void);
+N
+Nvoid TPM_Init(unsigned period_ms);
+N
+Nvoid TPM0_Init(void);
+Nvoid TPM0_Start(void);
+Nvoid Configure_TPM0_for_DMA(uint32_t period_us);
+N
+Nvoid PWM_Init(TPM_Type * TPM, uint8_t channel_num, uint16_t period, uint16_t duty);
+Nvoid PWM_Set_Value(TPM_Type * TPM, uint8_t channel_num, uint16_t value);
+N
+N
+Nvoid LPTMR_Init(void);
+Nvoid LPTMR_Start(void);
+Nvoid LPTMR_Stop(void);
+N
+N#endif
+N// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
+L 10 "src\sound.c" 2
+N#include "DMA.h"
+L 1 ".\inc\DMA.h" 1
+N#ifndef DMA_H
+N#define DMA_H
+N
+N#include <stdint.h>
+N
+Nvoid DMA_Init(void);
+Nvoid Configure_DMA_For_Playback(uint16_t * source, uint32_t count, uint32_t num_playbacks);
+Nvoid Start_DMA_Playback(void);
+N
+N#endif
+N// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
+L 11 "src\sound.c" 2
+N#include "tasks.h"
+L 1 ".\inc\tasks.h" 1
+N#ifndef TASKS_H
+N#define TASKS_H
+N
+N#include <RTL.h>
+N#include "TFT_LCD.h"
+L 1 ".\inc\TFT_LCD.h" 1
+N#ifndef TFT_LCD_H
+N#define TFT_LCD_H
+N
+N#include <stdint.h>
+N
+N#define TFT_WIDTH (240)
+N#define TFT_HEIGHT (320)
+N
+N// TFT LCD Hardware Interface
+N// signals -- all on port C
+N#define TFT_DB8_POS (3)
+N#define TFT_DB15_POS (10)
+N#define TFT_D_NC_POS (12)
+N#define TFT_NWR_POS (13)
+N#define TFT_NRD_POS (16)
+N#define TFT_NRST_POS (17)
+N#define TFT_DATA_MASK (((unsigned )0x0ff) << TFT_DB8_POS)
+N
+N// Backlight
+N#define TFT_BL_TPM (TPM1)
+N#define TFT_BL_TPM_CHANNEL (0)
+N#define TFT_BL_TPM_FREQ (200)
+N#define TFT_BL_PERIOD ((SystemCoreClock)/(2*(TFT_BL_TPM_FREQ)))
+N
+N// Touchscreen Hardware Interface
+N#define TFT_TS_YD_CHANNEL (0)
+N#define TFT_TS_YU_CHANNEL (3)
+N#define TFT_TS_XL_CHANNEL (4) 
+N#define TFT_TS_XR_CHANNEL (7)
+N
+N#define TFT_TS_YD_BIT (20)
+N#define TFT_TS_XL_BIT (21)
+N#define TFT_TS_YU_BIT (22)
+N#define TFT_TS_XR_BIT (23)
+N
+N// Touchscreen Configuration
+N#define TS_DELAY (1)
+N#define TS_CALIB_SAMPLES (10)
+N
+N/**************************************************************/
+N#define	GPIO_ResetBit(pos)	(FPTC->PCOR = MASK(pos))
+N#define	GPIO_SetBit(pos) 		(FPTC->PSOR = MASK(pos))
+N#define GPIO_Write(cmd) 		FPTC->PDOR &= ~TFT_DATA_MASK; \
+N														FPTC->PDOR |= (cmd & 0xff) << TFT_DB8_POS;
+X#define GPIO_Write(cmd) 		FPTC->PDOR &= ~TFT_DATA_MASK; 														FPTC->PDOR |= (cmd & 0xff) << TFT_DB8_POS;
+N/**************************************************************/
+N
+N#define MIN(a,b) ((a)<(b)? a : b)
+N#define MAX(a,b) ((a)>(b)? a : b)
+N
+Ntypedef struct {
+N	uint32_t X, Y;
+N} PT_T;
+N
+Ntypedef struct {
+N	uint8_t R, G, B; // note: using 5-6-5 color mode for LCD. 
+N									 // Values are left aligned here
+N} COLOR_T;
+N
+N
+N void TFT_Init(void);
+N void TFT_Fill_Buffer(COLOR_T * color);
+N void TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color);
+N uint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2);
+N void TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count);
+N
+N
+N void TFT_Plot_Pixel(PT_T * pos, COLOR_T * color);
+N void TFT_Set_BL(uint8_t on);
+N void TFT_Set_Brightness(uint8_t brightness);
+N void TFT_Set_Backlight_Brightness(uint16_t brightness_percent);
+N void TFT_Set_Colors(COLOR_T * foreground, COLOR_T * background);
+N
+N void TFT_Erase(void);
+N void TFT_Text_Init(uint8_t font_num);
+N void TFT_Text_PrintChar(PT_T * pos, char ch);
+N void TFT_Text_PrintStr(PT_T * pos, char * str);
+N void TFT_Text_PrintStr_RC( uint8_t  row, uint8_t col, char *  str);
+N
+N void Graphics_Test(void);
+N void TFT_Draw_Line(PT_T * p1, PT_T * p2, COLOR_T * color);
+N
+N
+N void TFT_TS_Init(void);
+N uint32_t TFT_TS_Read(PT_T * position);
+N void TFT_TS_Test(void);
+N void TFT_TS_Calibrate(void);
+N
+N extern uint8_t G_TFT_char_width, G_TFT_char_height;
+N
+N
+N#endif
+L 6 ".\inc\tasks.h" 2
+N
+N#define TASK_READ_TS_PERIOD_TICKS (20)  // 1 tick/ms
+N#define TASK_READ_ACCELEROMETER_PERIOD_TICKS (100)  // 1 tick/ms
+N#define TASK_SOUND_PERIOD_TICKS (100)  // 1 tick/ms
+N#define TASK_UPDATE_SCREEN_PERIOD_TICKS (100)
+N
+N// Debug outputs on Port B
+N#define DEBUG_T0_POS 	0		// J10 pin 2
+N#define DEBUG_T1_POS 	1 	// J10 pin 4
+N#define DEBUG_T2_POS 2 	// J10 pin 6
+N#define DEBUG_T3_POS 	3		// J10 pin 8
+N
+N void	Init_Debug_Signals(void);
+N
+N#define EV_PLAYSOUND (1) 
+N#define EV_SOUND_ON (2)
+N#define EV_SOUND_OFF (4)
+N
+N#define EV_REFILL_SOUND (1)
+N
+N#define WAIT_FOREVER (0xffff)
+N
+N __task void Task_Init(void);
+X __declspec(noreturn) void Task_Init(void);
+N __task void Task_Read_TS(void);
+X __declspec(noreturn) void Task_Read_TS(void);
+N __task void Task_Read_Accelerometer(void);
+X __declspec(noreturn) void Task_Read_Accelerometer(void);
+N __task void Task_Update_Screen(void);
+X __declspec(noreturn) void Task_Update_Screen(void);
+N 
+Nextern OS_TID t_Read_TS, t_Read_Accelerometer, t_Sound_Manager, t_US, t_Refill_Sound_Buffer;
+N
+N 
+N// Game Constants
+N#define PADDLE_WIDTH (40)
+N#define PADDLE_HEIGHT (15)
+N#define PADDLE_Y_POS (TFT_HEIGHT-4-PADDLE_HEIGHT)
+N 
+N#endif // TASKS_H
+L 12 "src\sound.c" 2
+N
+Nuint16_t SineTable[NUM_STEPS];
+Xuint16_t SineTable[(64)];
+Nuint16_t Waveform[NUM_WAVEFORM_SAMPLES];
+Xuint16_t Waveform[(512)];
+N
+Nuint32_t WNG_Len=0;
+N
+Nvoid DAC_Init(void) {
 N  // Init DAC output
 N	
-N	SIM->SCGC6 |= (1UL << SIM_SCGC6_DAC0_SHIFT); 
-X	((SIM_Type *)(0x40047000u))->SCGC6 |= (1UL << 31); 
-N	SIM->SCGC5 |= (1UL << SIM_SCGC5_PORTE_SHIFT); 
-X	((SIM_Type *)(0x40047000u))->SCGC5 |= (1UL << 13); 
+N	SIM->SCGC6 |= MASK(SIM_SCGC6_DAC0_SHIFT); 
+X	((SIM_Type *)(0x40047000u))->SCGC6 |= (1UL << (31)); 
+N	SIM->SCGC5 |= MASK(SIM_SCGC5_PORTE_SHIFT); 
+X	((SIM_Type *)(0x40047000u))->SCGC5 |= (1UL << (13)); 
 N	
 N	PORTE->PCR[DAC_POS] &= ~PORT_PCR_MUX_MASK;	
 X	((PORT_Type *)(0x4004D000u))->PCR[(30)] &= ~0x700u;	
@@ -7316,11 +9754,8 @@ N	DAC0->C2 = 0;
 X	((DAC_Type *)(0x4003F000u))->C2 = 0;
 N	
 N	// Enable DAC, select VDDA as reference voltage
-N	DAC0->C0 = (1 << DAC_C0_DACEN_SHIFT) | 
-X	((DAC_Type *)(0x4003F000u))->C0 = (1 << 7) | 
-N							(1 << DAC_C0_DACRFS_SHIFT);
-X							(1 << 6);
-N
+N	DAC0->C0 = MASK(DAC_C0_DACEN_SHIFT) | MASK(DAC_C0_DACRFS_SHIFT);
+X	((DAC_Type *)(0x4003F000u))->C0 = (1UL << (7)) | (1UL << (6));
 N}
 N
 N/*
@@ -7333,17 +9768,150 @@ N	DAC0->DAT[0].DATL = DAC_DATL_DATA0(val);
 X	((DAC_Type *)(0x4003F000u))->DAT[0].DATL = (((uint8_t)(((uint8_t)(val))<<0))&0xFFu);
 N}
 N
-N/* Initialize sound hardware */
+Nvoid SineTable_Init(void) {
+N	unsigned n;
+N	
+N	for (n=0; n<NUM_STEPS; n++) {
+X	for (n=0; n<(64); n++) {
+N		SineTable[n] = (MAX_DAC_CODE/2)*(1+sinf(n*(2*3.1415927/NUM_STEPS)));
+X		SineTable[n] = ((4095)/2)*(1+sinf(n*(2*3.1415927/(64))));
+N	}
+N}
+N
+Nvoid Init_Waveform(void) {
+N	uint32_t i;
+N	
+N	for (i=0; i<NUM_WAVEFORM_SAMPLES; i++) {
+X	for (i=0; i<(512); i++) {
+N		Waveform[i] = (MAX_DAC_CODE/2)*
+X		Waveform[i] = ((4095)/2)*
+N			(1.0+((1.0-((float)i)/NUM_WAVEFORM_SAMPLES))*sinf(i*(2*3.1415927/NUM_STEPS)));
+X			(1.0+((1.0-((float)i)/(512)))*sinf(i*(2*3.1415927/(64))));
+N	}
+N}
+N
+N/* Initialize sound hardware and sine table*/
 Nvoid Sound_Init(void) {
-N	Init_DAC();
+N	SineTable_Init();	
+N	Init_Waveform();
+N
+N	DAC_Init();
+N	DMA_Init();
+N	TPM0_Init();
+N	Configure_TPM0_for_DMA(45);
+N
+N	SIM->SOPT2 |= (SIM_SOPT2_TPMSRC(1) | SIM_SOPT2_PLLFLLSEL_MASK);
+X	((SIM_Type *)(0x40047000u))->SOPT2 |= ((((uint32_t)(((uint32_t)(1))<<24))&0x3000000u) | 0x10000u);
+N
+N
 N	SIM->SCGC5 |= (1UL << SIM_SCGC5_PORTE_SHIFT); 
 X	((SIM_Type *)(0x40047000u))->SCGC5 |= (1UL << 13); 
+N	
 N	PORTE->PCR[AMP_ENABLE_POS] &= ~PORT_PCR_MUX_MASK;	
 X	((PORT_Type *)(0x4004D000u))->PCR[(29)] &= ~0x700u;	
 N	PORTE->PCR[AMP_ENABLE_POS] |= PORT_PCR_MUX(1);	// Select GPIO
 X	((PORT_Type *)(0x4004D000u))->PCR[(29)] |= (((uint32_t)(((uint32_t)(1))<<8))&0x700u);	
-N	PTE->PDDR |= AMP_ENABLE_POS; // set to output
-X	((GPIO_Type *)(0x400FF100u))->PDDR |= (29); 
-N	PTE->PSOR = AMP_ENABLE_POS;  // enable audio amp
-X	((GPIO_Type *)(0x400FF100u))->PSOR = (29);  
+N	PTE->PDDR |= MASK(AMP_ENABLE_POS); // set to output
+X	((GPIO_Type *)(0x400FF100u))->PDDR |= (1UL << ((29))); 
+N	PTE->PSOR = MASK(AMP_ENABLE_POS);  // enable audio amp
+X	((GPIO_Type *)(0x400FF100u))->PSOR = (1UL << ((29)));  
+N
 N}
+N
+Nvoid Sound_Enable_Amp(void) {
+N	PTE->PSOR = MASK(AMP_ENABLE_POS);  // enable audio amp
+X	((GPIO_Type *)(0x400FF100u))->PSOR = (1UL << ((29)));  
+N}
+N
+Nvoid Sound_Disable_Amp(void) {
+N	PTE->PCOR = MASK(AMP_ENABLE_POS);  // disable audio amp
+X	((GPIO_Type *)(0x400FF100u))->PCOR = (1UL << ((29)));  
+N}
+N
+Nvoid Play_Tone(void) {
+N	int n, d=MAX_DAC_CODE>>1, p;
+X	int n, d=(4095)>>1, p;
+N	
+N	for (p=5; p>=1; p--) {
+N		for (n=0; n<20/p; n++) {
+N			Play_Sound_Sample((MAX_DAC_CODE>>1)+d);
+X			Play_Sound_Sample(((4095)>>1)+d);
+N			Delay(p);
+N			Play_Sound_Sample((MAX_DAC_CODE>>1)-d);
+X			Play_Sound_Sample(((4095)>>1)-d);
+N			Delay(p);
+N		}
+N	}
+N}
+N
+Nuint16_t Sound_Generate_Next_Sample (void) {
+N	static uint16_t lfsr = 0xACE1u;
+N	static uint16_t bit;
+N	
+N	// source code from http://en.wikipedia.org/wiki/Linear_feedback_shift_register
+N  /* taps: 16 14 13 11; characteristic polynomial: x^16 + x^14 + x^13 + x^11 + 1 */
+N  bit  = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5) ) & 1;
+N  lfsr =  (lfsr >> 1) | (bit << 15);
+N	return lfsr & 0x03ff;
+N}
+N
+N// void Play_Waveform_with_DMA(uint32_t sample_period_us, uint16_t * waveform, uint32_t num_samples) {
+Nvoid Play_Waveform_with_DMA(void) {
+N	//	Init_Waveform();
+N	//	Configure_TPM0_for_DMA(45);
+N	Configure_DMA_For_Playback(Waveform, NUM_WAVEFORM_SAMPLES, 1);
+X	Configure_DMA_For_Playback(Waveform, (512), 1);
+N	Start_DMA_Playback();
+N}
+N
+N
+Nvoid Play_Tone_with_DMA(unsigned int period, unsigned int num_cycles) {
+N	Configure_TPM0_for_DMA(period/NUM_STEPS);
+X	Configure_TPM0_for_DMA(period/(64));
+N	Configure_DMA_For_Playback(SineTable, NUM_STEPS, num_cycles);
+X	Configure_DMA_For_Playback(SineTable, (64), num_cycles);
+N	Start_DMA_Playback();
+N}
+N
+N
+N__task void Task_Sound_Manager(void) {
+X__declspec(noreturn) void Task_Sound_Manager(void) {
+N	
+N	os_itv_set(1000);
+X	_os_itv_set((U32)rt_itv_set,1000);
+N	
+N	while (1) {
+N		os_itv_wait();
+X		_os_itv_wait((U32)rt_itv_wait);
+N		//		os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
+N		// make a new sound every second
+N		
+N		// Hack - temporary code until voice code is added
+N		WNG_Len = 2500;
+N		Play_Waveform_with_DMA();
+N	}
+N}
+N
+N__task void Task_Refill_Sound_Buffer(void) {
+X__declspec(noreturn) void Task_Refill_Sound_Buffer(void) {
+N	uint32_t i;
+N	
+N	while (1) {
+N		os_evt_wait_and(EV_REFILL_SOUND, WAIT_FOREVER); // wait for trigger
+X		_os_evt_wait((U32)rt_evt_wait,(1),(0xffff),1); 
+N
+N		for (i=0; i<NUM_WAVEFORM_SAMPLES; i++) {
+X		for (i=0; i<(512); i++) {
+N			if (WNG_Len > 0) {
+N				Waveform[i] = Sound_Generate_Next_Sample();
+N				WNG_Len--;
+N			} else {
+N				Waveform[i] = MAX_DAC_CODE/2;
+X				Waveform[i] = (4095)/2;
+N			}
+N		}
+N	}
+N}
+N
+N
+N

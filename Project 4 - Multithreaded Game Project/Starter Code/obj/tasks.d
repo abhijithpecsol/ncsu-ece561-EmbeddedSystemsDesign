@@ -7,8 +7,10 @@
 .\obj\tasks.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h
 .\obj\tasks.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h
 .\obj\tasks.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h
-.\obj\tasks.o: .\inc\tft_lcd.h
+.\obj\tasks.o: .\inc\TFT_LCD.h
+.\obj\tasks.o: .\inc\font.h
 .\obj\tasks.o: .\inc\tasks.h
-.\obj\tasks.o: .\inc\mma8451.h
+.\obj\tasks.o: .\inc\MMA8451.h
 .\obj\tasks.o: .\inc\sound.h
+.\obj\tasks.o: .\inc\DMA.h
 .\obj\tasks.o: .\inc\gpio_defs.h

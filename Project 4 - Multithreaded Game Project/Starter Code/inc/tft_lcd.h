@@ -57,35 +57,35 @@ typedef struct {
 } COLOR_T;
 
 
-extern void TFT_Init(void);
-extern void TFT_Fill_Buffer(COLOR_T * color);
-extern void TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color);
-extern uint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2);
-extern void TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count);
+ void TFT_Init(void);
+ void TFT_Fill_Buffer(COLOR_T * color);
+ void TFT_Fill_Rectangle(PT_T * p1, PT_T * p2, COLOR_T * color);
+ uint32_t TFT_Start_Rectangle(PT_T * p1, PT_T * p2);
+ void TFT_Write_Rectangle_Pixel(COLOR_T * color, unsigned int count);
 
 
-extern void TFT_Plot_Pixel(PT_T * pos, COLOR_T * color);
-extern void TFT_Set_BL(uint8_t on);
-extern void TFT_Set_Brightness(uint8_t brightness);
-extern void TFT_Set_Backlight_Brightness(uint16_t brightness_percent);
-extern void TFT_Set_Colors(COLOR_T * foreground, COLOR_T * background);
+ void TFT_Plot_Pixel(PT_T * pos, COLOR_T * color);
+ void TFT_Set_BL(uint8_t on);
+ void TFT_Set_Brightness(uint8_t brightness);
+ void TFT_Set_Backlight_Brightness(uint16_t brightness_percent);
+ void TFT_Set_Colors(COLOR_T * foreground, COLOR_T * background);
 
-extern void TFT_Erase(void);
-extern void TFT_Text_Init(uint8_t font_num);
-extern void TFT_Text_PrintChar(PT_T * pos, char ch);
-extern void TFT_Text_PrintStr(PT_T * pos, char * str);
-extern void TFT_Text_PrintStr_RC( uint8_t  row, uint8_t col, char *  str);
+ void TFT_Erase(void);
+ void TFT_Text_Init(uint8_t font_num);
+ void TFT_Text_PrintChar(PT_T * pos, char ch);
+ void TFT_Text_PrintStr(PT_T * pos, char * str);
+ void TFT_Text_PrintStr_RC( uint8_t  row, uint8_t col, char *  str);
 
-extern void Graphics_Test(void);
-extern void TFT_Draw_Line(PT_T * p1, PT_T * p2, COLOR_T * color);
+ void Graphics_Test(void);
+ void TFT_Draw_Line(PT_T * p1, PT_T * p2, COLOR_T * color);
 
 
-extern void TFT_TS_Init(void);
-extern uint32_t TFT_TS_Read(PT_T * position);
-extern void TFT_TS_Test(void);
-extern void TFT_TS_Calibrate(void);
+ void TFT_TS_Init(void);
+ uint32_t TFT_TS_Read(PT_T * position);
+ void TFT_TS_Test(void);
+ void TFT_TS_Calibrate(void);
 
-extern uint8_t G_TFT_char_width, G_TFT_char_height;
+ extern uint8_t G_TFT_char_width, G_TFT_char_height;
 
 
 #endif
