@@ -72,14 +72,19 @@ typedef struct {
 	uint8_t protection;
 } BRICK_T;
 
+// STATUS button
+#define STATUS_BUT_WIDTH	(TFT_WIDTH/2)
+#define STATUS_BUT_HEIGHT	(2*INFO_BAR_HEIGHT)
+
 // GAME structure will contain all the appropriate elements of a game in one central location
-#define INFO_BAR_HEIGHT		(16)
+#define INFO_BAR_HEIGHT		(17)
 typedef struct {
 	PADDLES_T paddles;
 	COLORS_T colors;
 	BALL_T ball;
 	BRICK_T bricks[NUM_BRICK_ROWS][NUM_BRICK_COLS];
 	uint8_t hits;
+	uint8_t lives;
 } GAME_T;
 
 

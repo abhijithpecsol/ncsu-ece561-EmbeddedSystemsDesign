@@ -1,0 +1,15 @@
+.\obj\utilization.o: src\utilization.c
+.\obj\utilization.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\obj\utilization.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\obj\utilization.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\obj\utilization.o: C:\Keil_v5\ARM\RV31\INC\RTL.H
+.\obj\utilization.o: .\inc\timers.h
+.\obj\utilization.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h
+.\obj\utilization.o: C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h
+.\obj\utilization.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h
+.\obj\utilization.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h
+.\obj\utilization.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h
+.\obj\utilization.o: .\inc\TFT_LCD.h
+.\obj\utilization.o: .\inc\font.h
+.\obj\utilization.o: .\inc\tasks.h
+.\obj\utilization.o: .\inc\utilization.h

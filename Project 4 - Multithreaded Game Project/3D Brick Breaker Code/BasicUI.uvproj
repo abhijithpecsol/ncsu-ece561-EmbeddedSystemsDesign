@@ -396,7 +396,7 @@
             <ScatterFile></ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
-            <Misc></Misc>
+            <Misc>--callgraph</Misc>
             <LinkerInputFile></LinkerInputFile>
             <DisabledWarnings></DisabledWarnings>
           </LDads>
@@ -558,6 +558,11 @@
               <FileName>game.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\game.c</FilePath>
+            </File>
+            <File>
+              <FileName>utilization.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\utilization.c</FilePath>
             </File>
           </Files>
         </Group>

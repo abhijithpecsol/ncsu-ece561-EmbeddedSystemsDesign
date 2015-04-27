@@ -7349,6 +7349,31 @@ N void Display_Profile(void);
 N
 N#endif
 L 5 "src\timers.c" 2
+N#include "utilization.h"
+L 1 ".\inc\utilization.h" 1
+N#ifndef utilization_h
+N#define utilization_h
+N
+N#include <stdint.h>
+N
+N#define NUM_TASKS		(7)
+N
+N#define TASK_IDLE			(0)
+N#define TASK_READ_TS	(1)
+N#define TASK_ACCEL		(2)
+N#define TASK_SND_MNGR	(3)
+N#define TASK_SND_RFL	(4)
+N#define TASK_GAME			(5)
+N#define TASK_STATUS		(6)
+N#define TASK_GAME_PAUSED (7)
+N
+Nvoid Init_Utilization_Profiling(void);
+Nvoid Reset_Utilization_Stats(void);
+Nfloat Get_Utilization_Stats(uint8_t task_id);
+Nvoid Pause_Game_Utilization(void);
+N
+N#endif
+L 6 "src\timers.c" 2
 N
 Nvolatile unsigned PIT_interrupt_counter = 0;
 Nvolatile unsigned LCD_update_requested = 0;
@@ -7359,10 +7384,12 @@ Nextern volatile char profiling_enabled;
 N
 Nextern volatile unsigned int adx_lost, num_lost; 
 N
-Nvoid PIT_IRQHandler() {
-N	unsigned int s, e;
-N  unsigned int i;
-N	
+Nextern volatile unsigned long total_ticks;
+Nextern volatile uint8_t current_task;
+Nextern unsigned long task_ticks[];
+N
+N// Utilization PIT IRQ
+Nvoid PIT_IRQHandler() {	
 N	//clear pending IRQ
 N	NVIC_ClearPendingIRQ(PIT_IRQn);
 N	
@@ -7372,26 +7399,21 @@ X	if (((PIT_Type *)(0x40037000u))->CHANNEL[0].TFLG & 0x1u) {
 N		// clear status flag for timer channel 0
 N		PIT->CHANNEL[0].TFLG &= PIT_TFLG_TIF_MASK;
 X		((PIT_Type *)(0x40037000u))->CHANNEL[0].TFLG &= 0x1u;
-N		
-N		// Do ISR work
-N		// Profiler
-N		if (profiling_enabled > 0) {
-N			PC_val = *((unsigned int *) (__current_sp()+CUR_FRAME_SIZE+RET_ADX_OFFSET));
-X			PC_val = *((unsigned int *) (__current_sp()+(8)+(0x18)));
-N			profile_ticks++;
-N  	
-N			/* look up function in table and increment counter  */
-N			for (i=0; i<NumProfileRegions; i++) {
-N				s = RegionTable[i].Start;
-N				e = RegionTable[i].End;
-N				if ((PC_val >= s) && (PC_val <= e)) {
-N					RegionCount[i]++;
-N					break; // break out of the for loop
-N				}
+N			
+N		// increment utilization counters
+N		if (total_ticks < 0xFFFFFFFF){
+N			total_ticks++;
+N			if (current_task != TASK_GAME_PAUSED){
+X			if (current_task != (7)){
+N				task_ticks[current_task]++;
 N			}
-N			if (i == NumProfileRegions) {
-N				adx_lost = PC_val;
-N				num_lost++;
+N		}
+N		else {
+N			unsigned i;
+N			total_ticks = 0;
+N			for (i=0; i<NUM_TASKS; i++) {
+X			for (i=0; i<(7); i++) {
+N				task_ticks[i]=0;
 N			}
 N		}
 N	} else if (PIT->CHANNEL[1].TFLG & PIT_TFLG_TIF_MASK) {
@@ -7401,6 +7423,45 @@ N		PIT->CHANNEL[1].TFLG &= PIT_TFLG_TIF_MASK;
 X		((PIT_Type *)(0x40037000u))->CHANNEL[1].TFLG &= 0x1u;
 N	} 
 N}
+N
+N// Profiling PIT IRQ
+N//void PIT_IRQHandler() {
+N//	unsigned int s, e;
+N//  unsigned int i;
+N//	
+N//	//clear pending IRQ
+N//	NVIC_ClearPendingIRQ(PIT_IRQn);
+N//	
+N//	// check to see which channel triggered interrupt 
+N//	if (PIT->CHANNEL[0].TFLG & PIT_TFLG_TIF_MASK) {
+N//		// clear status flag for timer channel 0
+N//		PIT->CHANNEL[0].TFLG &= PIT_TFLG_TIF_MASK;
+N//		
+N//		// Do ISR work
+N//		// Profiler
+N//		if (profiling_enabled > 0) {
+N//			PC_val = *((unsigned int *) (__current_sp()+CUR_FRAME_SIZE+RET_ADX_OFFSET));
+N//			profile_ticks++;
+N//  	
+N//			/* look up function in table and increment counter  */
+N//			for (i=0; i<NumProfileRegions; i++) {
+N//				s = RegionTable[i].Start;
+N//				e = RegionTable[i].End;
+N//				if ((PC_val >= s) && (PC_val <= e)) {
+N//					RegionCount[i]++;
+N//					break; // break out of the for loop
+N//				}
+N//			}
+N//			if (i == NumProfileRegions) {
+N//				adx_lost = PC_val;
+N//				num_lost++;
+N//			}
+N//		}
+N//	} else if (PIT->CHANNEL[1].TFLG & PIT_TFLG_TIF_MASK) {
+N//		// clear status flag for timer channel 1
+N//		PIT->CHANNEL[1].TFLG &= PIT_TFLG_TIF_MASK;
+N//	} 
+N//}
 N
 Nvoid PIT_Init(unsigned period) {
 N	// Enable clock to PIT module

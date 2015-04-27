@@ -2,6 +2,7 @@
 #include "MKL25Z4.h"
 #include "region.h"
 #include "profile.h"
+#include "utilization.h"
 
 volatile unsigned PIT_interrupt_counter = 0;
 volatile unsigned LCD_update_requested = 0;
@@ -12,10 +13,12 @@ extern volatile char profiling_enabled;
 
 extern volatile unsigned int adx_lost, num_lost; 
 
-void PIT_IRQHandler() {
-	unsigned int s, e;
-  unsigned int i;
-	
+extern volatile unsigned long total_ticks;
+extern volatile uint8_t current_task;
+extern unsigned long task_ticks[];
+
+// Utilization PIT IRQ
+void PIT_IRQHandler() {	
 	//clear pending IRQ
 	NVIC_ClearPendingIRQ(PIT_IRQn);
 	
@@ -23,25 +26,19 @@ void PIT_IRQHandler() {
 	if (PIT->CHANNEL[0].TFLG & PIT_TFLG_TIF_MASK) {
 		// clear status flag for timer channel 0
 		PIT->CHANNEL[0].TFLG &= PIT_TFLG_TIF_MASK;
-		
-		// Do ISR work
-		// Profiler
-		if (profiling_enabled > 0) {
-			PC_val = *((unsigned int *) (__current_sp()+CUR_FRAME_SIZE+RET_ADX_OFFSET));
-			profile_ticks++;
-  	
-			/* look up function in table and increment counter  */
-			for (i=0; i<NumProfileRegions; i++) {
-				s = RegionTable[i].Start;
-				e = RegionTable[i].End;
-				if ((PC_val >= s) && (PC_val <= e)) {
-					RegionCount[i]++;
-					break; // break out of the for loop
-				}
+			
+		// increment utilization counters
+		if (total_ticks < 0xFFFFFFFF){
+			total_ticks++;
+			if (current_task != TASK_GAME_PAUSED){
+				task_ticks[current_task]++;
 			}
-			if (i == NumProfileRegions) {
-				adx_lost = PC_val;
-				num_lost++;
+		}
+		else {
+			unsigned i;
+			total_ticks = 0;
+			for (i=0; i<NUM_TASKS; i++) {
+				task_ticks[i]=0;
 			}
 		}
 	} else if (PIT->CHANNEL[1].TFLG & PIT_TFLG_TIF_MASK) {
@@ -49,6 +46,45 @@ void PIT_IRQHandler() {
 		PIT->CHANNEL[1].TFLG &= PIT_TFLG_TIF_MASK;
 	} 
 }
+
+// Profiling PIT IRQ
+//void PIT_IRQHandler() {
+//	unsigned int s, e;
+//  unsigned int i;
+//	
+//	//clear pending IRQ
+//	NVIC_ClearPendingIRQ(PIT_IRQn);
+//	
+//	// check to see which channel triggered interrupt 
+//	if (PIT->CHANNEL[0].TFLG & PIT_TFLG_TIF_MASK) {
+//		// clear status flag for timer channel 0
+//		PIT->CHANNEL[0].TFLG &= PIT_TFLG_TIF_MASK;
+//		
+//		// Do ISR work
+//		// Profiler
+//		if (profiling_enabled > 0) {
+//			PC_val = *((unsigned int *) (__current_sp()+CUR_FRAME_SIZE+RET_ADX_OFFSET));
+//			profile_ticks++;
+//  	
+//			/* look up function in table and increment counter  */
+//			for (i=0; i<NumProfileRegions; i++) {
+//				s = RegionTable[i].Start;
+//				e = RegionTable[i].End;
+//				if ((PC_val >= s) && (PC_val <= e)) {
+//					RegionCount[i]++;
+//					break; // break out of the for loop
+//				}
+//			}
+//			if (i == NumProfileRegions) {
+//				adx_lost = PC_val;
+//				num_lost++;
+//			}
+//		}
+//	} else if (PIT->CHANNEL[1].TFLG & PIT_TFLG_TIF_MASK) {
+//		// clear status flag for timer channel 1
+//		PIT->CHANNEL[1].TFLG &= PIT_TFLG_TIF_MASK;
+//	} 
+//}
 
 void PIT_Init(unsigned period) {
 	// Enable clock to PIT module

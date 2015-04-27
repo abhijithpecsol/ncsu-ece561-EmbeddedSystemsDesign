@@ -9,11 +9,13 @@
 #include "timers.h"
 #include "DMA.h"
 #include "tasks.h"
+#include "utilization.h"
 
 uint16_t SineTable[NUM_STEPS];
 uint16_t Waveform[NUM_WAVEFORM_SAMPLES];
 
 uint32_t WNG_Len=0;
+extern volatile uint8_t current_task;
 
 void DAC_Init(void) {
   // Init DAC output
@@ -133,12 +135,15 @@ __task void Task_Sound_Manager(void) {
 	
 	while (1) {
 		os_itv_wait();
+		current_task = TASK_SND_MNGR;
 		//os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
 		// make a new sound every second
 		
 		// Hack - temporary code until voice code is added
 		WNG_Len = 2500;
 		Play_Waveform_with_DMA();
+		
+		current_task = TASK_IDLE;
 	}
 }
 
@@ -147,7 +152,7 @@ __task void Task_Refill_Sound_Buffer(void) {
 	
 	while (1) {
 		os_evt_wait_and(EV_REFILL_SOUND, WAIT_FOREVER); // wait for trigger
-
+		current_task = TASK_SND_RFL;
 		for (i=0; i<NUM_WAVEFORM_SAMPLES; i++) {
 			if (WNG_Len > 0) {
 				Waveform[i] = Sound_Generate_Next_Sample();
@@ -156,6 +161,8 @@ __task void Task_Refill_Sound_Buffer(void) {
 				Waveform[i] = MAX_DAC_CODE/2;
 			}
 		}
+		
+		current_task = TASK_IDLE;
 	}
 }
 

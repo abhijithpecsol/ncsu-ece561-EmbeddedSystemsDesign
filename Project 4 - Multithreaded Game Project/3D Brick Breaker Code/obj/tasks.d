@@ -16,3 +16,4 @@
 .\obj\tasks.o: .\inc\DMA.h
 .\obj\tasks.o: .\inc\gpio_defs.h
 .\obj\tasks.o: .\inc\game.h
+.\obj\tasks.o: .\inc\utilization.h

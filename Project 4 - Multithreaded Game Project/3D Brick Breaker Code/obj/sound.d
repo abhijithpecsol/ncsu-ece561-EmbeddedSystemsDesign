@@ -14,3 +14,4 @@
 .\obj\sound.o: .\inc\DMA.h
 .\obj\sound.o: .\inc\tasks.h
 .\obj\sound.o: .\inc\TFT_LCD.h
+.\obj\sound.o: .\inc\utilization.h

@@ -9709,6 +9709,14 @@ N#define EV_REFILL_SOUND (1)
 N
 N#define EV_INITIAL_PRESS	(1)
 N
+N#define WAIT_START			(0)
+N#define STATUS_OPEN			(1)
+N#define STATUS_CLOSED		(2)
+N#define STATUS_UPDATE_FREQ	(6*1000/TASK_UPDATE_GAME_STATE_TICKS)
+N#define STATUS_CPU_FREQ			(STATUS_UPDATE_FREQ/3)
+N#define STATUS_STK_FREQ			(2*STATUS_CPU_FREQ)
+N#define STATUS_MAX_STK_FREQ	(STATUS_UPDATE_FREQ)
+N
 N#define WAIT_FOREVER (0xffff)
 N
 N __task void Task_Init(void);
@@ -9730,6 +9738,31 @@ N#define PADDLE_Y_POS (TFT_HEIGHT-4-PADDLE_HEIGHT)
 N 
 N#endif // TASKS_H
 L 12 "src\sound.c" 2
+N#include "utilization.h"
+L 1 ".\inc\utilization.h" 1
+N#ifndef utilization_h
+N#define utilization_h
+N
+N#include <stdint.h>
+N
+N#define NUM_TASKS		(7)
+N
+N#define TASK_IDLE			(0)
+N#define TASK_READ_TS	(1)
+N#define TASK_ACCEL		(2)
+N#define TASK_SND_MNGR	(3)
+N#define TASK_SND_RFL	(4)
+N#define TASK_GAME			(5)
+N#define TASK_STATUS		(6)
+N#define TASK_GAME_PAUSED (7)
+N
+Nvoid Init_Utilization_Profiling(void);
+Nvoid Reset_Utilization_Stats(void);
+Nfloat Get_Utilization_Stats(uint8_t task_id);
+Nvoid Pause_Game_Utilization(void);
+N
+N#endif
+L 13 "src\sound.c" 2
 N
 Nuint16_t SineTable[NUM_STEPS];
 Xuint16_t SineTable[(64)];
@@ -9737,6 +9770,7 @@ Nuint16_t Waveform[NUM_WAVEFORM_SAMPLES];
 Xuint16_t Waveform[(512)];
 N
 Nuint32_t WNG_Len=0;
+Nextern volatile uint8_t current_task;
 N
 Nvoid DAC_Init(void) {
 N  // Init DAC output
@@ -9887,12 +9921,17 @@ N
 N	while (1) {
 N		os_itv_wait();
 X		_os_itv_wait((U32)rt_itv_wait);
+N		current_task = TASK_SND_MNGR;
+X		current_task = (3);
 N		//os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
 N		// make a new sound every second
 N		
 N		// Hack - temporary code until voice code is added
 N		WNG_Len = 2500;
 N		Play_Waveform_with_DMA();
+N		
+N		current_task = TASK_IDLE;
+X		current_task = (0);
 N	}
 N}
 N
@@ -9903,7 +9942,8 @@ N
 N	while (1) {
 N		os_evt_wait_and(EV_REFILL_SOUND, WAIT_FOREVER); // wait for trigger
 X		_os_evt_wait((U32)rt_evt_wait,(1),(0xffff),1); 
-N
+N		current_task = TASK_SND_RFL;
+X		current_task = (4);
 N		for (i=0; i<NUM_WAVEFORM_SAMPLES; i++) {
 X		for (i=0; i<(512); i++) {
 N			if (WNG_Len > 0) {
@@ -9914,6 +9954,9 @@ N				Waveform[i] = MAX_DAC_CODE/2;
 X				Waveform[i] = (4095)/2;
 N			}
 N		}
+N		
+N		current_task = TASK_IDLE;
+X		current_task = (0);
 N	}
 N}
 N

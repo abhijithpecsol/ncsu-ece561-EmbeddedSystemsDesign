@@ -10,6 +10,7 @@
  *---------------------------------------------------------------------------*/
 
 #include <RTL.h>
+#include "utilization.h"
 
 /*----------------------------------------------------------------------------
  *      RTX User configuration part BEGIN
@@ -151,6 +152,7 @@ __task void os_idle_demon (void) {
 
   for (;;) {
   /* HERE: include optional user code to be executed when no task runs.*/
+		//Update_Utilization_Stats(TASK_IDLE);
   }
 }
 

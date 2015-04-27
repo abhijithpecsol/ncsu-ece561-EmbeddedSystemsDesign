@@ -27,6 +27,14 @@
 
 #define EV_INITIAL_PRESS	(1)
 
+#define WAIT_START			(0)
+#define STATUS_OPEN			(1)
+#define STATUS_CLOSED		(2)
+#define STATUS_UPDATE_FREQ	(6*1000/TASK_UPDATE_GAME_STATE_TICKS)
+#define STATUS_CPU_FREQ			(STATUS_UPDATE_FREQ/3)
+#define STATUS_STK_FREQ			(2*STATUS_CPU_FREQ)
+#define STATUS_MAX_STK_FREQ	(STATUS_UPDATE_FREQ)
+
 #define WAIT_FOREVER (0xffff)
 
  __task void Task_Init(void);

@@ -10219,6 +10219,14 @@ N#define EV_REFILL_SOUND (1)
 N
 N#define EV_INITIAL_PRESS	(1)
 N
+N#define WAIT_START			(0)
+N#define STATUS_OPEN			(1)
+N#define STATUS_CLOSED		(2)
+N#define STATUS_UPDATE_FREQ	(6*1000/TASK_UPDATE_GAME_STATE_TICKS)
+N#define STATUS_CPU_FREQ			(STATUS_UPDATE_FREQ/3)
+N#define STATUS_STK_FREQ			(2*STATUS_CPU_FREQ)
+N#define STATUS_MAX_STK_FREQ	(STATUS_UPDATE_FREQ)
+N
 N#define WAIT_FOREVER (0xffff)
 N
 N __task void Task_Init(void);
@@ -10423,8 +10431,12 @@ N	uint8_t health;
 N	uint8_t protection;
 N} BRICK_T;
 N
+N// STATUS button
+N#define STATUS_BUT_WIDTH	(TFT_WIDTH/2)
+N#define STATUS_BUT_HEIGHT	(2*INFO_BAR_HEIGHT)
+N
 N// GAME structure will contain all the appropriate elements of a game in one central location
-N#define INFO_BAR_HEIGHT		(16)
+N#define INFO_BAR_HEIGHT		(17)
 Ntypedef struct {
 N	PADDLES_T paddles;
 N	COLORS_T colors;
@@ -10432,6 +10444,7 @@ N	BALL_T ball;
 N	BRICK_T bricks[NUM_BRICK_ROWS][NUM_BRICK_COLS];
 X	BRICK_T bricks[(10)][(6)];
 N	uint8_t hits;
+N	uint8_t lives;
 N} GAME_T;
 N
 N
@@ -10454,6 +10467,31 @@ Nvoid Redraw_Bricks(GAME_T * g);							// Redraws all bricks. Necessary to avoid
 N
 N#endif
 L 14 "src\tasks.c" 2
+N#include "utilization.h"
+L 1 ".\inc\utilization.h" 1
+N#ifndef utilization_h
+N#define utilization_h
+N
+N#include <stdint.h>
+N
+N#define NUM_TASKS		(7)
+N
+N#define TASK_IDLE			(0)
+N#define TASK_READ_TS	(1)
+N#define TASK_ACCEL		(2)
+N#define TASK_SND_MNGR	(3)
+N#define TASK_SND_RFL	(4)
+N#define TASK_GAME			(5)
+N#define TASK_STATUS		(6)
+N#define TASK_GAME_PAUSED (7)
+N
+Nvoid Init_Utilization_Profiling(void);
+Nvoid Reset_Utilization_Stats(void);
+Nfloat Get_Utilization_Stats(uint8_t task_id);
+Nvoid Pause_Game_Utilization(void);
+N
+N#endif
+L 15 "src\tasks.c" 2
 N
 N
 NU64 RA_Stack[64];
@@ -10462,8 +10500,12 @@ N
 NOS_TID t_Read_TS, t_Read_Accelerometer, t_Sound_Manager, t_US, t_Refill_Sound_Buffer;
 NOS_MUT LCD_mutex;
 NOS_MUT TS_mutex;
+NOS_MUT util_mutex;
 Nos_mbx_declare(tilt_mbx, 2);
 XU32 tilt_mbx [4 + 2];
+Nos_mbx_declare(touch_mbx, 3);
+XU32 touch_mbx [4 + 3];
+Nvolatile uint8_t current_task;
 N
 Nvoid Init_Debug_Signals(void) {
 N	// Enable clock to port B
@@ -10514,9 +10556,13 @@ X__declspec(noreturn) void Task_Init(void) {
 N	
 N	os_mut_init(&LCD_mutex);
 X	_os_mut_init((U32)rt_mut_init,&LCD_mutex);
+N	os_mut_init(&util_mutex);
+X	_os_mut_init((U32)rt_mut_init,&util_mutex);
 N	
 N	os_mbx_init(&tilt_mbx, sizeof(tilt_mbx));
 X	_os_mbx_init((U32)rt_mbx_init,&tilt_mbx,sizeof(tilt_mbx));
+N	os_mbx_init(&touch_mbx, sizeof(touch_mbx));
+X	_os_mbx_init((U32)rt_mbx_init,&touch_mbx,sizeof(touch_mbx));
 N	
 N	t_Read_TS = os_tsk_create(Task_Read_TS, 4);
 X	t_Read_TS = _os_tsk_create((U32)rt_tsk_create,Task_Read_TS,4,0,0);
@@ -10529,6 +10575,9 @@ X	t_US = _os_tsk_create((U32)rt_tsk_create,Task_Update_Game_State,5|(sizeof(GAME
 N	t_Refill_Sound_Buffer = os_tsk_create(Task_Refill_Sound_Buffer, 1);
 X	t_Refill_Sound_Buffer = _os_tsk_create((U32)rt_tsk_create,Task_Refill_Sound_Buffer,1,0,0);
 N
+N	current_task = TASK_IDLE;
+X	current_task = (0);
+N	Init_Utilization_Profiling();			// begin utilization tracking
 N
 N  os_tsk_delete_self ();
 X  { _os_tsk_delete((U32)rt_tsk_delete, 0); for(;;); };
@@ -10536,6 +10585,7 @@ N}
 N
 N__task void Task_Read_TS(void) {
 X__declspec(noreturn) void Task_Read_TS(void) {
+N	PT_T * touch_msg;
 N	PT_T p;
 N	uint8_t initial_press = 0;
 N
@@ -10545,6 +10595,9 @@ N
 N	while (1) {
 N		os_itv_wait();
 X		_os_itv_wait((U32)rt_itv_wait);
+N		current_task = TASK_READ_TS;
+X		current_task = (1);
+N		
 N		PTB->PSOR = MASK(DEBUG_T1_POS);
 X		((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << (1));
 N		if (TFT_TS_Read(&p)) { 
@@ -10553,9 +10606,19 @@ N				initial_press++;											// we have been pressed
 N				os_evt_set(EV_INITIAL_PRESS, t_US);		// so start the game
 X				_os_evt_set((U32)rt_evt_set,(1),t_US);		
 N			}
+N			else {
+N				// if the game has been started, send the touch position in a mailbox
+N				touch_msg = malloc(sizeof(PT_T));
+N				*touch_msg = p;
+N				os_mbx_send(&touch_mbx, (void *)touch_msg, WAIT_FOREVER);
+X				_os_mbx_send((U32)rt_mbx_send,&touch_mbx,(void *)touch_msg,(0xffff));
+N			}
 N		}
 N		PTB->PCOR = MASK(DEBUG_T1_POS);
 X		((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (1));
+N		
+N		current_task = TASK_IDLE;
+X		current_task = (0);
 N	}
 N}
 N
@@ -10569,36 +10632,52 @@ N
 N	while (1) {
 N		os_itv_wait();
 X		_os_itv_wait((U32)rt_itv_wait);
+N		current_task = TASK_ACCEL;
+X		current_task = (2);
 N		PTB->PSOR = MASK(DEBUG_T0_POS);
 X		((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << (0));
 N		read_full_xyz();
 N		convert_xyz_to_roll_pitch();
 N		
-N		// send roll
-N		msg = malloc(sizeof(float));
-N		*msg = roll;
-N		os_mbx_send(&tilt_mbx, (void *)msg, WAIT_FOREVER);
-X		_os_mbx_send((U32)rt_mbx_send,&tilt_mbx,(void *)msg,(0xffff));
-N		
-N		// send pitch
-N		msg = malloc(sizeof(float));
-N		*msg = pitch;
-N		os_mbx_send(&tilt_mbx, (void *)msg, WAIT_FOREVER);
-X		_os_mbx_send((U32)rt_mbx_send,&tilt_mbx,(void *)msg,(0xffff));
+N		// send accel data if there is room
+N		if (os_mbx_check(&tilt_mbx) == 2){
+X		if (_os_mbx_check((U32)rt_mbx_check,&tilt_mbx) == 2){
+N			// send roll
+N			msg = malloc(sizeof(float));
+N			*msg = roll;
+N			os_mbx_send(&tilt_mbx, (void *)msg, WAIT_FOREVER);
+X			_os_mbx_send((U32)rt_mbx_send,&tilt_mbx,(void *)msg,(0xffff));
+N			
+N			// send pitch
+N			msg = malloc(sizeof(float));
+N			*msg = pitch;
+N			os_mbx_send(&tilt_mbx, (void *)msg, WAIT_FOREVER);
+X			_os_mbx_send((U32)rt_mbx_send,&tilt_mbx,(void *)msg,(0xffff));
+N		}
 N
 N		PTB->PCOR = MASK(DEBUG_T0_POS);
 X		((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (0));
+N		
+N		current_task = TASK_IDLE;
+X		current_task = (0);
 N	}
 N}
 N
 N__task void Task_Update_Game_State(void) {	
 X__declspec(noreturn) void Task_Update_Game_State(void) {	
+N	char buffer[20];
+N	uint8_t state = STATUS_OPEN;
+X	uint8_t state = (1);
+N	uint8_t util_update_freq = STATUS_CPU_FREQ;
+X	uint8_t util_update_freq = ((6*1000/(30))/3);
 N	GAME_T game;
 N	
 N	Game_Init(&game);
 N	
-N	os_evt_wait_and(EV_INITIAL_PRESS, WAIT_FOREVER);
-X	_os_evt_wait((U32)rt_evt_wait,(1),(0xffff),1);
+N	//os_evt_wait_and(EV_INITIAL_PRESS, WAIT_FOREVER);
+N	TFT_Erase();
+N	
+N	Reset_Utilization_Stats();
 N	
 N	os_itv_set(TASK_UPDATE_GAME_STATE_TICKS);
 X	_os_itv_set((U32)rt_itv_set,(30));
@@ -10614,38 +10693,198 @@ X		_os_itv_wait((U32)rt_itv_wait);
 N		PTB->PSOR = MASK(DEBUG_T3_POS);
 X		((GPIO_Type *)(0x400FF040u))->PSOR = (1UL << (3));
 N		
-N		// test - automatic ball movement
-N		if (game.ball.loc.Y > TFT_HEIGHT - 2*PADDLE_BUFFER) game.ball.vy = BALL_INITIAL_VY;
-X		if (game.ball.loc.Y > (320) - 2*(5)) game.ball.vy = (-3);
-N		else if (game.ball.loc.Y < INFO_BAR_HEIGHT + HORZ_PADDLE_HEIGHT) game.ball.vy = -BALL_INITIAL_VY;
-X		else if (game.ball.loc.Y < (16) + (6)) game.ball.vy = -(-3);
-N		if (game.ball.loc.X > TFT_WIDTH - PADDLE_BUFFER - BALL_SIDE_LENGTH) game.ball.vx = BALL_INITIAL_VX;
-X		if (game.ball.loc.X > (240) - (5) - ((6))) game.ball.vx = (-2);
-N		else if (game.ball.loc.X < PADDLE_BUFFER) game.ball.vx = -BALL_INITIAL_VX;
-X		else if (game.ball.loc.X < (5)) game.ball.vx = -(-2);
-N		
-N		// brick processing
-N		Detect_Brick_Collision(&game);	// look for ball collisions with a brick
-N		Redraw_Bricks(&game);						// redraw all bricks, adjusting color where necessary
-N		
-N		// ball processing
-N		Detect_Paddle_Collision(&game);	// look for ball collisions with the paddle
-N		Move_Ball(&game);								// adjust the position of the ball based on velocities
-N		Redraw_Ball(&game);							// redraw ball based on new position
-N		
-N		// paddle processing
-N		Convert_Tilt(&game);						// Covert the pitch/roll values to velocities for the paddles
-N		Move_Paddles(&game);						// adjust position of paddles based on velocities
-N		Redraw_Paddles(&game);					// redraw paddles based on new positions
-N		
-N		// check for win
-N		if (game.hits >= BRICK_TOTAL_NUM) {
-X		if (game.hits >= ((10)*(6))) {
-N			TFT_Text_PrintStr_RC(3,0, "VICTORY!");
-N			while(1);
+N		// if the status window is closed, process the game normally
+N		if (state == STATUS_CLOSED) {
+X		if (state == (2)) {
+N			current_task = TASK_GAME;
+X			current_task = (5);
+N			
+N			// redraw info bar
+N			sprintf(buffer, "[STATUS]   Lives: %d", game.lives);
+N			os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X			_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N			TFT_Text_PrintStr_RC(0,0, buffer);
+N			os_mut_release(&LCD_mutex);
+X			_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N			
+N			// test - automatic ball movement
+N			if (game.ball.loc.Y > TFT_HEIGHT - 2*PADDLE_BUFFER) game.ball.vy = BALL_INITIAL_VY;
+X			if (game.ball.loc.Y > (320) - 2*(5)) game.ball.vy = (-3);
+N			else if (game.ball.loc.Y < INFO_BAR_HEIGHT + HORZ_PADDLE_HEIGHT) game.ball.vy = -BALL_INITIAL_VY;
+X			else if (game.ball.loc.Y < (17) + (6)) game.ball.vy = -(-3);
+N			if (game.ball.loc.X > TFT_WIDTH - PADDLE_BUFFER - BALL_SIDE_LENGTH) game.ball.vx = BALL_INITIAL_VX;
+X			if (game.ball.loc.X > (240) - (5) - ((6))) game.ball.vx = (-2);
+N			else if (game.ball.loc.X < PADDLE_BUFFER) game.ball.vx = -BALL_INITIAL_VX;
+X			else if (game.ball.loc.X < (5)) game.ball.vx = -(-2);
+N			
+N			// brick processing
+N			Detect_Brick_Collision(&game);	// look for ball collisions with a brick
+N			Redraw_Bricks(&game);						// redraw all bricks, adjusting color where necessary
+N			
+N			// ball processing
+N			Detect_Paddle_Collision(&game);	// look for ball collisions with the paddle
+N			Move_Ball(&game);								// adjust the position of the ball based on velocities
+N			Redraw_Ball(&game);							// redraw ball based on new position
+N			
+N			// paddle processing
+N			Convert_Tilt(&game);						// Covert the pitch/roll values to velocities for the paddles
+N			Move_Paddles(&game);						// adjust position of paddles based on velocities
+N			Redraw_Paddles(&game);					// redraw paddles based on new positions
+N			
+N			// check for win
+N			if (game.hits >= BRICK_TOTAL_NUM) {
+X			if (game.hits >= ((10)*(6))) {
+N				TFT_Text_PrintStr_RC(3,0, "VICTORY!");
+N				Reset_Utilization_Stats();
+N				while(1);
+N			}
+N			
+N			// check for screen press from mailbox
+N			if (os_mbx_check(&touch_mbx) < 3){
+X			if (_os_mbx_check((U32)rt_mbx_check,&touch_mbx) < 3){
+N				void * msg;
+N				PT_T p;
+N				os_mbx_wait(touch_mbx, &msg, WAIT_FOREVER);
+X				_os_mbx_wait((U32)rt_mbx_wait,touch_mbx,&msg,(0xffff));
+N				p = *(PT_T *)msg;
+N				free(msg);
+N				// check if pressed in status box
+N				if (p.X < STATUS_BUT_WIDTH && p.Y < STATUS_BUT_HEIGHT){
+X				if (p.X < ((240)/2) && p.Y < (2*(17))){
+N					Pause_Game_Utilization();
+N					TFT_Erase();
+N					state = STATUS_OPEN;
+X					state = (1);
+N					util_update_freq = STATUS_CPU_FREQ;
+X					util_update_freq = ((6*1000/(30))/3);
+N				}
+N			}
+N		}
+N		// if the status window is opened, display the status window and pause the game
+N		else if (state == STATUS_OPEN){			
+X		else if (state == (1)){			
+N			current_task = TASK_GAME_PAUSED;
+X			current_task = (7);
+N			
+N			// redraw info bars
+N			os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X			_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N			TFT_Text_PrintStr_RC(0,0, "[EXIT]  System Info");
+N			TFT_Text_PrintStr_RC(TFT_MAX_ROWS - 1,0, "      PAUSED");
+X			TFT_Text_PrintStr_RC(((320)/G_TFT_char_height) - 1,0, "      PAUSED");
+N			os_mut_release(&LCD_mutex);
+X			_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N			
+N			// CPU statistics
+N			if(util_update_freq == STATUS_CPU_FREQ) {	
+X			if(util_update_freq == ((6*1000/(30))/3)) {	
+N				float val;
+N				float total = 0.0;
+N				os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X				_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N				TFT_Text_PrintStr_RC(3,0, "Task      CPU Usage");
+N				TFT_Text_PrintStr_RC(4,0, "-------------------");
+N				val = Get_Utilization_Stats(TASK_READ_TS);
+X				val = Get_Utilization_Stats((1));
+N				total += val;
+N				sprintf(buffer, "Read TS      %5.2f%%", val);
+N				TFT_Text_PrintStr_RC(5,0, buffer);
+N				val = Get_Utilization_Stats(TASK_ACCEL);
+X				val = Get_Utilization_Stats((2));
+N				total += val;
+N				sprintf(buffer, "Read Accel   %5.2f%%", val);
+N				TFT_Text_PrintStr_RC(6,0, buffer);
+N				val = Get_Utilization_Stats(TASK_SND_MNGR);
+X				val = Get_Utilization_Stats((3));
+N				total += val;
+N				sprintf(buffer, "Sound Mngr   %5.2f%%", val);
+N				TFT_Text_PrintStr_RC(7,0, buffer);
+N				val = Get_Utilization_Stats(TASK_SND_RFL);
+X				val = Get_Utilization_Stats((4));
+N				total += val;
+N				sprintf(buffer, "Sound Refil  %5.2f%%", val);
+N				TFT_Text_PrintStr_RC(8,0, buffer);
+N				val = Get_Utilization_Stats(TASK_GAME_PAUSED);
+X				val = Get_Utilization_Stats((7));
+N				total += val;
+N				sprintf(buffer, "Update Game  %5.2f%%", val);
+N				TFT_Text_PrintStr_RC(9,0, buffer);
+N				TFT_Text_PrintStr_RC(10,0, "-------------------");
+N				sprintf(buffer, "Total Usage  %5.2f%%", total);
+N				TFT_Text_PrintStr_RC(11,0, buffer);	
+N				val = 100.0 - total;
+N				sprintf(buffer, "Idle Time    %5.2f%%", val);
+N				TFT_Text_PrintStr_RC(12,0, buffer);
+N				os_mut_release(&LCD_mutex);
+X				_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N			}
+N			else if (util_update_freq == STATUS_STK_FREQ){
+X			else if (util_update_freq == (2*((6*1000/(30))/3))){
+N				int val;
+N				os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X				_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N				TFT_Text_PrintStr_RC(3,0, "Task          Stack");
+N				val = 0;
+N				sprintf(buffer, "Read TS      %5db", val);
+N				TFT_Text_PrintStr_RC(5,0, buffer);
+N				sprintf(buffer, "Read Accel   %5db", val);
+N				TFT_Text_PrintStr_RC(6,0, buffer);
+N				sprintf(buffer, "Sound Mngr   %5db", val);
+N				TFT_Text_PrintStr_RC(7,0, buffer);
+N				sprintf(buffer, "Sound Refil  %5db", val);
+N				TFT_Text_PrintStr_RC(8,0, buffer);
+N				sprintf(buffer, "Update Game  %5db", val);
+N				TFT_Text_PrintStr_RC(9,0, buffer);
+N				TFT_Text_PrintStr_RC(11,0, "                   ");
+N				TFT_Text_PrintStr_RC(12,0, "                   ");
+N				os_mut_release(&LCD_mutex);
+X				_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N			}
+N			// maximum stack depth, based on configuration
+N			else if (util_update_freq == STATUS_MAX_STK_FREQ){
+X			else if (util_update_freq == ((6*1000/(30)))){
+N				util_update_freq = 0;
+N				os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X				_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N				TFT_Text_PrintStr_RC(3,0, "Task      Max Stack");
+N				sprintf(buffer, "Read TS      %5dB", 256);
+N				TFT_Text_PrintStr_RC(5,0, buffer);
+N				sprintf(buffer, "Read Accel   %5dB", 512);
+N				TFT_Text_PrintStr_RC(6,0, buffer);
+N				sprintf(buffer, "Sound Mngr   %5dB", 256);
+N				TFT_Text_PrintStr_RC(7,0, buffer);
+N				sprintf(buffer, "Sound Refil  %5dB", 256);
+N				TFT_Text_PrintStr_RC(8,0, buffer);
+N				sprintf(buffer, "Update Game  %5dB", 1024);
+N				TFT_Text_PrintStr_RC(9,0, buffer);
+N				os_mut_release(&LCD_mutex);
+X				_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N			}
+N			util_update_freq++;
+N			
+N			// check for screen press from mailbox
+N			if (os_mbx_check(&touch_mbx) < 3){
+X			if (_os_mbx_check((U32)rt_mbx_check,&touch_mbx) < 3){
+N				void * msg;
+N				PT_T p;
+N				os_mbx_wait(touch_mbx, &msg, WAIT_FOREVER);
+X				_os_mbx_wait((U32)rt_mbx_wait,touch_mbx,&msg,(0xffff));
+N				p = *(PT_T *)msg;
+N				free(msg);
+N				// check if pressed in exit box
+N				if (p.X < STATUS_BUT_WIDTH && p.Y < STATUS_BUT_HEIGHT){
+X				if (p.X < ((240)/2) && p.Y < (2*(17))){
+N					TFT_Erase();
+N					state = STATUS_CLOSED;
+X					state = (2);
+N					Reset_Utilization_Stats();
+N				}
+N			}
 N		}
 N
 N		PTB->PCOR = MASK(DEBUG_T3_POS);
 X		((GPIO_Type *)(0x400FF040u))->PCOR = (1UL << (3));
+N		current_task = TASK_IDLE;
+X		current_task = (0);
 N	}
 N}

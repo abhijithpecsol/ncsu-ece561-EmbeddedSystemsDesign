@@ -8,3 +8,4 @@
 .\obj\timers.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h
 .\obj\timers.o: .\inc\region.h
 .\obj\timers.o: .\inc\profile.h
+.\obj\timers.o: .\inc\utilization.h
