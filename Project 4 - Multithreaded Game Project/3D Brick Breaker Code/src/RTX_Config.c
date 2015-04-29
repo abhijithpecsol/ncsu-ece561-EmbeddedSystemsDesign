@@ -33,7 +33,7 @@
 //   <i> The memory space for the stack is provided by the user.
 //   <i> Default: 0
 #ifndef OS_PRIVCNT
- #define OS_PRIVCNT     2
+ #define OS_PRIVCNT     5
 #endif
 
 //   <o>Task stack size [bytes] <20-4096:8><#/4>

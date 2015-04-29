@@ -8820,6 +8820,47 @@ N#endif /* __math_h */
 N
 N/* end of math.h */
 L 7 "src\MMA8451.c" 2
+N#include "utilization.h"
+L 1 ".\inc\utilization.h" 1
+N#ifndef utilization_h
+N#define utilization_h
+N
+N#include <stdint.h>
+N
+N#define NUM_TASKS		(7)
+N
+N#define TASK_IDLE			(0)
+N#define TASK_READ_TS	(1)
+N#define TASK_ACCEL		(2)
+N#define TASK_SND_MNGR	(3)
+N#define TASK_SND_RFL	(4)
+N#define TASK_GAME			(5)
+N#define TASK_STATUS		(6)
+N#define TASK_GAME_PAUSED (7)
+N
+N#define STACK_RA_BOT		(63)
+N#define STACK_GAME_BOT	(127)
+N#define STACK_RTS_BOT		(256/8-1)
+N#define STACK_SM_BOT		(256/8-1)
+N#define STACK_SR_BOT		(256/8-1)
+N
+N#define CURRENT_STACK	(1)
+N#define MAX_STACK			(2)
+N
+N#define TRACK_STACK		(1)
+N
+Nvoid Init_Utilization_Profiling(void);
+Nvoid Reset_Utilization_Stats(void);
+Nfloat Get_Utilization_Stats(uint8_t task_id);
+Nvoid Pause_Game_Utilization(void);
+Nvoid Update_Stack_Pointer(unsigned int sp, uint8_t task_id);
+Nunsigned int Get_Stack_Depth(uint8_t task_id, uint8_t type);
+Nvoid Display_CPU_Stats(void);
+Nvoid Display_Stack_Stats(void);
+Nvoid Display_Max_Stack_Stats(void);
+N
+N#endif
+L 8 "src\MMA8451.c" 2
 N
 N#define M_PI_2 (M_PI/2.0)
 N#define M_PI_4 (M_PI/4.0)
@@ -8868,9 +8909,15 @@ N  Reads full 16-bit X, Y, Z accelerations.
 N*/
 Nvoid read_full_xyz()
 N{
-N	
 N	int i;
 N	uint8_t data[6];
+N	
+N	// utilization tracking
+N	#if TRACK_STACK == 1
+X	#if (1) == 1
+N		Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+X		Update_Stack_Pointer(__current_sp(), (2));
+N	#endif
 N	
 N	i2c_start();
 N	i2c_read_setup(MMA_ADDR , REG_XHI);
@@ -8969,6 +9016,13 @@ N	float ax = acc_X/COUNTS_PER_G,
 N				ay = acc_Y/COUNTS_PER_G,
 N				az = acc_Z/COUNTS_PER_G;
 N*/
+N	
+N	// utilization tracking
+N	#if TRACK_STACK == 1
+X	#if (1) == 1
+N		Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+X		Update_Stack_Pointer(__current_sp(), (2));
+N	#endif
 N	
 N	roll = approx_atan2f(acc_Y, acc_Z)*(180/M_PI);
 X	roll = approx_atan2f(acc_Y, acc_Z)*(180/(3.14159265));

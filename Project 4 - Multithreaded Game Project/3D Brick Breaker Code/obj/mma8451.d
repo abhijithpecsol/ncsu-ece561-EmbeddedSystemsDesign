@@ -10,3 +10,4 @@
 .\obj\mma8451.o: .\inc\delay.h
 .\obj\mma8451.o: .\inc\LEDs.h
 .\obj\mma8451.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+.\obj\mma8451.o: .\inc\utilization.h

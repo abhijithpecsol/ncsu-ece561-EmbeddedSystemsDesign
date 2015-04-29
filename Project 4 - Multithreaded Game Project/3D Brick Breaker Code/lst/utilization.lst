@@ -9830,7 +9830,8 @@ N
 N#define WAIT_START			(0)
 N#define STATUS_OPEN			(1)
 N#define STATUS_CLOSED		(2)
-N#define STATUS_UPDATE_FREQ	(6*1000/TASK_UPDATE_GAME_STATE_TICKS)
+N#define STATUS_SEC_PER	(3)
+N#define STATUS_UPDATE_FREQ	(3*STATUS_SEC_PER*1000/TASK_UPDATE_GAME_STATE_TICKS)
 N#define STATUS_CPU_FREQ			(STATUS_UPDATE_FREQ/3)
 N#define STATUS_STK_FREQ			(2*STATUS_CPU_FREQ)
 N#define STATUS_MAX_STK_FREQ	(STATUS_UPDATE_FREQ)
@@ -9874,10 +9875,26 @@ N#define TASK_GAME			(5)
 N#define TASK_STATUS		(6)
 N#define TASK_GAME_PAUSED (7)
 N
+N#define STACK_RA_BOT		(63)
+N#define STACK_GAME_BOT	(127)
+N#define STACK_RTS_BOT		(256/8-1)
+N#define STACK_SM_BOT		(256/8-1)
+N#define STACK_SR_BOT		(256/8-1)
+N
+N#define CURRENT_STACK	(1)
+N#define MAX_STACK			(2)
+N
+N#define TRACK_STACK		(1)
+N
 Nvoid Init_Utilization_Profiling(void);
 Nvoid Reset_Utilization_Stats(void);
 Nfloat Get_Utilization_Stats(uint8_t task_id);
 Nvoid Pause_Game_Utilization(void);
+Nvoid Update_Stack_Pointer(unsigned int sp, uint8_t task_id);
+Nunsigned int Get_Stack_Depth(uint8_t task_id, uint8_t type);
+Nvoid Display_CPU_Stats(void);
+Nvoid Display_Stack_Stats(void);
+Nvoid Display_Max_Stack_Stats(void);
 N
 N#endif
 L 10 "src\utilization.c" 2
@@ -9886,7 +9903,12 @@ Nvolatile unsigned long total_ticks;
 Nunsigned long total_ticks_game_paused;
 Nunsigned long task_ticks[NUM_TASKS];
 Xunsigned long task_ticks[(7)];
-Nextern OS_MUT util_mutex;
+Nunsigned int stack_pointers[NUM_TASKS];
+Xunsigned int stack_pointers[(7)];
+Nunsigned int max_stack_pointers[NUM_TASKS];
+Xunsigned int max_stack_pointers[(7)];
+Nextern OS_MUT LCD_mutex;
+Nextern U64 RA_Stack[], GAME_Stack[], RTS_Stack[], SM_Stack[], SR_Stack[];
 N
 Nvoid Init_Utilization_Profiling(void) {
 N	unsigned i;
@@ -9896,6 +9918,9 @@ N	total_ticks = 0;
 N  for (i=0; i<NUM_TASKS; i++) {
 X  for (i=0; i<(7); i++) {
 N	  task_ticks[i]=0;
+N		stack_pointers[i] = 0;
+N		max_stack_pointers[i] = UINT32_MAX;
+X		max_stack_pointers[i] = 4294967295u;
 N  }
 N	
 N	// Initialize and start PIT timer
@@ -9903,6 +9928,7 @@ N	PIT_Init(2399); 		// 24 MHz/(23999+1) = 1000 samples per second
 N	PIT_Start();
 N}
 N
+N// Sets utilization stats back to zero
 Nvoid Reset_Utilization_Stats(void){
 N	unsigned i;
 N	total_ticks = 0;
@@ -9912,6 +9938,7 @@ N	  task_ticks[i]=0;
 N  }
 N}
 N
+N// Get CPU utilization for a specific task
 Nfloat Get_Utilization_Stats(uint8_t task_id){
 N	if (task_id == TASK_GAME_PAUSED){
 X	if (task_id == (7)){
@@ -9923,6 +9950,197 @@ N		return (float)task_ticks[task_id]/total_ticks*100.0;
 N	}
 N}
 N
+N// Since the utilization stats show in game thread, save game thread utilization to show accurate value
 Nvoid Pause_Game_Utilization(void) {
 N	total_ticks_game_paused = total_ticks;
+N}
+N
+N// Updates the value of the stack pointer for a specific task
+Nvoid Update_Stack_Pointer(unsigned int sp, uint8_t task_id){
+N	// track greatest stack depth
+N	if (sp < stack_pointers[task_id]){
+N		max_stack_pointers[task_id] = sp;
+N	}
+N	
+N	// track current stack depth
+N	stack_pointers[task_id] = sp;
+N}
+N
+N// Returns the current size of the stack for a specific task
+Nunsigned int Get_Stack_Depth(uint8_t task_id, uint8_t type){
+N	unsigned int task_sp;
+N	unsigned int bot_stk;
+N	
+N	switch(type){
+N		case CURRENT_STACK:
+X		case (1):
+N			task_sp = stack_pointers[task_id];
+N			break;
+N		
+N		case MAX_STACK:
+X		case (2):
+N			task_sp = max_stack_pointers[task_id];
+N			break;
+N		
+N		default:
+N			return 0;
+N	}
+N	
+N	#if TRACK_STACK == 0
+X	#if (1) == 0
+S		return 0;
+N	#endif
+N	
+N	if (task_sp == 0 || task_sp == UINT32_MAX){
+X	if (task_sp == 0 || task_sp == 4294967295u){
+N		return 0;
+N	}
+N	
+N	// get task's bottom of stack
+N	switch(task_id){
+N		case TASK_ACCEL:
+X		case (2):
+N			bot_stk = (unsigned int)&RA_Stack[STACK_RA_BOT];
+X			bot_stk = (unsigned int)&RA_Stack[(63)];
+N			break;
+N		
+N		case TASK_READ_TS:
+X		case (1):
+N			bot_stk = (unsigned int)&RTS_Stack[STACK_RTS_BOT];
+X			bot_stk = (unsigned int)&RTS_Stack[(256/8-1)];
+N			break;
+N		
+N		case TASK_SND_MNGR:
+X		case (3):
+N			bot_stk = (unsigned int)&SM_Stack[STACK_SM_BOT];
+X			bot_stk = (unsigned int)&SM_Stack[(256/8-1)];
+N			break;
+N		
+N		case TASK_SND_RFL:
+X		case (4):
+N			bot_stk = (unsigned int)&SR_Stack[STACK_SR_BOT];
+X			bot_stk = (unsigned int)&SR_Stack[(256/8-1)];
+N			break;
+N		
+N		case TASK_GAME:
+X		case (5):
+N			bot_stk = (unsigned int)&GAME_Stack[STACK_GAME_BOT];
+X			bot_stk = (unsigned int)&GAME_Stack[(127)];
+N			break;
+N		
+N		default:
+N			return 0;
+N	}
+N	
+N	// 64 + difference is stack depth
+N	// each task has 64B of kernel info by default
+N	return 64 + (bot_stk - task_sp);
+N}
+N
+Nvoid Display_CPU_Stats(void){
+N	char buffer[20];
+N	float val;
+N	float total = 0.0;
+N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N	TFT_Text_PrintStr_RC(3,0, "Task      CPU Usage");
+N	TFT_Text_PrintStr_RC(4,0, "-------------------");
+N	val = Get_Utilization_Stats(TASK_READ_TS);
+X	val = Get_Utilization_Stats((1));
+N	total += val;
+N	sprintf(buffer, "Read TS      %5.2f%%", val);
+N	TFT_Text_PrintStr_RC(5,0, buffer);
+N	val = Get_Utilization_Stats(TASK_ACCEL);
+X	val = Get_Utilization_Stats((2));
+N	total += val;
+N	sprintf(buffer, "Read Accel   %5.2f%%", val);
+N	TFT_Text_PrintStr_RC(6,0, buffer);
+N	val = Get_Utilization_Stats(TASK_SND_MNGR);
+X	val = Get_Utilization_Stats((3));
+N	total += val;
+N	sprintf(buffer, "Sound Mngr   %5.2f%%", val);
+N	TFT_Text_PrintStr_RC(7,0, buffer);
+N	val = Get_Utilization_Stats(TASK_SND_RFL);
+X	val = Get_Utilization_Stats((4));
+N	total += val;
+N	sprintf(buffer, "Sound Refil  %5.2f%%", val);
+N	TFT_Text_PrintStr_RC(8,0, buffer);
+N	val = Get_Utilization_Stats(TASK_GAME_PAUSED);
+X	val = Get_Utilization_Stats((7));
+N	total += val;
+N	sprintf(buffer, "Update Game  %5.2f%%", val);
+N	TFT_Text_PrintStr_RC(9,0, buffer);
+N	TFT_Text_PrintStr_RC(10,0, "-------------------");
+N	sprintf(buffer, "Total Usage  %5.2f%%", total);
+N	TFT_Text_PrintStr_RC(11,0, buffer);	
+N	val = 100.0 - total;
+N	sprintf(buffer, "Idle Time    %5.2f%%", val);
+N	TFT_Text_PrintStr_RC(12,0, buffer);
+N	os_mut_release(&LCD_mutex);
+X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N}
+N
+Nvoid Display_Stack_Stats(void){
+N	char buffer[20];
+N	unsigned int val;
+N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N	//TFT_Text_PrintStr_RC(3,0, "Task          Stack");
+N	TFT_Text_PrintStr_RC(3,0, "Task  Current Stack");
+N	val = Get_Stack_Depth(TASK_READ_TS, CURRENT_STACK);
+X	val = Get_Stack_Depth((1), (1));
+N	sprintf(buffer, "Read TS      %5uB", val);
+N	TFT_Text_PrintStr_RC(5,0, buffer);
+N	val = Get_Stack_Depth(TASK_ACCEL, CURRENT_STACK);
+X	val = Get_Stack_Depth((2), (1));
+N	sprintf(buffer, "Read Accel   %5uB", val);
+N	TFT_Text_PrintStr_RC(6,0, buffer);
+N	val = Get_Stack_Depth(TASK_SND_MNGR, CURRENT_STACK);
+X	val = Get_Stack_Depth((3), (1));
+N	sprintf(buffer, "Sound Mngr   %5uB", val);
+N	TFT_Text_PrintStr_RC(7,0, buffer);
+N	val = Get_Stack_Depth(TASK_SND_RFL, CURRENT_STACK);
+X	val = Get_Stack_Depth((4), (1));
+N	sprintf(buffer, "Sound Refil  %5uB", val);
+N	TFT_Text_PrintStr_RC(8,0, buffer);
+N	val = Get_Stack_Depth(TASK_GAME, CURRENT_STACK);
+X	val = Get_Stack_Depth((5), (1));
+N	sprintf(buffer, "Update Game  %5uB", val);
+N	TFT_Text_PrintStr_RC(9,0, buffer);
+N	TFT_Text_PrintStr_RC(11,0, "                   ");
+N	TFT_Text_PrintStr_RC(12,0, "                   ");
+N	os_mut_release(&LCD_mutex);
+X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N}
+N
+Nvoid Display_Max_Stack_Stats(void){
+N	char buffer[20];
+N	unsigned int val;
+N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N	TFT_Text_PrintStr_RC(3,0, "Task      Max Stack");
+N	val = Get_Stack_Depth(TASK_READ_TS, MAX_STACK);
+X	val = Get_Stack_Depth((1), (2));
+N	sprintf(buffer, "Read TS      %5uB", val);
+N	TFT_Text_PrintStr_RC(5,0, buffer);
+N	val = Get_Stack_Depth(TASK_ACCEL, MAX_STACK);
+X	val = Get_Stack_Depth((2), (2));
+N	sprintf(buffer, "Read Accel   %5uB", val);
+N	TFT_Text_PrintStr_RC(6,0, buffer);
+N	val = Get_Stack_Depth(TASK_SND_MNGR, MAX_STACK);
+X	val = Get_Stack_Depth((3), (2));
+N	sprintf(buffer, "Sound Mngr   %5uB", val);
+N	TFT_Text_PrintStr_RC(7,0, buffer);
+N	val = Get_Stack_Depth(TASK_SND_RFL, MAX_STACK);
+X	val = Get_Stack_Depth((4), (2));
+N	sprintf(buffer, "Sound Refil  %5uB", val);
+N	TFT_Text_PrintStr_RC(8,0, buffer);
+N	val = Get_Stack_Depth(TASK_GAME, MAX_STACK);
+X	val = Get_Stack_Depth((5), (2));
+N	sprintf(buffer, "Update Game  %5uB", val);
+N	TFT_Text_PrintStr_RC(9,0, buffer);
+N	TFT_Text_PrintStr_RC(11,0, "                   ");
+N	TFT_Text_PrintStr_RC(12,0, "                   ");
+N	os_mut_release(&LCD_mutex);
+X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
 N}

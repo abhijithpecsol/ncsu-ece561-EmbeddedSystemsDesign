@@ -1096,10 +1096,26 @@ N#define TASK_GAME			(5)
 N#define TASK_STATUS		(6)
 N#define TASK_GAME_PAUSED (7)
 N
+N#define STACK_RA_BOT		(63)
+N#define STACK_GAME_BOT	(127)
+N#define STACK_RTS_BOT		(256/8-1)
+N#define STACK_SM_BOT		(256/8-1)
+N#define STACK_SR_BOT		(256/8-1)
+N
+N#define CURRENT_STACK	(1)
+N#define MAX_STACK			(2)
+N
+N#define TRACK_STACK		(1)
+N
 Nvoid Init_Utilization_Profiling(void);
 Nvoid Reset_Utilization_Stats(void);
 Nfloat Get_Utilization_Stats(uint8_t task_id);
 Nvoid Pause_Game_Utilization(void);
+Nvoid Update_Stack_Pointer(unsigned int sp, uint8_t task_id);
+Nunsigned int Get_Stack_Depth(uint8_t task_id, uint8_t type);
+Nvoid Display_CPU_Stats(void);
+Nvoid Display_Stack_Stats(void);
+Nvoid Display_Max_Stack_Stats(void);
 N
 N#endif
 L 14 "src\RTX_Config.c" 2
@@ -1125,7 +1141,7 @@ N//   <i> Define the number of tasks that will use a bigger stack.
 N//   <i> The memory space for the stack is provided by the user.
 N//   <i> Default: 0
 N#ifndef OS_PRIVCNT
-N #define OS_PRIVCNT     2
+N #define OS_PRIVCNT     5
 N#endif
 N
 N//   <o>Task stack size [bytes] <20-4096:8><#/4>
@@ -1346,7 +1362,7 @@ N *---------------------------------------------------------------------------*/
 NU16 const os_maxtaskrun = OS_TASKCNT;
 XU16 const os_maxtaskrun = 7;
 NU32 const os_stackinfo  = (OS_STKCHECK<<24)| (OS_PRIVCNT<<16) | (OS_STKSIZE*4);
-XU32 const os_stackinfo  = (1<<24)| (2<<16) | (64*4);
+XU32 const os_stackinfo  = (1<<24)| (5<<16) | (64*4);
 NU32 const os_rrobin     = (OS_ROBIN << 16) | OS_ROBINTOUT;
 XU32 const os_rrobin     = (0 << 16) | 1000;
 N#if (__CM__)
@@ -1373,7 +1389,7 @@ NU16 const mp_tcb_size = sizeof(mp_tcb);
 N
 N/* Memory pool for System stack allocation (+ os_idle_demon). */
 N_declare_box8 (mp_stk, OS_STKSIZE*4, OS_TASKCNT-OS_PRIVCNT+1);
-XU64 mp_stk[(((64*4)+7)/8)*(7-2+1) + 2];
+XU64 mp_stk[(((64*4)+7)/8)*(7-5+1) + 2];
 NU32 const mp_stk_size = sizeof(mp_stk);
 N
 N#ifndef OS_FIFOSZ

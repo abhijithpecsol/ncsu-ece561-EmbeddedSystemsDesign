@@ -1,5 +1,6 @@
 #include <MKL25Z4.H>
 #include "I2C.h"
+#include "utilization.h"
 
 //init i2c0
 void i2c_init(void)
@@ -44,6 +45,11 @@ void i2c_start()
 #pragma no_inline 
 void i2c_read_setup(uint8_t dev, uint8_t address)
 {
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+	#endif
+	
 	I2C0->D = dev;			  /*send dev address	*/
 	I2C_WAIT							/*wait for completion */
 	
@@ -63,6 +69,11 @@ void i2c_read_setup(uint8_t dev, uint8_t address)
 uint8_t i2c_repeated_read(uint8_t isLastRead)
 {
 	uint8_t data;
+	
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+	#endif
 	
 	if(isLastRead)	{
 		NACK;								/*set NACK after read	*/

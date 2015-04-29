@@ -7367,10 +7367,26 @@ N#define TASK_GAME			(5)
 N#define TASK_STATUS		(6)
 N#define TASK_GAME_PAUSED (7)
 N
+N#define STACK_RA_BOT		(63)
+N#define STACK_GAME_BOT	(127)
+N#define STACK_RTS_BOT		(256/8-1)
+N#define STACK_SM_BOT		(256/8-1)
+N#define STACK_SR_BOT		(256/8-1)
+N
+N#define CURRENT_STACK	(1)
+N#define MAX_STACK			(2)
+N
+N#define TRACK_STACK		(1)
+N
 Nvoid Init_Utilization_Profiling(void);
 Nvoid Reset_Utilization_Stats(void);
 Nfloat Get_Utilization_Stats(uint8_t task_id);
 Nvoid Pause_Game_Utilization(void);
+Nvoid Update_Stack_Pointer(unsigned int sp, uint8_t task_id);
+Nunsigned int Get_Stack_Depth(uint8_t task_id, uint8_t type);
+Nvoid Display_CPU_Stats(void);
+Nvoid Display_Stack_Stats(void);
+Nvoid Display_Max_Stack_Stats(void);
 N
 N#endif
 L 6 "src\timers.c" 2

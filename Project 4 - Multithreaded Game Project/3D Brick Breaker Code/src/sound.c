@@ -121,6 +121,9 @@ uint16_t Sound_Generate_Next_Sample (void) {
 void Play_Waveform_with_DMA(void) {
 	//	Init_Waveform();
 	//	Configure_TPM0_for_DMA(45);
+	#if TRACK_STACK == 1
+			Update_Stack_Pointer(__current_sp(), TASK_SND_MNGR);
+	#endif
 	Configure_DMA_For_Playback(Waveform, NUM_WAVEFORM_SAMPLES, 1);
 	Start_DMA_Playback();
 }
@@ -137,20 +140,36 @@ __task void Task_Sound_Manager(void) {
 	
 	os_itv_set(1000);
 	
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_SND_MNGR);
+	#endif
+	
 	while (1) {
 		//os_itv_wait();	// make a new sound every second
 		os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
 		
+		// utilization tracking
 		current_task = TASK_SND_MNGR;
+		#if TRACK_STACK == 1
+			Update_Stack_Pointer(__current_sp(), TASK_SND_MNGR);
+		#endif
 		
 		// play blip sound
-		blip_sound_length = BLIP_SOUND_LEN;
-		Play_Waveform_with_DMA();
-		
+		if (blip_sound_length == 0){
+			blip_sound_index = 0;
+			blip_sound_length = BLIP_SOUND_LEN;
+			Play_Waveform_with_DMA();
+		}
+				
 		// Hack - temporary code until voice code is added
 //		WNG_Len = 2500;
 //		Play_Waveform_with_DMA();
 		
+		// utilization tracking
+		#if TRACK_STACK == 1
+			Update_Stack_Pointer(__current_sp(), TASK_SND_MNGR);
+		#endif
 		current_task = TASK_IDLE;
 	}
 }
@@ -158,18 +177,19 @@ __task void Task_Sound_Manager(void) {
 __task void Task_Refill_Sound_Buffer(void) {
 	uint32_t i;
 	
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_SND_RFL);
+	#endif
+	
 	while (1) {
 		os_evt_wait_and(EV_REFILL_SOUND, WAIT_FOREVER); // wait for trigger
-		current_task = TASK_SND_RFL;
 		
-//		for (i=0; i<NUM_WAVEFORM_SAMPLES; i++) {
-//			if (WNG_Len > 0) {
-//				Waveform[i] = Sound_Generate_Next_Sample();
-//				WNG_Len--;
-//			} else {
-//				Waveform[i] = MAX_DAC_CODE/2;
-//			}
-//		}
+		// utilization tracking
+		current_task = TASK_SND_RFL;
+		#if TRACK_STACK == 1
+			Update_Stack_Pointer(__current_sp(), TASK_SND_RFL);
+		#endif
 		
 		// play sound once, otherwise play nothing
 		for (i=0; i<NUM_WAVEFORM_SAMPLES; i++) {
@@ -183,15 +203,28 @@ __task void Task_Refill_Sound_Buffer(void) {
 			}
 		}
 		
+		// utilization tracking
+		#if TRACK_STACK == 1
+			Update_Stack_Pointer(__current_sp(), TASK_SND_RFL);
+		#endif
 		current_task = TASK_IDLE;
 	}
 }
 
 uint16_t Get_Next_Blip_Sample(void){
 	uint16_t sample;
+	
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_SND_RFL);
+	#endif
+	
+	// check for buffer overflow
 	if (blip_sound_index >= BLIP_SOUND_LEN) {
 		blip_sound_index = 0;
 	}
+	
+	// return next sample
 	sample = blip_sound[blip_sound_index++] << 5;		// align for 12 bits
 	if (sample > MAX_DAC_CODE) {
 		sample = MAX_DAC_CODE;

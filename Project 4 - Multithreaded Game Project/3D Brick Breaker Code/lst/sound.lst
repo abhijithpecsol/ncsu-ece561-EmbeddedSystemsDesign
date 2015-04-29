@@ -9715,7 +9715,8 @@ N
 N#define WAIT_START			(0)
 N#define STATUS_OPEN			(1)
 N#define STATUS_CLOSED		(2)
-N#define STATUS_UPDATE_FREQ	(6*1000/TASK_UPDATE_GAME_STATE_TICKS)
+N#define STATUS_SEC_PER	(3)
+N#define STATUS_UPDATE_FREQ	(3*STATUS_SEC_PER*1000/TASK_UPDATE_GAME_STATE_TICKS)
 N#define STATUS_CPU_FREQ			(STATUS_UPDATE_FREQ/3)
 N#define STATUS_STK_FREQ			(2*STATUS_CPU_FREQ)
 N#define STATUS_MAX_STK_FREQ	(STATUS_UPDATE_FREQ)
@@ -9759,10 +9760,26 @@ N#define TASK_GAME			(5)
 N#define TASK_STATUS		(6)
 N#define TASK_GAME_PAUSED (7)
 N
+N#define STACK_RA_BOT		(63)
+N#define STACK_GAME_BOT	(127)
+N#define STACK_RTS_BOT		(256/8-1)
+N#define STACK_SM_BOT		(256/8-1)
+N#define STACK_SR_BOT		(256/8-1)
+N
+N#define CURRENT_STACK	(1)
+N#define MAX_STACK			(2)
+N
+N#define TRACK_STACK		(1)
+N
 Nvoid Init_Utilization_Profiling(void);
 Nvoid Reset_Utilization_Stats(void);
 Nfloat Get_Utilization_Stats(uint8_t task_id);
 Nvoid Pause_Game_Utilization(void);
+Nvoid Update_Stack_Pointer(unsigned int sp, uint8_t task_id);
+Nunsigned int Get_Stack_Depth(uint8_t task_id, uint8_t type);
+Nvoid Display_CPU_Stats(void);
+Nvoid Display_Stack_Stats(void);
+Nvoid Display_Max_Stack_Stats(void);
 N
 N#endif
 L 13 "src\sound.c" 2
@@ -9904,6 +9921,11 @@ N// void Play_Waveform_with_DMA(uint32_t sample_period_us, uint16_t * waveform, 
 Nvoid Play_Waveform_with_DMA(void) {
 N	//	Init_Waveform();
 N	//	Configure_TPM0_for_DMA(45);
+N	#if TRACK_STACK == 1
+X	#if (1) == 1
+N			Update_Stack_Pointer(__current_sp(), TASK_SND_MNGR);
+X			Update_Stack_Pointer(__current_sp(), (3));
+N	#endif
 N	Configure_DMA_For_Playback(Waveform, NUM_WAVEFORM_SAMPLES, 1);
 X	Configure_DMA_For_Playback(Waveform, (512), 1);
 N	Start_DMA_Playback();
@@ -9925,23 +9947,45 @@ N
 N	os_itv_set(1000);
 X	_os_itv_set((U32)rt_itv_set,1000);
 N	
+N	// utilization tracking
+N	#if TRACK_STACK == 1
+X	#if (1) == 1
+N		Update_Stack_Pointer(__current_sp(), TASK_SND_MNGR);
+X		Update_Stack_Pointer(__current_sp(), (3));
+N	#endif
+N	
 N	while (1) {
 N		//os_itv_wait();	// make a new sound every second
 N		os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
 X		_os_evt_wait((U32)rt_evt_wait,(1),(0xffff),1); 
 N		
+N		// utilization tracking
 N		current_task = TASK_SND_MNGR;
 X		current_task = (3);
+N		#if TRACK_STACK == 1
+X		#if (1) == 1
+N			Update_Stack_Pointer(__current_sp(), TASK_SND_MNGR);
+X			Update_Stack_Pointer(__current_sp(), (3));
+N		#endif
 N		
 N		// play blip sound
-N		blip_sound_length = BLIP_SOUND_LEN;
-X		blip_sound_length = (3507);
-N		Play_Waveform_with_DMA();
-N		
+N		if (blip_sound_length == 0){
+N			blip_sound_index = 0;
+N			blip_sound_length = BLIP_SOUND_LEN;
+X			blip_sound_length = (3507);
+N			Play_Waveform_with_DMA();
+N		}
+N				
 N		// Hack - temporary code until voice code is added
 N//		WNG_Len = 2500;
 N//		Play_Waveform_with_DMA();
 N		
+N		// utilization tracking
+N		#if TRACK_STACK == 1
+X		#if (1) == 1
+N			Update_Stack_Pointer(__current_sp(), TASK_SND_MNGR);
+X			Update_Stack_Pointer(__current_sp(), (3));
+N		#endif
 N		current_task = TASK_IDLE;
 X		current_task = (0);
 N	}
@@ -9951,20 +9995,25 @@ N__task void Task_Refill_Sound_Buffer(void) {
 X__declspec(noreturn) void Task_Refill_Sound_Buffer(void) {
 N	uint32_t i;
 N	
+N	// utilization tracking
+N	#if TRACK_STACK == 1
+X	#if (1) == 1
+N		Update_Stack_Pointer(__current_sp(), TASK_SND_RFL);
+X		Update_Stack_Pointer(__current_sp(), (4));
+N	#endif
+N	
 N	while (1) {
 N		os_evt_wait_and(EV_REFILL_SOUND, WAIT_FOREVER); // wait for trigger
 X		_os_evt_wait((U32)rt_evt_wait,(1),(0xffff),1); 
+N		
+N		// utilization tracking
 N		current_task = TASK_SND_RFL;
 X		current_task = (4);
-N		
-N//		for (i=0; i<NUM_WAVEFORM_SAMPLES; i++) {
-N//			if (WNG_Len > 0) {
-N//				Waveform[i] = Sound_Generate_Next_Sample();
-N//				WNG_Len--;
-N//			} else {
-N//				Waveform[i] = MAX_DAC_CODE/2;
-N//			}
-N//		}
+N		#if TRACK_STACK == 1
+X		#if (1) == 1
+N			Update_Stack_Pointer(__current_sp(), TASK_SND_RFL);
+X			Update_Stack_Pointer(__current_sp(), (4));
+N		#endif
 N		
 N		// play sound once, otherwise play nothing
 N		for (i=0; i<NUM_WAVEFORM_SAMPLES; i++) {
@@ -9979,6 +10028,12 @@ N				Waveform[i] = 0;
 N			}
 N		}
 N		
+N		// utilization tracking
+N		#if TRACK_STACK == 1
+X		#if (1) == 1
+N			Update_Stack_Pointer(__current_sp(), TASK_SND_RFL);
+X			Update_Stack_Pointer(__current_sp(), (4));
+N		#endif
 N		current_task = TASK_IDLE;
 X		current_task = (0);
 N	}
@@ -9986,10 +10041,21 @@ N}
 N
 Nuint16_t Get_Next_Blip_Sample(void){
 N	uint16_t sample;
+N	
+N	// utilization tracking
+N	#if TRACK_STACK == 1
+X	#if (1) == 1
+N		Update_Stack_Pointer(__current_sp(), TASK_SND_RFL);
+X		Update_Stack_Pointer(__current_sp(), (4));
+N	#endif
+N	
+N	// check for buffer overflow
 N	if (blip_sound_index >= BLIP_SOUND_LEN) {
 X	if (blip_sound_index >= (3507)) {
 N		blip_sound_index = 0;
 N	}
+N	
+N	// return next sample
 N	sample = blip_sound[blip_sound_index++] << 5;		// align for 12 bits
 N	if (sample > MAX_DAC_CODE) {
 X	if (sample > (4095)) {

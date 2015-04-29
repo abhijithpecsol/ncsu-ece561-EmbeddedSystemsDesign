@@ -11674,7 +11674,8 @@ N
 N#define WAIT_START			(0)
 N#define STATUS_OPEN			(1)
 N#define STATUS_CLOSED		(2)
-N#define STATUS_UPDATE_FREQ	(6*1000/TASK_UPDATE_GAME_STATE_TICKS)
+N#define STATUS_SEC_PER	(3)
+N#define STATUS_UPDATE_FREQ	(3*STATUS_SEC_PER*1000/TASK_UPDATE_GAME_STATE_TICKS)
 N#define STATUS_CPU_FREQ			(STATUS_UPDATE_FREQ/3)
 N#define STATUS_STK_FREQ			(2*STATUS_CPU_FREQ)
 N#define STATUS_MAX_STK_FREQ	(STATUS_UPDATE_FREQ)
@@ -11919,9 +11920,51 @@ Nvoid Calc_Bounce_Velocities(BALL_T * b, int16_t cb, int16_t cp, uint8_t paddle)
 Nvoid Draw_Brick(BRICK_T * b, COLOR_T * c);	// Draws a single brick in a certain color, but only if the brick is active
 Nvoid Detect_Brick_Collision(GAME_T * g);		// Detects the first ball collision with a brick and takes the appropriate action
 Nvoid Redraw_Bricks(GAME_T * g);							// Redraws all bricks. Necessary to avoid ball erase making it look as though contact happened.
+Nvoid Redraw_Info_Bar(GAME_T * g);						// Redraws the info bar
 N
 N#endif
 L 15 "src\game.c" 2
+N#include "utilization.h"
+L 1 ".\inc\utilization.h" 1
+N#ifndef utilization_h
+N#define utilization_h
+N
+N#include <stdint.h>
+N
+N#define NUM_TASKS		(7)
+N
+N#define TASK_IDLE			(0)
+N#define TASK_READ_TS	(1)
+N#define TASK_ACCEL		(2)
+N#define TASK_SND_MNGR	(3)
+N#define TASK_SND_RFL	(4)
+N#define TASK_GAME			(5)
+N#define TASK_STATUS		(6)
+N#define TASK_GAME_PAUSED (7)
+N
+N#define STACK_RA_BOT		(63)
+N#define STACK_GAME_BOT	(127)
+N#define STACK_RTS_BOT		(256/8-1)
+N#define STACK_SM_BOT		(256/8-1)
+N#define STACK_SR_BOT		(256/8-1)
+N
+N#define CURRENT_STACK	(1)
+N#define MAX_STACK			(2)
+N
+N#define TRACK_STACK		(1)
+N
+Nvoid Init_Utilization_Profiling(void);
+Nvoid Reset_Utilization_Stats(void);
+Nfloat Get_Utilization_Stats(uint8_t task_id);
+Nvoid Pause_Game_Utilization(void);
+Nvoid Update_Stack_Pointer(unsigned int sp, uint8_t task_id);
+Nunsigned int Get_Stack_Depth(uint8_t task_id, uint8_t type);
+Nvoid Display_CPU_Stats(void);
+Nvoid Display_Stack_Stats(void);
+Nvoid Display_Max_Stack_Stats(void);
+N
+N#endif
+L 16 "src\game.c" 2
 N
 Nextern OS_MUT LCD_mutex;
 Nextern OS_MBX tilt_mbx;
@@ -12030,6 +12073,9 @@ N			}
 N			brick->protection = 0;
 N		}
 N	}
+N	
+N	// set initial life count
+N	g->lives = 5;
 N}
 N
 N// Redraw, including movement, the vertical paddles
@@ -12095,7 +12141,7 @@ N	for (i = 0; i < 2; i++){
 N		PADDLE_T * pad;
 N		if (i == 0) pad = tp;
 N		else pad = bp;
-N		
+N				
 N		// will always redraw the paddle
 N		p = pad->loc;
 N		pp.X = pad->loc.X + HORZ_PADDLE_WIDTH;
@@ -12186,7 +12232,7 @@ N	static float calibration = 0;
 N	float roll_val, pitch_val;
 N	float abs_roll_val, abs_pitch_val;
 N	void * msg;
-N	
+N		
 N	// get values from mailbox, if they are there
 N	if (os_mbx_check(tilt_mbx) == 0){
 X	if (_os_mbx_check((U32)rt_mbx_check,tilt_mbx) == 0){
@@ -12697,3 +12743,22 @@ N		}
 N	}
 N}
 N
+N// Redraws the info bar
+Nvoid Redraw_Info_Bar(GAME_T * g){
+N	char buffer[20];
+N	
+N	// utilization tracking
+N	// analysis has determined the max stack occurs here due to the char buffer
+N	#if TRACK_STACK == 1
+X	#if (1) == 1
+N		Update_Stack_Pointer(__current_sp(), TASK_GAME);
+X		Update_Stack_Pointer(__current_sp(), (5));
+N	#endif
+N	
+N	sprintf(buffer, "[STATUS]   Lives: %d", g->lives);
+N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
+N	TFT_Text_PrintStr_RC(0,0, buffer);
+N	os_mut_release(&LCD_mutex);
+X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N}

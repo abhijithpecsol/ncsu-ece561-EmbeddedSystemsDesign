@@ -7,8 +7,10 @@
 #include "gpio_defs.h"
 #include "timers.h"
 #include "font.h"
+#include "utilization.h"
 
 extern void Delay(uint32_t);
+extern volatile uint8_t current_task;
 
 /* Is set to one if touchscreen been calibrated. */
 uint8_t TFT_TS_Calibrated = 1;
@@ -356,6 +358,11 @@ position unchanged. */
 uint32_t TFT_TS_Read(PT_T * position) {
 	uint32_t x, y;
 	uint32_t b;
+	
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_READ_TS);
+	#endif
 
 	// Determine if screen was pressed.
 	// Set YU digital output at ground, 

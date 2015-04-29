@@ -16,11 +16,13 @@
 
 U64 RA_Stack[64];
 U64 GAME_Stack[128];
+U64 RTS_Stack[256/8];
+U64 SM_Stack[256/8];
+U64 SR_Stack[256/8];
 
 OS_TID t_Read_TS, t_Read_Accelerometer, t_Sound_Manager, t_US, t_Refill_Sound_Buffer;
 OS_MUT LCD_mutex;
 OS_MUT TS_mutex;
-OS_MUT util_mutex;
 os_mbx_declare(tilt_mbx, 2);
 os_mbx_declare(touch_mbx, 3);
 volatile uint8_t current_task;
@@ -55,18 +57,18 @@ void Init_Debug_Signals(void) {
 __task void Task_Init(void) {
 	
 	os_mut_init(&LCD_mutex);
-	os_mut_init(&util_mutex);
 	
 	os_mbx_init(&tilt_mbx, sizeof(tilt_mbx));
 	os_mbx_init(&touch_mbx, sizeof(touch_mbx));
 	
-	t_Read_TS = os_tsk_create(Task_Read_TS, 4);
+	t_Read_TS = os_tsk_create_user(Task_Read_TS, 4, RTS_Stack, sizeof(RTS_Stack));
 	t_Read_Accelerometer = os_tsk_create_user(Task_Read_Accelerometer, 3, RA_Stack, 512);
-	t_Sound_Manager = os_tsk_create(Task_Sound_Manager, 2);
+	t_Sound_Manager = os_tsk_create_user(Task_Sound_Manager, 2, SM_Stack, sizeof(SM_Stack));
 	t_US = os_tsk_create_user(Task_Update_Game_State, 5, GAME_Stack, sizeof(GAME_Stack));
-	t_Refill_Sound_Buffer = os_tsk_create(Task_Refill_Sound_Buffer, 1);
+	t_Refill_Sound_Buffer = os_tsk_create_user(Task_Refill_Sound_Buffer, 1, SR_Stack, sizeof(SR_Stack));
 
 	current_task = TASK_IDLE;
+	
 	Init_Utilization_Profiling();			// begin utilization tracking
 
   os_tsk_delete_self ();
@@ -79,9 +81,19 @@ __task void Task_Read_TS(void) {
 
 	os_itv_set(TASK_READ_TS_PERIOD_TICKS);
 	
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_READ_TS);
+	#endif
+	
 	while (1) {
 		os_itv_wait();
+		
+		// utilization tracking
 		current_task = TASK_READ_TS;
+		#if TRACK_STACK == 1
+			Update_Stack_Pointer(__current_sp(), TASK_READ_TS);
+		#endif
 		
 		PTB->PSOR = MASK(DEBUG_T1_POS);
 		if (TFT_TS_Read(&p)) { 
@@ -98,6 +110,10 @@ __task void Task_Read_TS(void) {
 		}
 		PTB->PCOR = MASK(DEBUG_T1_POS);
 		
+		// utilization tracking
+		#if TRACK_STACK == 1
+			Update_Stack_Pointer(__current_sp(), TASK_READ_TS);
+		#endif
 		current_task = TASK_IDLE;
 	}
 }
@@ -106,13 +122,29 @@ __task void Task_Read_Accelerometer(void) {
 	float * msg;
 	
 	os_itv_set(TASK_READ_ACCELEROMETER_PERIOD_TICKS);
+	
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+	#endif
 
 	while (1) {
 		os_itv_wait();
+		
+		// utilization tracking
 		current_task = TASK_ACCEL;
+		#if TRACK_STACK == 1
+			Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+		#endif
+		
 		PTB->PSOR = MASK(DEBUG_T0_POS);
 		read_full_xyz();
 		convert_xyz_to_roll_pitch();
+		
+		// utilization tracking
+		#if TRACK_STACK == 1
+			Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+		#endif
 		
 		// send accel data if there is room
 		if (os_mbx_check(&tilt_mbx) == 2){
@@ -129,17 +161,25 @@ __task void Task_Read_Accelerometer(void) {
 
 		PTB->PCOR = MASK(DEBUG_T0_POS);
 		
+		// utilization tracking
+		#if TRACK_STACK == 1
+			Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+		#endif
 		current_task = TASK_IDLE;
 	}
 }
 
 __task void Task_Update_Game_State(void) {	
-	char buffer[20];
 	uint8_t state = STATUS_CLOSED;
-	uint8_t util_update_freq = STATUS_CPU_FREQ;
+	uint16_t util_update_freq = STATUS_CPU_FREQ;
 	GAME_T game;
 	
 	Game_Init(&game);
+	
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_GAME);
+	#endif
 	
 	os_evt_wait_and(EV_INITIAL_PRESS, WAIT_FOREVER);
 	
@@ -149,6 +189,11 @@ __task void Task_Update_Game_State(void) {
 	
 	game.ball.vy = BALL_INITIAL_VY;
 	game.ball.vx = BALL_INITIAL_VX;
+	
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_GAME);
+	#endif
 
 	while (1) {
 		os_itv_wait();
@@ -159,10 +204,7 @@ __task void Task_Update_Game_State(void) {
 			current_task = TASK_GAME;
 			
 			// redraw info bar
-			sprintf(buffer, "[STATUS]   Lives: %d", game.lives);
-			os_mut_wait(&LCD_mutex, WAIT_FOREVER);
-			TFT_Text_PrintStr_RC(0,0, buffer);
-			os_mut_release(&LCD_mutex);
+			Redraw_Info_Bar(&game);					// redraw the info bar at top of screen
 			
 			// test - automatic ball movement
 			if (game.ball.loc.Y > TFT_HEIGHT - 2*PADDLE_BUFFER) game.ball.vy = BALL_INITIAL_VY;
@@ -219,74 +261,15 @@ __task void Task_Update_Game_State(void) {
 			
 			// CPU statistics
 			if(util_update_freq == STATUS_CPU_FREQ) {	
-				float val;
-				float total = 0.0;
-				os_mut_wait(&LCD_mutex, WAIT_FOREVER);
-				TFT_Text_PrintStr_RC(3,0, "Task      CPU Usage");
-				TFT_Text_PrintStr_RC(4,0, "-------------------");
-				val = Get_Utilization_Stats(TASK_READ_TS);
-				total += val;
-				sprintf(buffer, "Read TS      %5.2f%%", val);
-				TFT_Text_PrintStr_RC(5,0, buffer);
-				val = Get_Utilization_Stats(TASK_ACCEL);
-				total += val;
-				sprintf(buffer, "Read Accel   %5.2f%%", val);
-				TFT_Text_PrintStr_RC(6,0, buffer);
-				val = Get_Utilization_Stats(TASK_SND_MNGR);
-				total += val;
-				sprintf(buffer, "Sound Mngr   %5.2f%%", val);
-				TFT_Text_PrintStr_RC(7,0, buffer);
-				val = Get_Utilization_Stats(TASK_SND_RFL);
-				total += val;
-				sprintf(buffer, "Sound Refil  %5.2f%%", val);
-				TFT_Text_PrintStr_RC(8,0, buffer);
-				val = Get_Utilization_Stats(TASK_GAME_PAUSED);
-				total += val;
-				sprintf(buffer, "Update Game  %5.2f%%", val);
-				TFT_Text_PrintStr_RC(9,0, buffer);
-				TFT_Text_PrintStr_RC(10,0, "-------------------");
-				sprintf(buffer, "Total Usage  %5.2f%%", total);
-				TFT_Text_PrintStr_RC(11,0, buffer);	
-				val = 100.0 - total;
-				sprintf(buffer, "Idle Time    %5.2f%%", val);
-				TFT_Text_PrintStr_RC(12,0, buffer);
-				os_mut_release(&LCD_mutex);
+				Display_CPU_Stats();
 			}
-			else if (util_update_freq == STATUS_STK_FREQ){
-				int val;
-				os_mut_wait(&LCD_mutex, WAIT_FOREVER);
-				TFT_Text_PrintStr_RC(3,0, "Task          Stack");
-				val = 0;
-				sprintf(buffer, "Read TS      %5db", val);
-				TFT_Text_PrintStr_RC(5,0, buffer);
-				sprintf(buffer, "Read Accel   %5db", val);
-				TFT_Text_PrintStr_RC(6,0, buffer);
-				sprintf(buffer, "Sound Mngr   %5db", val);
-				TFT_Text_PrintStr_RC(7,0, buffer);
-				sprintf(buffer, "Sound Refil  %5db", val);
-				TFT_Text_PrintStr_RC(8,0, buffer);
-				sprintf(buffer, "Update Game  %5db", val);
-				TFT_Text_PrintStr_RC(9,0, buffer);
-				TFT_Text_PrintStr_RC(11,0, "                   ");
-				TFT_Text_PrintStr_RC(12,0, "                   ");
-				os_mut_release(&LCD_mutex);
+			else if (util_update_freq == STATUS_STK_FREQ){				
+				Display_Stack_Stats();
 			}
 			// maximum stack depth, based on configuration
 			else if (util_update_freq == STATUS_MAX_STK_FREQ){
+				Display_Max_Stack_Stats();
 				util_update_freq = 0;
-				os_mut_wait(&LCD_mutex, WAIT_FOREVER);
-				TFT_Text_PrintStr_RC(3,0, "Task      Max Stack");
-				sprintf(buffer, "Read TS      %5dB", 256);
-				TFT_Text_PrintStr_RC(5,0, buffer);
-				sprintf(buffer, "Read Accel   %5dB", 512);
-				TFT_Text_PrintStr_RC(6,0, buffer);
-				sprintf(buffer, "Sound Mngr   %5dB", 256);
-				TFT_Text_PrintStr_RC(7,0, buffer);
-				sprintf(buffer, "Sound Refil  %5dB", 256);
-				TFT_Text_PrintStr_RC(8,0, buffer);
-				sprintf(buffer, "Update Game  %5dB", 1024);
-				TFT_Text_PrintStr_RC(9,0, buffer);
-				os_mut_release(&LCD_mutex);
 			}
 			util_update_freq++;
 			
@@ -304,6 +287,11 @@ __task void Task_Update_Game_State(void) {
 					Reset_Utilization_Stats();
 				}
 			}
+			
+			// utilization tracking
+			#if TRACK_STACK == 1
+				Update_Stack_Pointer(__current_sp(), TASK_GAME);
+			#endif
 		}
 
 		PTB->PCOR = MASK(DEBUG_T3_POS);

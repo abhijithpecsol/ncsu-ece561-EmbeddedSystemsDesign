@@ -12,6 +12,7 @@
 #include "DMA.h"
 #include "gpio_defs.h"
 #include "game.h"
+#include "utilization.h"
 
 extern OS_MUT LCD_mutex;
 extern OS_MBX tilt_mbx;
@@ -101,6 +102,9 @@ void Game_Init(GAME_T * g) {
 			brick->protection = 0;
 		}
 	}
+	
+	// set initial life count
+	g->lives = 5;
 }
 
 // Redraw, including movement, the vertical paddles
@@ -156,7 +160,7 @@ void Redraw_Horizontal_Paddles(GAME_T * g){
 		PADDLE_T * pad;
 		if (i == 0) pad = tp;
 		else pad = bp;
-		
+				
 		// will always redraw the paddle
 		p = pad->loc;
 		pp.X = pad->loc.X + HORZ_PADDLE_WIDTH;
@@ -225,7 +229,7 @@ void Convert_Tilt(GAME_T * g) {
 	float roll_val, pitch_val;
 	float abs_roll_val, abs_pitch_val;
 	void * msg;
-	
+		
 	// get values from mailbox, if they are there
 	if (os_mbx_check(tilt_mbx) == 0){
 		// get roll
@@ -654,3 +658,18 @@ void Detect_Brick_Collision(GAME_T * g){
 	}
 }
 
+// Redraws the info bar
+void Redraw_Info_Bar(GAME_T * g){
+	char buffer[20];
+	
+	// utilization tracking
+	// analysis has determined the max stack occurs here due to the char buffer
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_GAME);
+	#endif
+	
+	sprintf(buffer, "[STATUS]   Lives: %d", g->lives);
+	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+	TFT_Text_PrintStr_RC(0,0, buffer);
+	os_mut_release(&LCD_mutex);
+}

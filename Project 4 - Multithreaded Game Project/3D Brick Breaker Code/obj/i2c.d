@@ -6,3 +6,4 @@
 .\obj\i2c.o: C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h
 .\obj\i2c.o: C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h
 .\obj\i2c.o: .\inc\I2C.h
+.\obj\i2c.o: .\inc\utilization.h

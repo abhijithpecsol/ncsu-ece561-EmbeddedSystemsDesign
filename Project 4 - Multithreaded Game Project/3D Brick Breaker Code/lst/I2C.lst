@@ -7307,6 +7307,47 @@ N
 Nuint8_t i2c_read_byte(uint8_t dev, uint8_t address);
 Nvoid i2c_write_byte(uint8_t dev, uint8_t address, uint8_t data);
 L 3 "src\I2C.c" 2
+N#include "utilization.h"
+L 1 ".\inc\utilization.h" 1
+N#ifndef utilization_h
+N#define utilization_h
+N
+N#include <stdint.h>
+N
+N#define NUM_TASKS		(7)
+N
+N#define TASK_IDLE			(0)
+N#define TASK_READ_TS	(1)
+N#define TASK_ACCEL		(2)
+N#define TASK_SND_MNGR	(3)
+N#define TASK_SND_RFL	(4)
+N#define TASK_GAME			(5)
+N#define TASK_STATUS		(6)
+N#define TASK_GAME_PAUSED (7)
+N
+N#define STACK_RA_BOT		(63)
+N#define STACK_GAME_BOT	(127)
+N#define STACK_RTS_BOT		(256/8-1)
+N#define STACK_SM_BOT		(256/8-1)
+N#define STACK_SR_BOT		(256/8-1)
+N
+N#define CURRENT_STACK	(1)
+N#define MAX_STACK			(2)
+N
+N#define TRACK_STACK		(1)
+N
+Nvoid Init_Utilization_Profiling(void);
+Nvoid Reset_Utilization_Stats(void);
+Nfloat Get_Utilization_Stats(uint8_t task_id);
+Nvoid Pause_Game_Utilization(void);
+Nvoid Update_Stack_Pointer(unsigned int sp, uint8_t task_id);
+Nunsigned int Get_Stack_Depth(uint8_t task_id, uint8_t type);
+Nvoid Display_CPU_Stats(void);
+Nvoid Display_Stack_Stats(void);
+Nvoid Display_Max_Stack_Stats(void);
+N
+N#endif
+L 4 "src\I2C.c" 2
 N
 N//init i2c0
 Nvoid i2c_init(void)
@@ -7362,6 +7403,13 @@ N//send device and register addresses
 N#pragma no_inline 
 Nvoid i2c_read_setup(uint8_t dev, uint8_t address)
 N{
+N	// utilization tracking
+N	#if TRACK_STACK == 1
+X	#if (1) == 1
+N		Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+X		Update_Stack_Pointer(__current_sp(), (2));
+N	#endif
+N	
 N	I2C0->D = dev;			  /*send dev address	*/
 X	((I2C_Type *)(0x40066000u))->D = dev;			   
 N	I2C_WAIT							/*wait for completion */
@@ -7389,6 +7437,13 @@ N// #pragma no_inline
 Nuint8_t i2c_repeated_read(uint8_t isLastRead)
 N{
 N	uint8_t data;
+N	
+N	// utilization tracking
+N	#if TRACK_STACK == 1
+X	#if (1) == 1
+N		Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+X		Update_Stack_Pointer(__current_sp(), (2));
+N	#endif
 N	
 N	if(isLastRead)	{
 N		NACK;								/*set NACK after read	*/

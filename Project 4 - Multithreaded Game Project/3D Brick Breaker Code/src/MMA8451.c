@@ -4,6 +4,7 @@
 #include "delay.h"
 #include "LEDs.h"
 #include <math.h>
+#include "utilization.h"
 
 #define M_PI_2 (M_PI/2.0)
 #define M_PI_4 (M_PI/4.0)
@@ -49,9 +50,13 @@ int init_mma()
 */
 void read_full_xyz()
 {
-	
 	int i;
 	uint8_t data[6];
+	
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+	#endif
 	
 	i2c_start();
 	i2c_read_setup(MMA_ADDR , REG_XHI);
@@ -139,6 +144,11 @@ void convert_xyz_to_roll_pitch(void) {
 				ay = acc_Y/COUNTS_PER_G,
 				az = acc_Z/COUNTS_PER_G;
 */
+	
+	// utilization tracking
+	#if TRACK_STACK == 1
+		Update_Stack_Pointer(__current_sp(), TASK_ACCEL);
+	#endif
 	
 	roll = approx_atan2f(acc_Y, acc_Z)*(180/M_PI);
 	pitch = approx_atan2f(acc_X, approx_sqrtf(acc_Y*acc_Y + acc_Z*acc_Z))*(180/M_PI);

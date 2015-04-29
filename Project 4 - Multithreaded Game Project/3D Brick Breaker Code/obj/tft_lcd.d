@@ -10,3 +10,4 @@
 .\obj\tft_lcd.o: .\inc\gpio_defs.h
 .\obj\tft_lcd.o: .\inc\timers.h
 .\obj\tft_lcd.o: .\inc\font.h
+.\obj\tft_lcd.o: .\inc\utilization.h

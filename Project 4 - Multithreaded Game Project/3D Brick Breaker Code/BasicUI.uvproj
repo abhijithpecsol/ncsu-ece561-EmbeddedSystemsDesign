@@ -564,6 +564,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\utilization.c</FilePath>
             </File>
+            <File>
+              <FileName>bounce_sound.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\bounce_sound.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

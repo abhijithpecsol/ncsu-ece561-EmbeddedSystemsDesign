@@ -17,3 +17,4 @@
 .\obj\game.o: .\inc\DMA.h
 .\obj\game.o: .\inc\gpio_defs.h
 .\obj\game.o: .\inc\game.h
+.\obj\game.o: .\inc\utilization.h

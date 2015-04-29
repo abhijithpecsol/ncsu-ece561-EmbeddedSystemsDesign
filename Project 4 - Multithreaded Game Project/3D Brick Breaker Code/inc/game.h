@@ -104,5 +104,6 @@ void Calc_Bounce_Velocities(BALL_T * b, int16_t cb, int16_t cp, uint8_t paddle);
 void Draw_Brick(BRICK_T * b, COLOR_T * c);	// Draws a single brick in a certain color, but only if the brick is active
 void Detect_Brick_Collision(GAME_T * g);		// Detects the first ball collision with a brick and takes the appropriate action
 void Redraw_Bricks(GAME_T * g);							// Redraws all bricks. Necessary to avoid ball erase making it look as though contact happened.
+void Redraw_Info_Bar(GAME_T * g);						// Redraws the info bar
 
 #endif
