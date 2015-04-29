@@ -10296,6 +10296,8 @@ N#define MAX_DAC_CODE (4095)
 N#define NUM_STEPS (64)
 N#define NUM_WAVEFORM_SAMPLES (512)
 N
+N#define BLIP_SOUND_LEN (3507)
+N
 N
 Ntypedef struct {
 N	uint16_t Volume;
@@ -10318,6 +10320,7 @@ N
 Nvoid Sound_Refill_Buffer(uint32_t samples);
 N
 Nvoid Play_Waveform_with_DMA(void);
+Nuint16_t Get_Next_Blip_Sample(void);
 N
 N __task void Task_Sound_Manager(void);
 X __declspec(noreturn) void Task_Sound_Manager(void);
@@ -10666,16 +10669,16 @@ N
 N__task void Task_Update_Game_State(void) {	
 X__declspec(noreturn) void Task_Update_Game_State(void) {	
 N	char buffer[20];
-N	uint8_t state = STATUS_OPEN;
-X	uint8_t state = (1);
+N	uint8_t state = STATUS_CLOSED;
+X	uint8_t state = (2);
 N	uint8_t util_update_freq = STATUS_CPU_FREQ;
 X	uint8_t util_update_freq = ((6*1000/(30))/3);
 N	GAME_T game;
 N	
 N	Game_Init(&game);
 N	
-N	//os_evt_wait_and(EV_INITIAL_PRESS, WAIT_FOREVER);
-N	TFT_Erase();
+N	os_evt_wait_and(EV_INITIAL_PRESS, WAIT_FOREVER);
+X	_os_evt_wait((U32)rt_evt_wait,(1),(0xffff),1);
 N	
 N	Reset_Utilization_Stats();
 N	

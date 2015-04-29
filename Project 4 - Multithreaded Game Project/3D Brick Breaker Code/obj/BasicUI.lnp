@@ -21,6 +21,7 @@
 ".\obj\tft_text.o"
 ".\obj\game.o"
 ".\obj\utilization.o"
+".\obj\bounce_sound.o"
 C:\Keil_v5\ARM\RV31\LIB\RTX_CM1.LIB
 --library_type=microlib --strict --scatter ".\obj\BasicUI.sct"
 

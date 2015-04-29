@@ -15,6 +15,10 @@ uint16_t SineTable[NUM_STEPS];
 uint16_t Waveform[NUM_WAVEFORM_SAMPLES];
 
 uint32_t WNG_Len=0;
+uint32_t blip_sound_index = 0;
+uint32_t blip_sound_length;
+extern const uint16_t blip_sound[];
+
 extern volatile uint8_t current_task;
 
 void DAC_Init(void) {
@@ -67,7 +71,7 @@ void Sound_Init(void) {
 	DAC_Init();
 	DMA_Init();
 	TPM0_Init();
-	Configure_TPM0_for_DMA(45);
+	Configure_TPM0_for_DMA(45);		// 1/45us = 22 kHz
 
 	SIM->SOPT2 |= (SIM_SOPT2_TPMSRC(1) | SIM_SOPT2_PLLFLLSEL_MASK);
 
@@ -134,14 +138,18 @@ __task void Task_Sound_Manager(void) {
 	os_itv_set(1000);
 	
 	while (1) {
-		os_itv_wait();
+		//os_itv_wait();	// make a new sound every second
+		os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
+		
 		current_task = TASK_SND_MNGR;
-		//os_evt_wait_and(EV_PLAYSOUND, WAIT_FOREVER); // wait for trigger
-		// make a new sound every second
+		
+		// play blip sound
+		blip_sound_length = BLIP_SOUND_LEN;
+		Play_Waveform_with_DMA();
 		
 		// Hack - temporary code until voice code is added
-		WNG_Len = 2500;
-		Play_Waveform_with_DMA();
+//		WNG_Len = 2500;
+//		Play_Waveform_with_DMA();
 		
 		current_task = TASK_IDLE;
 	}
@@ -153,17 +161,42 @@ __task void Task_Refill_Sound_Buffer(void) {
 	while (1) {
 		os_evt_wait_and(EV_REFILL_SOUND, WAIT_FOREVER); // wait for trigger
 		current_task = TASK_SND_RFL;
+		
+//		for (i=0; i<NUM_WAVEFORM_SAMPLES; i++) {
+//			if (WNG_Len > 0) {
+//				Waveform[i] = Sound_Generate_Next_Sample();
+//				WNG_Len--;
+//			} else {
+//				Waveform[i] = MAX_DAC_CODE/2;
+//			}
+//		}
+		
+		// play sound once, otherwise play nothing
 		for (i=0; i<NUM_WAVEFORM_SAMPLES; i++) {
-			if (WNG_Len > 0) {
-				Waveform[i] = Sound_Generate_Next_Sample();
-				WNG_Len--;
-			} else {
-				Waveform[i] = MAX_DAC_CODE/2;
+			if(blip_sound_length > 0){
+				Waveform[i] = Get_Next_Blip_Sample();
+				blip_sound_length--;
+			}
+			else {
+				// otherwise play no sound
+				Waveform[i] = 0;
 			}
 		}
 		
 		current_task = TASK_IDLE;
 	}
+}
+
+uint16_t Get_Next_Blip_Sample(void){
+	uint16_t sample;
+	if (blip_sound_index >= BLIP_SOUND_LEN) {
+		blip_sound_index = 0;
+	}
+	sample = blip_sound[blip_sound_index++] << 5;		// align for 12 bits
+	if (sample > MAX_DAC_CODE) {
+		sample = MAX_DAC_CODE;
+	}
+	return sample;
 }
 
 

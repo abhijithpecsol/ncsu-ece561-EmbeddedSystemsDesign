@@ -464,7 +464,8 @@ void Calc_Bounce_Velocities(BALL_T * b, int16_t cb, int16_t cp, uint8_t paddle){
 	int8_t perpen_vel;
 	int16_t normalized_dist;
 	
-	//os_evt_set(EV_PLAYSOUND, t_Sound_Manager);
+	// trigger sound
+	os_evt_set(EV_PLAYSOUND, t_Sound_Manager);
 	
 	// adjust all paddles to common orientation
 	if (paddle == BOTTOM_PADDLE){
@@ -604,6 +605,9 @@ void Detect_Brick_Collision(GAME_T * g){
 					if ((left_ball >= left_brick && left_ball <= right_brick) || (right_ball >= left_brick && right_ball <= right_brick)){
 						int8_t in_left, in_right, in_top, in_bottom;
 						int8_t * max;
+						
+						// trigger sound
+						os_evt_set(EV_PLAYSOUND, t_Sound_Manager);
 						
 						// reduce health if not protected
 						brick->health--;

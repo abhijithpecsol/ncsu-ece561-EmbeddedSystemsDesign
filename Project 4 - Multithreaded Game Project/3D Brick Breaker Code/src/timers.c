@@ -203,7 +203,6 @@ void TPM0_Init(void) {
 
 void Configure_TPM0_for_DMA(uint32_t period_us)
 {
-
 	// disable TPM
 	TPM0->SC = 0;
 	

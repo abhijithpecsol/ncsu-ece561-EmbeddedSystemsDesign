@@ -31,8 +31,8 @@ int main (void) {
 	Init_Debug_Signals();
 	Init_RGB_LEDs();
 	Sound_Init();	
-	Sound_Disable_Amp();
-	Play_Tone();
+	//Sound_Disable_Amp();
+	//Play_Tone();		// uses DAC, no DMA?
 	
 	TFT_Init();
 	TFT_Text_Init(1);
@@ -56,7 +56,7 @@ int main (void) {
 			;
 	}
 
-	Play_Waveform_with_DMA();
+	//Play_Waveform_with_DMA();
 
 	Delay(70);
 

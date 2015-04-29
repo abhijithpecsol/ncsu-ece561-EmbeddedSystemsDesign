@@ -11,6 +11,8 @@
 #define NUM_STEPS (64)
 #define NUM_WAVEFORM_SAMPLES (512)
 
+#define BLIP_SOUND_LEN (3507)
+
 
 typedef struct {
 	uint16_t Volume;
@@ -33,6 +35,7 @@ void Play_Tone_with_DMA(unsigned int period, unsigned int num_cycles);
 void Sound_Refill_Buffer(uint32_t samples);
 
 void Play_Waveform_with_DMA(void);
+uint16_t Get_Next_Blip_Sample(void);
 
  __task void Task_Sound_Manager(void);
  __task void Task_Refill_Sound_Buffer(void);

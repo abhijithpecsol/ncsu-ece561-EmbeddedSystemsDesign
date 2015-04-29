@@ -135,14 +135,13 @@ __task void Task_Read_Accelerometer(void) {
 
 __task void Task_Update_Game_State(void) {	
 	char buffer[20];
-	uint8_t state = STATUS_OPEN;
+	uint8_t state = STATUS_CLOSED;
 	uint8_t util_update_freq = STATUS_CPU_FREQ;
 	GAME_T game;
 	
 	Game_Init(&game);
 	
-	//os_evt_wait_and(EV_INITIAL_PRESS, WAIT_FOREVER);
-	TFT_Erase();
+	os_evt_wait_and(EV_INITIAL_PRESS, WAIT_FOREVER);
 	
 	Reset_Utilization_Stats();
 	

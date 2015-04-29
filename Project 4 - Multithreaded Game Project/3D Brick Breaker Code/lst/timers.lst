@@ -7610,7 +7610,6 @@ N}
 N
 Nvoid Configure_TPM0_for_DMA(uint32_t period_us)
 N{
-N
 N	// disable TPM
 N	TPM0->SC = 0;
 X	((TPM_Type *)(0x40038000u))->SC = 0;
