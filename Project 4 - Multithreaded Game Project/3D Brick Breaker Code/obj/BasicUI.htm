@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\obj\BasicUI.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\obj\BasicUI.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Wed Apr 29 14:34:22 2015
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Thu Apr 30 11:45:29 2015
 <BR><P>
 <H3>Maximum Stack Usage =        544 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -954,10 +954,14 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task_Update_Game_State
 </UL>
 
-<P><STRONG><a name="[7c]"></a>Convert_Tilt</STRONG> (Thumb, 382 bytes, Stack size 32 bytes, game.o(.text))
+<P><STRONG><a name="[7c]"></a>Convert_Tilt</STRONG> (Thumb, 432 bytes, Stack size 32 bytes, game.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = Convert_Tilt &rArr; __aeabi_fsub &rArr; __aeabi_fadd &rArr; _float_epilogue
 </UL>
-<BR>[Calls]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fsub
+<BR>[Calls]<UL><LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2f
+<LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fsub
+<LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fdiv
+<LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fmul
+<LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fadd
 <LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2f
 <LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;free
@@ -983,7 +987,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task_Update_Game_State
 </UL>
 
-<P><STRONG><a name="[78]"></a>Redraw_Bricks</STRONG> (Thumb, 184 bytes, Stack size 24 bytes, game.o(.text))
+<P><STRONG><a name="[78]"></a>Redraw_Bricks</STRONG> (Thumb, 182 bytes, Stack size 24 bytes, game.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = Redraw_Bricks &rArr; Draw_Brick &rArr; TFT_Fill_Rectangle
 </UL>
 <BR>[Calls]<UL><LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Draw_Brick
@@ -1124,6 +1128,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fsub
 <LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;approx_atan2f
 <LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Display_CPU_Stats
+<LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Convert_Tilt
 <LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SineTable_Init
 <LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_frsub
 <LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sinf
@@ -1157,6 +1162,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_Utilization_Stats
 <LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;approx_atan2f
 <LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;convert_xyz_to_roll_pitch
+<LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Convert_Tilt
 <LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SineTable_Init
 <LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sinf
 <LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__mathlib_rredf2
@@ -1169,6 +1175,7 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_Utilization_Stats
 <LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;approx_atan2f
+<LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Convert_Tilt
 <LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__mathlib_flt_invalid
 </UL>
 
@@ -1229,6 +1236,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_float_epilogue
 </UL>
 <BR>[Called By]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;convert_xyz_to_roll_pitch
+<LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Convert_Tilt
 <LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__mathlib_rredf2
 </UL>
 

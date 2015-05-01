@@ -10514,10 +10514,9 @@ N
 N#endif
 L 15 "src\tasks.c" 2
 N
-N
 NU64 RA_Stack[64];
 NU64 GAME_Stack[128];
-NU64 RTS_Stack[256/8];
+NU64 RTS_Stack[256/8];	
 NU64 SM_Stack[256/8];
 NU64 SR_Stack[256/8];
 N

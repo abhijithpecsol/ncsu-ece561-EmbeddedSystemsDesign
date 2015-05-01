@@ -10032,9 +10032,9 @@ N		default:
 N			return 0;
 N	}
 N	
-N	// 64 + difference is stack depth
+N	// 8 + difference is stack depth because bottom of stack is 8 bytes below last element
 N	// each task has 64B of kernel info by default
-N	return 64 + (bot_stk - task_sp);
+N	return 64 + (bot_stk - task_sp + 8);
 N}
 N
 Nvoid Display_CPU_Stats(void){

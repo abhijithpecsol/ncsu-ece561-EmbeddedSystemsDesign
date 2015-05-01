@@ -13,10 +13,9 @@
 #include "game.h"
 #include "utilization.h"
 
-
 U64 RA_Stack[64];
 U64 GAME_Stack[128];
-U64 RTS_Stack[256/8];
+U64 RTS_Stack[256/8];	
 U64 SM_Stack[256/8];
 U64 SR_Stack[256/8];
 

@@ -225,7 +225,8 @@ void Move_Paddles(GAME_T * g) {
 
 // Convert pitch and roll to velocities of the paddles
 void Convert_Tilt(GAME_T * g) {
-	static float calibration = 0;
+	static float calibration = 30.0;
+	static uint8_t calibration_ticks = 5;
 	float roll_val, pitch_val;
 	float abs_roll_val, abs_pitch_val;
 	void * msg;
@@ -289,9 +290,12 @@ void Convert_Tilt(GAME_T * g) {
 		}
 	}
 	
-	// convert pitch
-	if (calibration == 0){
-		calibration = pitch_val;		// calibrates with first non-zero pitch
+	// calibrate ticks with first 5 accelerometer readings
+	if (calibration_ticks > 0){
+		calibration *= (float)(6 - calibration_ticks);
+		calibration += pitch_val;
+		calibration_ticks--;
+		calibration /= (float)(6 - calibration_ticks);
 	}
 	pitch_val = pitch_val - calibration;
 	abs_pitch_val = fabs(pitch_val);

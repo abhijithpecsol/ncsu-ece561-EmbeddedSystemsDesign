@@ -119,9 +119,9 @@ unsigned int Get_Stack_Depth(uint8_t task_id, uint8_t type){
 			return 0;
 	}
 	
-	// 64 + difference is stack depth
+	// 8 + difference is stack depth because bottom of stack is 8 bytes below last element
 	// each task has 64B of kernel info by default
-	return 64 + (bot_stk - task_sp);
+	return 64 + (bot_stk - task_sp + 8);
 }
 
 void Display_CPU_Stats(void){
