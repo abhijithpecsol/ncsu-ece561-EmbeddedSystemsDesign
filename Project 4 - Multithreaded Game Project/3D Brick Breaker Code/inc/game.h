@@ -6,8 +6,8 @@
 
 // PADDLES
 #define PADDLE_BUFFER				(5)
-#define HORZ_PADDLE_WIDTH 	(50)
-#define HORZ_PADDLE_HEIGHT	(6)
+#define HORZ_PADDLE_WIDTH 	(75)
+#define HORZ_PADDLE_HEIGHT	(7)
 #define VERT_PADDLE_WIDTH		(HORZ_PADDLE_HEIGHT)
 #define VERT_PADDLE_HEIGHT	(HORZ_PADDLE_WIDTH)
 #define ORIENTATION_VERT		(0)
@@ -78,6 +78,12 @@ typedef struct {
 
 // GAME structure will contain all the appropriate elements of a game in one central location
 #define INFO_BAR_HEIGHT		(17)
+#define GAME_INIT_LIVES 	(5)
+#define GAME_PLAYING			(0)
+#define GAME_VICTORY			(1)
+#define GAME_LOSS					(2)
+#define GAME_CHEAT				(3)
+#define GAME_WAIT_START		(4)
 typedef struct {
 	PADDLES_T paddles;
 	COLORS_T colors;
@@ -85,6 +91,7 @@ typedef struct {
 	BRICK_T bricks[NUM_BRICK_ROWS][NUM_BRICK_COLS];
 	uint8_t hits;
 	uint8_t lives;
+	uint8_t state;
 } GAME_T;
 
 
@@ -105,5 +112,7 @@ void Draw_Brick(BRICK_T * b, COLOR_T * c);	// Draws a single brick in a certain 
 void Detect_Brick_Collision(GAME_T * g);		// Detects the first ball collision with a brick and takes the appropriate action
 void Redraw_Bricks(GAME_T * g);							// Redraws all bricks. Necessary to avoid ball erase making it look as though contact happened.
 void Redraw_Info_Bar(GAME_T * g);						// Redraws the info bar
+void Detect_Wall_Collision(GAME_T * g);			// Detects the ball making a collision with the wall (a loss)
+void Start_Game(GAME_T * g);								// Initiates playing of the game after it has been initialized
 
 #endif

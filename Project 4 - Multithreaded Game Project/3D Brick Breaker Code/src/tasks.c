@@ -23,7 +23,7 @@ OS_TID t_Read_TS, t_Read_Accelerometer, t_Sound_Manager, t_US, t_Refill_Sound_Bu
 OS_MUT LCD_mutex;
 OS_MUT TS_mutex;
 os_mbx_declare(tilt_mbx, 2);
-os_mbx_declare(touch_mbx, 3);
+os_mbx_declare(touch_mbx, 1);
 volatile uint8_t current_task;
 
 void Init_Debug_Signals(void) {
@@ -180,18 +180,15 @@ __task void Task_Update_Game_State(void) {
 		Update_Stack_Pointer(__current_sp(), TASK_GAME);
 	#endif
 	
-	os_evt_wait_and(EV_INITIAL_PRESS, WAIT_FOREVER);
-	
-	Reset_Utilization_Stats();
-	
+	os_evt_wait_and(EV_INITIAL_PRESS, WAIT_FOREVER);	
 	os_itv_set(TASK_UPDATE_GAME_STATE_TICKS);
 	
-	game.ball.vy = BALL_INITIAL_VY;
-	game.ball.vx = BALL_INITIAL_VX;
+	Reset_Utilization_Stats();
+	Start_Game(&game);
 	
-	// utilization tracking
-	#if TRACK_STACK == 1
-		Update_Stack_Pointer(__current_sp(), TASK_GAME);
+	// CHEATING - automatic ball movement
+	#if 0
+		game.state = GAME_CHEAT;
 	#endif
 
 	while (1) {
@@ -201,39 +198,60 @@ __task void Task_Update_Game_State(void) {
 		// if the status window is closed, process the game normally
 		if (state == STATUS_CLOSED) {
 			current_task = TASK_GAME;
+									
+			// normal game play
+			if (game.state == GAME_PLAYING){
+				// redraw info bar
+				Redraw_Info_Bar(&game);					// redraw the info bar at top of screen
+				
+				// brick processing
+				Detect_Brick_Collision(&game);	// look for ball collisions with a brick
+				Redraw_Bricks(&game);						// redraw all bricks, adjusting color where necessary
+				
+				// ball processing
+				Detect_Paddle_Collision(&game);	// look for ball collisions with the paddle
+				Move_Ball(&game);								// adjust the position of the ball based on velocities
+				Redraw_Ball(&game);							// redraw ball based on new position
+				
+				// paddle processing
+				Convert_Tilt(&game);						// Covert the pitch/roll values to velocities for the paddles
+				Move_Paddles(&game);						// adjust position of paddles based on velocities
+				Redraw_Paddles(&game);					// redraw paddles based on new positions
+				
+				// check for wall collision, which also checks for game over
+				Detect_Wall_Collision(&game);
+				
+				// check for win
+				if (game.hits >= BRICK_TOTAL_NUM) {
+					game.state = GAME_VICTORY;
+					Reset_Utilization_Stats();
+				}
+			}
 			
-			// redraw info bar
-			Redraw_Info_Bar(&game);					// redraw the info bar at top of screen
-			
-			// test - automatic ball movement
-			if (game.ball.loc.Y > TFT_HEIGHT - 2*PADDLE_BUFFER) game.ball.vy = BALL_INITIAL_VY;
-			else if (game.ball.loc.Y < INFO_BAR_HEIGHT + HORZ_PADDLE_HEIGHT) game.ball.vy = -BALL_INITIAL_VY;
-			if (game.ball.loc.X > TFT_WIDTH - PADDLE_BUFFER - BALL_SIDE_LENGTH) game.ball.vx = BALL_INITIAL_VX;
-			else if (game.ball.loc.X < PADDLE_BUFFER) game.ball.vx = -BALL_INITIAL_VX;
-			
-			// brick processing
-			Detect_Brick_Collision(&game);	// look for ball collisions with a brick
-			Redraw_Bricks(&game);						// redraw all bricks, adjusting color where necessary
-			
-			// ball processing
-			Detect_Paddle_Collision(&game);	// look for ball collisions with the paddle
-			Move_Ball(&game);								// adjust the position of the ball based on velocities
-			Redraw_Ball(&game);							// redraw ball based on new position
-			
-			// paddle processing
-			Convert_Tilt(&game);						// Covert the pitch/roll values to velocities for the paddles
-			Move_Paddles(&game);						// adjust position of paddles based on velocities
-			Redraw_Paddles(&game);					// redraw paddles based on new positions
-			
-			// check for win
-			if (game.hits >= BRICK_TOTAL_NUM) {
-				TFT_Text_PrintStr_RC(3,0, "VICTORY!");
-				Reset_Utilization_Stats();
-				while(1);
+			// if game over or victory, redraw things only
+			if (game.state == GAME_LOSS || game.state == GAME_VICTORY) {
+				Redraw_Info_Bar(&game);
+				Redraw_Bricks(&game);	
+				Redraw_Ball(&game);
+				Redraw_Paddles(&game);
+				if (game.state == GAME_VICTORY){
+					os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+					TFT_Text_PrintStr_RC(2,5, "VICTORY!");
+					os_mut_release(&LCD_mutex);
+				}
+				else {
+					os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+					TFT_Text_PrintStr_RC(2,5, "GAME OVER!");
+					os_mut_release(&LCD_mutex);
+					os_itv_wait();
+					os_mut_wait(&LCD_mutex, WAIT_FOREVER);
+					TFT_Text_PrintStr_RC(14,3, "TOUCH TO RESET");
+					os_mut_release(&LCD_mutex);
+				}
 			}
 			
 			// check for screen press from mailbox
-			if (os_mbx_check(&touch_mbx) < 3){
+			if (os_mbx_check(&touch_mbx) < 1){
 				void * msg;
 				PT_T p;
 				os_mbx_wait(touch_mbx, &msg, WAIT_FOREVER);
@@ -245,6 +263,21 @@ __task void Task_Update_Game_State(void) {
 					TFT_Erase();
 					state = STATUS_OPEN;
 					util_update_freq = STATUS_CPU_FREQ;
+				}
+				// otherwise, if we are waiting for a touch to start, start the game
+				else if (game.state == GAME_WAIT_START){
+					game.state = GAME_PLAYING;
+					Start_Game(&game);
+				}
+				// otherwise, if we are in game over, reset
+				else if (game.state == GAME_LOSS){
+					Game_Init(&game);								// reinit game
+					TFT_Erase();
+					Redraw_Info_Bar(&game);
+					Redraw_Bricks(&game);	
+					Redraw_Ball(&game);
+					Redraw_Paddles(&game);
+					game.state = GAME_WAIT_START;		// wait for next touch
 				}
 			}
 		}
@@ -273,7 +306,7 @@ __task void Task_Update_Game_State(void) {
 			util_update_freq++;
 			
 			// check for screen press from mailbox
-			if (os_mbx_check(&touch_mbx) < 3){
+			if (os_mbx_check(&touch_mbx) < 1){
 				void * msg;
 				PT_T p;
 				os_mbx_wait(touch_mbx, &msg, WAIT_FOREVER);

@@ -55,7 +55,7 @@ void Game_Init(GAME_T * g) {
 	g->paddles.tp.loc.Y = INFO_BAR_HEIGHT + PADDLE_BUFFER;
 	g->paddles.lp.loc.X = PADDLE_BUFFER;
 	g->paddles.lp.loc.Y = (TFT_HEIGHT - INFO_BAR_HEIGHT - VERT_PADDLE_HEIGHT)/2 + INFO_BAR_HEIGHT;
-	g->paddles.rp.loc.X = TFT_WIDTH - VERT_PADDLE_WIDTH - PADDLE_BUFFER;
+	g->paddles.rp.loc.X = TFT_WIDTH - VERT_PADDLE_WIDTH - PADDLE_BUFFER - 1;
 	g->paddles.rp.loc.Y = (TFT_HEIGHT - INFO_BAR_HEIGHT - VERT_PADDLE_HEIGHT)/2 + INFO_BAR_HEIGHT;
 	
 	// draw paddles
@@ -104,7 +104,7 @@ void Game_Init(GAME_T * g) {
 	}
 	
 	// set initial life count
-	g->lives = 5;
+	g->lives = GAME_INIT_LIVES;
 }
 
 // Redraw, including movement, the vertical paddles
@@ -676,4 +676,54 @@ void Redraw_Info_Bar(GAME_T * g){
 	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 	TFT_Text_PrintStr_RC(0,0, buffer);
 	os_mut_release(&LCD_mutex);
+}
+
+// Detects the ball making a collision with the wall (a loss)
+void Detect_Wall_Collision(GAME_T * g){
+	uint8_t detected = 0;
+	int8_t * vel;
+	
+	// bottom wall
+	if (g->ball.loc.Y + BALL_SIDE_LENGTH > TFT_HEIGHT - PADDLE_BUFFER){
+		detected++;			
+		vel = &g->ball.vy;	// y-direction
+	}	
+	// top wall
+	else if (g->ball.loc.Y < INFO_BAR_HEIGHT + PADDLE_BUFFER){
+		detected++;			
+		vel = &g->ball.vy;	// y-direction
+	}			
+	// right wall
+	else if (g->ball.loc.X + BALL_SIDE_LENGTH > TFT_WIDTH - PADDLE_BUFFER){
+		detected++;
+		vel = &g->ball.vx;	// x-direction
+	}
+	// left wall
+	else if (g->ball.loc.X < PADDLE_BUFFER){
+		detected++;
+		vel = &g->ball.vx;	// x-direction
+	}
+	
+	// handle detection if it occurred
+	if (detected){
+		// if lives remain (or we are cheating), bounce the ball off the wall
+		if (g->lives > 1 || g->state == GAME_CHEAT){
+			*vel *= -1;
+			if (g->state != GAME_CHEAT){
+				g->lives--;
+			}
+		}
+		// if out of lives, end game
+		else {
+			g->lives = 0;
+			g->state = GAME_LOSS;
+		}
+	}
+}
+
+// Initiates playing of the game after it has been initialized
+void Start_Game(GAME_T * g){
+	g->ball.vy = BALL_INITIAL_VY;
+	g->ball.vx = BALL_INITIAL_VX;
+	g->state = GAME_PLAYING;
 }

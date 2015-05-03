@@ -11821,8 +11821,8 @@ N#include "tft_lcd.h"
 N
 N// PADDLES
 N#define PADDLE_BUFFER				(5)
-N#define HORZ_PADDLE_WIDTH 	(50)
-N#define HORZ_PADDLE_HEIGHT	(6)
+N#define HORZ_PADDLE_WIDTH 	(75)
+N#define HORZ_PADDLE_HEIGHT	(7)
 N#define VERT_PADDLE_WIDTH		(HORZ_PADDLE_HEIGHT)
 N#define VERT_PADDLE_HEIGHT	(HORZ_PADDLE_WIDTH)
 N#define ORIENTATION_VERT		(0)
@@ -11893,6 +11893,12 @@ N#define STATUS_BUT_HEIGHT	(2*INFO_BAR_HEIGHT)
 N
 N// GAME structure will contain all the appropriate elements of a game in one central location
 N#define INFO_BAR_HEIGHT		(17)
+N#define GAME_INIT_LIVES 	(5)
+N#define GAME_PLAYING			(0)
+N#define GAME_VICTORY			(1)
+N#define GAME_LOSS					(2)
+N#define GAME_CHEAT				(3)
+N#define GAME_WAIT_START		(4)
 Ntypedef struct {
 N	PADDLES_T paddles;
 N	COLORS_T colors;
@@ -11901,6 +11907,7 @@ N	BRICK_T bricks[NUM_BRICK_ROWS][NUM_BRICK_COLS];
 X	BRICK_T bricks[(10)][(6)];
 N	uint8_t hits;
 N	uint8_t lives;
+N	uint8_t state;
 N} GAME_T;
 N
 N
@@ -11921,6 +11928,8 @@ Nvoid Draw_Brick(BRICK_T * b, COLOR_T * c);	// Draws a single brick in a certain
 Nvoid Detect_Brick_Collision(GAME_T * g);		// Detects the first ball collision with a brick and takes the appropriate action
 Nvoid Redraw_Bricks(GAME_T * g);							// Redraws all bricks. Necessary to avoid ball erase making it look as though contact happened.
 Nvoid Redraw_Info_Bar(GAME_T * g);						// Redraws the info bar
+Nvoid Detect_Wall_Collision(GAME_T * g);			// Detects the ball making a collision with the wall (a loss)
+Nvoid Start_Game(GAME_T * g);								// Initiates playing of the game after it has been initialized
 N
 N#endif
 L 15 "src\game.c" 2
@@ -12002,30 +12011,30 @@ N	g->colors.c_brick_invulnerable.B = 225;
 N	
 N	// set positions of paddles
 N	g->paddles.bp.loc.X = (TFT_WIDTH - HORZ_PADDLE_WIDTH)/2;
-X	g->paddles.bp.loc.X = ((240) - (50))/2;
+X	g->paddles.bp.loc.X = ((240) - (75))/2;
 N	g->paddles.bp.loc.Y = TFT_HEIGHT - HORZ_PADDLE_HEIGHT - PADDLE_BUFFER;
-X	g->paddles.bp.loc.Y = (320) - (6) - (5);
+X	g->paddles.bp.loc.Y = (320) - (7) - (5);
 N	g->paddles.tp.loc.X = (TFT_WIDTH - HORZ_PADDLE_WIDTH)/2;
-X	g->paddles.tp.loc.X = ((240) - (50))/2;
+X	g->paddles.tp.loc.X = ((240) - (75))/2;
 N	g->paddles.tp.loc.Y = INFO_BAR_HEIGHT + PADDLE_BUFFER;
 X	g->paddles.tp.loc.Y = (17) + (5);
 N	g->paddles.lp.loc.X = PADDLE_BUFFER;
 X	g->paddles.lp.loc.X = (5);
 N	g->paddles.lp.loc.Y = (TFT_HEIGHT - INFO_BAR_HEIGHT - VERT_PADDLE_HEIGHT)/2 + INFO_BAR_HEIGHT;
-X	g->paddles.lp.loc.Y = ((320) - (17) - ((50)))/2 + (17);
-N	g->paddles.rp.loc.X = TFT_WIDTH - VERT_PADDLE_WIDTH - PADDLE_BUFFER;
-X	g->paddles.rp.loc.X = (240) - ((6)) - (5);
+X	g->paddles.lp.loc.Y = ((320) - (17) - ((75)))/2 + (17);
+N	g->paddles.rp.loc.X = TFT_WIDTH - VERT_PADDLE_WIDTH - PADDLE_BUFFER - 1;
+X	g->paddles.rp.loc.X = (240) - ((7)) - (5) - 1;
 N	g->paddles.rp.loc.Y = (TFT_HEIGHT - INFO_BAR_HEIGHT - VERT_PADDLE_HEIGHT)/2 + INFO_BAR_HEIGHT;
-X	g->paddles.rp.loc.Y = ((320) - (17) - ((50)))/2 + (17);
+X	g->paddles.rp.loc.Y = ((320) - (17) - ((75)))/2 + (17);
 N	
 N	// draw paddles
 N	Redraw_Paddles(g);
 N	
 N	// set position and velocities of ball
 N	g->ball.loc.X = (TFT_WIDTH - BALL_SIDE_LENGTH)/2;
-X	g->ball.loc.X = ((240) - ((6)))/2;
+X	g->ball.loc.X = ((240) - ((7)))/2;
 N	g->ball.loc.Y = TFT_HEIGHT - PADDLE_BUFFER - HORZ_PADDLE_HEIGHT - BALL_SIDE_LENGTH - 2*PADDLE_BUFFER;
-X	g->ball.loc.Y = (320) - (5) - (6) - ((6)) - 2*(5);
+X	g->ball.loc.Y = (320) - (5) - (7) - ((7)) - 2*(5);
 N	g->ball.vx = 0;
 N	g->ball.vy = 0;
 N	
@@ -12075,7 +12084,8 @@ N		}
 N	}
 N	
 N	// set initial life count
-N	g->lives = 5;
+N	g->lives = GAME_INIT_LIVES;
+X	g->lives = (5);
 N}
 N
 N// Redraw, including movement, the vertical paddles
@@ -12094,9 +12104,9 @@ N
 N		// will always redraw the paddle
 N		p = pad->loc;
 N		pp.X = pad->loc.X + VERT_PADDLE_WIDTH;
-X		pp.X = pad->loc.X + ((6));
+X		pp.X = pad->loc.X + ((7));
 N		pp.Y = pad->loc.Y + VERT_PADDLE_HEIGHT;
-X		pp.Y = pad->loc.Y + ((50));
+X		pp.Y = pad->loc.Y + ((75));
 N		os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X		_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
 N		TFT_Fill_Rectangle(&p, &pp, &g->colors.c_pad);
@@ -12107,7 +12117,7 @@ N		// if moving up the screen, erase below us
 N		vel = pad->v;
 N		if (vel < 0){
 N			p.Y += VERT_PADDLE_HEIGHT + 1;
-X			p.Y += ((50)) + 1;
+X			p.Y += ((75)) + 1;
 N			pp.Y -= vel;
 N			os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X			_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
@@ -12119,7 +12129,7 @@ N		// if moving down the screen, erase above us
 N		else if (vel > 0) {
 N			p.Y -= vel;	
 N			pp.Y -= VERT_PADDLE_HEIGHT + 1;
-X			pp.Y -= ((50)) + 1;
+X			pp.Y -= ((75)) + 1;
 N			os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X			_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
 N			TFT_Fill_Rectangle(&p, &pp, &g->colors.c_bg);
@@ -12145,9 +12155,9 @@ N
 N		// will always redraw the paddle
 N		p = pad->loc;
 N		pp.X = pad->loc.X + HORZ_PADDLE_WIDTH;
-X		pp.X = pad->loc.X + (50);
+X		pp.X = pad->loc.X + (75);
 N		pp.Y = pad->loc.Y + HORZ_PADDLE_HEIGHT;
-X		pp.Y = pad->loc.Y + (6);
+X		pp.Y = pad->loc.Y + (7);
 N		os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X		_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
 N		TFT_Fill_Rectangle(&p, &pp, &g->colors.c_pad);
@@ -12158,7 +12168,7 @@ N		// if moving left on the screen, erase to our right
 N		vel = pad->v;
 N		if (vel < 0){
 N			p.X += HORZ_PADDLE_WIDTH + 1;
-X			p.X += (50) + 1;
+X			p.X += (75) + 1;
 N			pp.X -= vel;
 N			os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X			_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
@@ -12170,7 +12180,7 @@ N		// if moving right on the screen, erase to our left
 N		else if (vel > 0) {
 N			p.X -= vel;
 N			pp.X -= HORZ_PADDLE_WIDTH + 1;
-X			pp.X -= (50) + 1;
+X			pp.X -= (75) + 1;
 N			os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X			_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
 N			TFT_Fill_Rectangle(&p, &pp, &g->colors.c_bg);
@@ -12202,11 +12212,11 @@ N		g->paddles.tp.loc.X = PADDLE_BUFFER;
 X		g->paddles.tp.loc.X = (5);
 N	}
 N	else if (g->paddles.bp.loc.X + HORZ_PADDLE_WIDTH > TFT_WIDTH - 1 - PADDLE_BUFFER){
-X	else if (g->paddles.bp.loc.X + (50) > (240) - 1 - (5)){
+X	else if (g->paddles.bp.loc.X + (75) > (240) - 1 - (5)){
 N		g->paddles.bp.loc.X = TFT_WIDTH - 1 - PADDLE_BUFFER - HORZ_PADDLE_WIDTH;
-X		g->paddles.bp.loc.X = (240) - 1 - (5) - (50);
+X		g->paddles.bp.loc.X = (240) - 1 - (5) - (75);
 N		g->paddles.tp.loc.X = TFT_WIDTH - 1 - PADDLE_BUFFER - HORZ_PADDLE_WIDTH;
-X		g->paddles.tp.loc.X = (240) - 1 - (5) - (50);
+X		g->paddles.tp.loc.X = (240) - 1 - (5) - (75);
 N	}
 N	
 N	// vertical wall collisions
@@ -12218,11 +12228,11 @@ N		g->paddles.rp.loc.Y = INFO_BAR_HEIGHT + PADDLE_BUFFER;
 X		g->paddles.rp.loc.Y = (17) + (5);
 N	}
 N	else if (g->paddles.lp.loc.Y + VERT_PADDLE_HEIGHT > TFT_HEIGHT - 1 - PADDLE_BUFFER){
-X	else if (g->paddles.lp.loc.Y + ((50)) > (320) - 1 - (5)){
+X	else if (g->paddles.lp.loc.Y + ((75)) > (320) - 1 - (5)){
 N		g->paddles.lp.loc.Y = TFT_HEIGHT - 1 - PADDLE_BUFFER - VERT_PADDLE_HEIGHT;
-X		g->paddles.lp.loc.Y = (320) - 1 - (5) - ((50));
+X		g->paddles.lp.loc.Y = (320) - 1 - (5) - ((75));
 N		g->paddles.rp.loc.Y = TFT_HEIGHT - 1 - PADDLE_BUFFER - VERT_PADDLE_HEIGHT;
-X		g->paddles.rp.loc.Y = (320) - 1 - (5) - ((50));
+X		g->paddles.rp.loc.Y = (320) - 1 - (5) - ((75));
 N	}
 N}
 N
@@ -12256,7 +12266,7 @@ N
 N	// convert roll
 N	abs_roll_val = fabs(roll_val);
 N	if ((g->paddles.bp.loc.X <= PADDLE_BUFFER && roll_val < 0) || (g->paddles.bp.loc.X >= (TFT_WIDTH - HORZ_PADDLE_WIDTH - 1) && roll_val > 0)){
-X	if ((g->paddles.bp.loc.X <= (5) && roll_val < 0) || (g->paddles.bp.loc.X >= ((240) - (50) - 1) && roll_val > 0)){
+X	if ((g->paddles.bp.loc.X <= (5) && roll_val < 0) || (g->paddles.bp.loc.X >= ((240) - (75) - 1) && roll_val > 0)){
 N		g->paddles.bp.v = 0;
 N		g->paddles.tp.v = 0;
 N	}
@@ -12307,7 +12317,7 @@ N	}
 N	pitch_val = pitch_val - calibration;
 N	abs_pitch_val = fabs(pitch_val);
 N	if ((g->paddles.lp.loc.Y <= INFO_BAR_HEIGHT + PADDLE_BUFFER && pitch_val < 0) || (g->paddles.lp.loc.Y >= (TFT_HEIGHT - VERT_PADDLE_HEIGHT - 1) && pitch_val > 0)){
-X	if ((g->paddles.lp.loc.Y <= (17) + (5) && pitch_val < 0) || (g->paddles.lp.loc.Y >= ((320) - ((50)) - 1) && pitch_val > 0)){
+X	if ((g->paddles.lp.loc.Y <= (17) + (5) && pitch_val < 0) || (g->paddles.lp.loc.Y >= ((320) - ((75)) - 1) && pitch_val > 0)){
 N		g->paddles.lp.v = 0;
 N		g->paddles.rp.v = 0;
 N	}
@@ -12358,9 +12368,9 @@ N
 N	// will always redraw the ball
 N	p = ball->loc;
 N	pp.X = ball->loc.X + BALL_SIDE_LENGTH;
-X	pp.X = ball->loc.X + ((6));
+X	pp.X = ball->loc.X + ((7));
 N	pp.Y = ball->loc.Y + BALL_SIDE_LENGTH;
-X	pp.Y = ball->loc.Y + ((6));
+X	pp.Y = ball->loc.Y + ((7));
 N	
 N	os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
@@ -12372,7 +12382,7 @@ N	// if moving up the screen, erase below us
 N	vel_y = ball->vy;
 N	if (vel_y < 0){
 N		p.Y += BALL_SIDE_LENGTH + 1;
-X		p.Y += ((6)) + 1;
+X		p.Y += ((7)) + 1;
 N		pp.Y -= vel_y;
 N		os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X		_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
@@ -12384,7 +12394,7 @@ N	// if moving down the screen, erase above us
 N	else if (vel_y > 0) {
 N		p.Y -= vel_y;	
 N		pp.Y -= BALL_SIDE_LENGTH + 1;
-X		pp.Y -= ((6)) + 1;
+X		pp.Y -= ((7)) + 1;
 N		os_mut_wait(&LCD_mutex, WAIT_FOREVER);
 X		_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
 N		TFT_Fill_Rectangle(&p, &pp, &g->colors.c_bg);
@@ -12394,13 +12404,13 @@ N	}
 N	// if moving left on the screen, erase to our right
 N	p = ball->loc;
 N	pp.X = ball->loc.X + BALL_SIDE_LENGTH;
-X	pp.X = ball->loc.X + ((6));
+X	pp.X = ball->loc.X + ((7));
 N	pp.Y = ball->loc.Y + BALL_SIDE_LENGTH;
-X	pp.Y = ball->loc.Y + ((6));
+X	pp.Y = ball->loc.Y + ((7));
 N	vel_x = ball->vx;
 N	if (vel_x < 0){
 N		p.X += BALL_SIDE_LENGTH + 1;
-X		p.X += ((6)) + 1;
+X		p.X += ((7)) + 1;
 N		pp.X -= vel_x;
 N		if (vel_y < 0){
 N			pp.Y -= vel_y;
@@ -12418,7 +12428,7 @@ N	// if moving right on the screen, erase to our left
 N	else if (vel_x > 0) {
 N		p.X -= vel_x;
 N		pp.X -= BALL_SIDE_LENGTH + 1;
-X		pp.X -= ((6)) + 1;
+X		pp.X -= ((7)) + 1;
 N		if (vel_y < 0){
 N			pp.Y -= vel_y;
 N		}
@@ -12447,21 +12457,21 @@ N	int16_t center_paddle;
 N	
 N	// determine center of ball
 N	center_ball.X = g->ball.loc.X + (BALL_SIDE_LENGTH/2);
-X	center_ball.X = g->ball.loc.X + (((6))/2);
+X	center_ball.X = g->ball.loc.X + (((7))/2);
 N	center_ball.Y = g->ball.loc.Y + (BALL_SIDE_LENGTH/2);
-X	center_ball.Y = g->ball.loc.Y + (((6))/2);
+X	center_ball.Y = g->ball.loc.Y + (((7))/2);
 N	
 N	// narrow down which paddle we could be making contact with, if at all, to reduce calculations
 N	// top paddle possible
 N	if (center_ball.Y < (TFT_HEIGHT/3)){
 X	if (center_ball.Y < ((320)/3)){
 N		int16_t top_ball = center_ball.Y - (BALL_SIDE_LENGTH/2);
-X		int16_t top_ball = center_ball.Y - (((6))/2);
+X		int16_t top_ball = center_ball.Y - (((7))/2);
 N		pos = &g->paddles.tp;
 N		if (g->ball.vy < 0 && top_ball <= pos->loc.Y + HORZ_PADDLE_HEIGHT && center_ball.X >= pos->loc.X && center_ball.X <= pos->loc.X + HORZ_PADDLE_WIDTH) {
-X		if (g->ball.vy < 0 && top_ball <= pos->loc.Y + (6) && center_ball.X >= pos->loc.X && center_ball.X <= pos->loc.X + (50)) {
+X		if (g->ball.vy < 0 && top_ball <= pos->loc.Y + (7) && center_ball.X >= pos->loc.X && center_ball.X <= pos->loc.X + (75)) {
 N			center_paddle = pos->loc.X + (HORZ_PADDLE_WIDTH/2);
-X			center_paddle = pos->loc.X + ((50)/2);
+X			center_paddle = pos->loc.X + ((75)/2);
 N			Calc_Bounce_Velocities(&g->ball, center_ball.X, center_paddle, TOP_PADDLE);
 X			Calc_Bounce_Velocities(&g->ball, center_ball.X, center_paddle, (2));
 N			return;
@@ -12471,12 +12481,12 @@ N	// bottom paddle possible
 N	else if (center_ball.Y > (2*TFT_HEIGHT/3)){
 X	else if (center_ball.Y > (2*(320)/3)){
 N		int16_t bottom_ball = center_ball.Y + (BALL_SIDE_LENGTH/2);
-X		int16_t bottom_ball = center_ball.Y + (((6))/2);
+X		int16_t bottom_ball = center_ball.Y + (((7))/2);
 N		pos = &g->paddles.bp;
 N		if (g->ball.vy > 0 && bottom_ball >= pos->loc.Y && center_ball.X >= pos->loc.X && center_ball.X <= pos->loc.X + HORZ_PADDLE_WIDTH) {
-X		if (g->ball.vy > 0 && bottom_ball >= pos->loc.Y && center_ball.X >= pos->loc.X && center_ball.X <= pos->loc.X + (50)) {
+X		if (g->ball.vy > 0 && bottom_ball >= pos->loc.Y && center_ball.X >= pos->loc.X && center_ball.X <= pos->loc.X + (75)) {
 N			center_paddle = pos->loc.X + (HORZ_PADDLE_WIDTH/2);
-X			center_paddle = pos->loc.X + ((50)/2);
+X			center_paddle = pos->loc.X + ((75)/2);
 N			Calc_Bounce_Velocities(&g->ball, center_ball.X, center_paddle, BOTTOM_PADDLE);
 X			Calc_Bounce_Velocities(&g->ball, center_ball.X, center_paddle, (1));
 N			return;
@@ -12486,12 +12496,12 @@ N	// left paddle possible
 N	if (center_ball.X < (TFT_WIDTH/3)){
 X	if (center_ball.X < ((240)/3)){
 N		int16_t left_ball = center_ball.X - (BALL_SIDE_LENGTH/2);
-X		int16_t left_ball = center_ball.X - (((6))/2);
+X		int16_t left_ball = center_ball.X - (((7))/2);
 N		pos = &g->paddles.lp;
 N		if (g->ball.vx < 0 && left_ball <= pos->loc.X + VERT_PADDLE_WIDTH && center_ball.Y >= pos->loc.Y && center_ball.Y <= pos->loc.Y + VERT_PADDLE_HEIGHT) {
-X		if (g->ball.vx < 0 && left_ball <= pos->loc.X + ((6)) && center_ball.Y >= pos->loc.Y && center_ball.Y <= pos->loc.Y + ((50))) {
+X		if (g->ball.vx < 0 && left_ball <= pos->loc.X + ((7)) && center_ball.Y >= pos->loc.Y && center_ball.Y <= pos->loc.Y + ((75))) {
 N			center_paddle = pos->loc.Y + (VERT_PADDLE_HEIGHT/2);
-X			center_paddle = pos->loc.Y + (((50))/2);
+X			center_paddle = pos->loc.Y + (((75))/2);
 N			Calc_Bounce_Velocities(&g->ball, center_ball.Y, center_paddle, LEFT_PADDLE);
 X			Calc_Bounce_Velocities(&g->ball, center_ball.Y, center_paddle, (3));
 N			return;
@@ -12501,12 +12511,12 @@ N	// right paddle possible
 N	else if (center_ball.X > (2*TFT_WIDTH/3)){
 X	else if (center_ball.X > (2*(240)/3)){
 N		int16_t right_ball = center_ball.X + (BALL_SIDE_LENGTH/2);
-X		int16_t right_ball = center_ball.X + (((6))/2);
+X		int16_t right_ball = center_ball.X + (((7))/2);
 N		pos = &g->paddles.rp;
 N		if (g->ball.vx > 0 && right_ball >= pos->loc.X && center_ball.Y >= pos->loc.Y && center_ball.Y <= pos->loc.Y + VERT_PADDLE_HEIGHT) {
-X		if (g->ball.vx > 0 && right_ball >= pos->loc.X && center_ball.Y >= pos->loc.Y && center_ball.Y <= pos->loc.Y + ((50))) {
+X		if (g->ball.vx > 0 && right_ball >= pos->loc.X && center_ball.Y >= pos->loc.Y && center_ball.Y <= pos->loc.Y + ((75))) {
 N			center_paddle = pos->loc.Y + (VERT_PADDLE_HEIGHT/2);
-X			center_paddle = pos->loc.Y + (((50))/2);
+X			center_paddle = pos->loc.Y + (((75))/2);
 N			Calc_Bounce_Velocities(&g->ball, center_ball.Y, center_paddle, RIGHT_PADDLE);
 X			Calc_Bounce_Velocities(&g->ball, center_ball.Y, center_paddle, (4));
 N			return;
@@ -12552,7 +12562,7 @@ N	}
 N	
 N	// determine adjustments based on where on the paddle we hit
 N	if (abs(normalized_dist) <= PADDLE_NORM_ZONE) {
-X	if (abs(normalized_dist) <= ((50)/6)) {
+X	if (abs(normalized_dist) <= ((75)/6)) {
 N		// if we hit in the "normal" zone, just reflect away at the incident angle
 N		perpen_vel *= -1;
 N	}
@@ -12662,10 +12672,10 @@ N
 N	// get ball hitbox
 N	left_ball = g->ball.loc.X;
 N	right_ball = g->ball.loc.X + BALL_SIDE_LENGTH;
-X	right_ball = g->ball.loc.X + ((6));
+X	right_ball = g->ball.loc.X + ((7));
 N	top_ball = g->ball.loc.Y;
 N	bottom_ball = g->ball.loc.Y + BALL_SIDE_LENGTH;
-X	bottom_ball = g->ball.loc.Y + ((6));
+X	bottom_ball = g->ball.loc.Y + ((7));
 N	
 N	// check each brick
 N	for (i = 0; i < NUM_BRICK_ROWS; i++){
@@ -12765,4 +12775,64 @@ X	_os_mut_wait((U32)rt_mut_wait,&LCD_mutex,(0xffff));
 N	TFT_Text_PrintStr_RC(0,0, buffer);
 N	os_mut_release(&LCD_mutex);
 X	_os_mut_release((U32)rt_mut_release,&LCD_mutex);
+N}
+N
+N// Detects the ball making a collision with the wall (a loss)
+Nvoid Detect_Wall_Collision(GAME_T * g){
+N	uint8_t detected = 0;
+N	int8_t * vel;
+N	
+N	// bottom wall
+N	if (g->ball.loc.Y + BALL_SIDE_LENGTH > TFT_HEIGHT - PADDLE_BUFFER){
+X	if (g->ball.loc.Y + ((7)) > (320) - (5)){
+N		detected++;			
+N		vel = &g->ball.vy;	// y-direction
+N	}	
+N	// top wall
+N	else if (g->ball.loc.Y < INFO_BAR_HEIGHT + PADDLE_BUFFER){
+X	else if (g->ball.loc.Y < (17) + (5)){
+N		detected++;			
+N		vel = &g->ball.vy;	// y-direction
+N	}			
+N	// right wall
+N	else if (g->ball.loc.X + BALL_SIDE_LENGTH > TFT_WIDTH - PADDLE_BUFFER){
+X	else if (g->ball.loc.X + ((7)) > (240) - (5)){
+N		detected++;
+N		vel = &g->ball.vx;	// x-direction
+N	}
+N	// left wall
+N	else if (g->ball.loc.X < PADDLE_BUFFER){
+X	else if (g->ball.loc.X < (5)){
+N		detected++;
+N		vel = &g->ball.vx;	// x-direction
+N	}
+N	
+N	// handle detection if it occurred
+N	if (detected){
+N		// if lives remain (or we are cheating), bounce the ball off the wall
+N		if (g->lives > 1 || g->state == GAME_CHEAT){
+X		if (g->lives > 1 || g->state == (3)){
+N			*vel *= -1;
+N			if (g->state != GAME_CHEAT){
+X			if (g->state != (3)){
+N				g->lives--;
+N			}
+N		}
+N		// if out of lives, end game
+N		else {
+N			g->lives = 0;
+N			g->state = GAME_LOSS;
+X			g->state = (2);
+N		}
+N	}
+N}
+N
+N// Initiates playing of the game after it has been initialized
+Nvoid Start_Game(GAME_T * g){
+N	g->ball.vy = BALL_INITIAL_VY;
+X	g->ball.vy = (-3);
+N	g->ball.vx = BALL_INITIAL_VX;
+X	g->ball.vx = (-2);
+N	g->state = GAME_PLAYING;
+X	g->state = (0);
 N}
