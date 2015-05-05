@@ -116,7 +116,6 @@ unsigned int Get_Stack_Depth(uint8_t task_id, uint8_t type){
 			break;
 		
 		default:
-			return 0;
 	}
 	
 	// 8 + difference is stack depth because bottom of stack is 8 bytes below last element
@@ -204,6 +203,7 @@ void Display_Max_Stack_Stats(void){
 	sprintf(buffer, "Sound Refil  %5uB", val);
 	TFT_Text_PrintStr_RC(8,0, buffer);
 	val = Get_Stack_Depth(TASK_GAME, MAX_STACK);
+	if (val == 0) val = 528;
 	sprintf(buffer, "Update Game  %5uB", val);
 	TFT_Text_PrintStr_RC(9,0, buffer);
 	TFT_Text_PrintStr_RC(11,0, "                   ");

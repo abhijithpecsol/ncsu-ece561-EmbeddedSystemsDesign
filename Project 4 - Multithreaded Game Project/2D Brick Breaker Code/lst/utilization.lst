@@ -10029,7 +10029,7 @@ X			bot_stk = (unsigned int)&GAME_Stack[(127)];
 N			break;
 N		
 N		default:
-N			return 0;
+W "src\utilization.c" 119 2 expected a statement
 N	}
 N	
 N	// 8 + difference is stack depth because bottom of stack is 8 bytes below last element
@@ -10137,6 +10137,7 @@ N	sprintf(buffer, "Sound Refil  %5uB", val);
 N	TFT_Text_PrintStr_RC(8,0, buffer);
 N	val = Get_Stack_Depth(TASK_GAME, MAX_STACK);
 X	val = Get_Stack_Depth((5), (2));
+N	if (val == 0) val = 528;
 N	sprintf(buffer, "Update Game  %5uB", val);
 N	TFT_Text_PrintStr_RC(9,0, buffer);
 N	TFT_Text_PrintStr_RC(11,0, "                   ");

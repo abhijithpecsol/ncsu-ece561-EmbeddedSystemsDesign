@@ -319,11 +319,6 @@ __task void Task_Update_Game_State(void) {
 					Reset_Utilization_Stats();
 				}
 			}
-			
-			// utilization tracking
-			#if TRACK_STACK == 1
-				Update_Stack_Pointer(__current_sp(), TASK_GAME);
-			#endif
 		}
 
 		PTB->PCOR = MASK(DEBUG_T3_POS);

@@ -12086,6 +12086,9 @@ N
 N	// set initial life count
 N	g->lives = GAME_INIT_LIVES;
 X	g->lives = (5);
+N	
+N	// reset brick count
+N	g->hits = 0;
 N}
 N
 N// Redraw, including movement, the vertical paddles
@@ -12328,32 +12331,32 @@ N			g->paddles.rp.v = 0;
 N		}
 N		else if (abs_pitch_val > 5 && abs_pitch_val < 15){
 N			if (pitch_val < 0){
-N				g->paddles.lp.v = -4;
-N				g->paddles.rp.v = -4;
+N				g->paddles.lp.v = -5;
+N				g->paddles.rp.v = -5;
 N			}
 N			else {
-N				g->paddles.lp.v = 4;
-N				g->paddles.rp.v = 4;
+N				g->paddles.lp.v = 5;
+N				g->paddles.rp.v = 5;
 N			}
 N		}
 N		else if (abs_pitch_val > 15 && abs_pitch_val < 30){
 N			if (pitch_val < 0){
-N				g->paddles.lp.v = -8;
-N				g->paddles.rp.v = -8;
+N				g->paddles.lp.v = -10;
+N				g->paddles.rp.v = -10;
 N			}
 N			else {
-N				g->paddles.lp.v = 8;
-N				g->paddles.rp.v = 8;
+N				g->paddles.lp.v = 10;
+N				g->paddles.rp.v = 10;
 N			}
 N		}
 N		else if (abs_pitch_val > 30){
 N			if (pitch_val < 0){
-N				g->paddles.lp.v = -12;
-N				g->paddles.rp.v = -12;
+N				g->paddles.lp.v = -15;
+N				g->paddles.rp.v = -15;
 N			}
 N			else {
-N				g->paddles.lp.v = 12;
-N				g->paddles.rp.v = 12;
+N				g->paddles.lp.v = 15;
+N				g->paddles.rp.v = 15;
 N			}
 N		}
 N	}

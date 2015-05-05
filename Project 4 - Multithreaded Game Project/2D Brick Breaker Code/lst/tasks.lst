@@ -10936,13 +10936,6 @@ X					state = (2);
 N					Reset_Utilization_Stats();
 N				}
 N			}
-N			
-N			// utilization tracking
-N			#if TRACK_STACK == 1
-X			#if (1) == 1
-N				Update_Stack_Pointer(__current_sp(), TASK_GAME);
-X				Update_Stack_Pointer(__current_sp(), (5));
-N			#endif
 N		}
 N
 N		PTB->PCOR = MASK(DEBUG_T3_POS);

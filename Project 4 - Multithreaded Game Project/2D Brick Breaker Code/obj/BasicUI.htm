@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\obj\BasicUI.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\obj\BasicUI.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Sat May 02 22:19:02 2015
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Tue May 05 17:58:59 2015
 <BR><P>
 <H3>Maximum Stack Usage =        552 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -500,7 +500,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[3c]"></a>Task_Update_Game_State</STRONG> (Thumb, 644 bytes, Stack size 432 bytes, tasks.o(.text))
+<P><STRONG><a name="[3c]"></a>Task_Update_Game_State</STRONG> (Thumb, 636 bytes, Stack size 432 bytes, tasks.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 552<LI>Call Chain = Task_Update_Game_State &rArr; Game_Init &rArr; Redraw_Paddles &rArr; Redraw_Horizontal_Paddles &rArr; TFT_Fill_Rectangle
 </UL>
 <BR>[Calls]<UL><LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start_Game
@@ -940,7 +940,7 @@ Global Symbols
 <LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task_Update_Game_State
 </UL>
 
-<P><STRONG><a name="[74]"></a>Game_Init</STRONG> (Thumb, 368 bytes, Stack size 32 bytes, game.o(.text))
+<P><STRONG><a name="[74]"></a>Game_Init</STRONG> (Thumb, 372 bytes, Stack size 32 bytes, game.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = Game_Init &rArr; Redraw_Paddles &rArr; Redraw_Horizontal_Paddles &rArr; TFT_Fill_Rectangle
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Draw_Brick
@@ -956,7 +956,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task_Update_Game_State
 </UL>
 
-<P><STRONG><a name="[7d]"></a>Convert_Tilt</STRONG> (Thumb, 428 bytes, Stack size 32 bytes, game.o(.text))
+<P><STRONG><a name="[7d]"></a>Convert_Tilt</STRONG> (Thumb, 430 bytes, Stack size 32 bytes, game.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = Convert_Tilt &rArr; __aeabi_fsub &rArr; __aeabi_fadd &rArr; _float_epilogue
 </UL>
 <BR>[Calls]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2f
@@ -989,7 +989,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task_Update_Game_State
 </UL>
 
-<P><STRONG><a name="[79]"></a>Redraw_Bricks</STRONG> (Thumb, 184 bytes, Stack size 24 bytes, game.o(.text))
+<P><STRONG><a name="[79]"></a>Redraw_Bricks</STRONG> (Thumb, 182 bytes, Stack size 24 bytes, game.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = Redraw_Bricks &rArr; Draw_Brick &rArr; TFT_Fill_Rectangle
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Draw_Brick
@@ -1066,7 +1066,7 @@ Global Symbols
 <LI><a href="#[6e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Play_Waveform_with_DMA
 </UL>
 
-<P><STRONG><a name="[b8]"></a>Get_Stack_Depth</STRONG> (Thumb, 84 bytes, Stack size 4 bytes, utilization.o(.text))
+<P><STRONG><a name="[b8]"></a>Get_Stack_Depth</STRONG> (Thumb, 80 bytes, Stack size 4 bytes, utilization.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = Get_Stack_Depth &rArr; __ARM_common_switch8
 </UL>
 <BR>[Calls]<UL><LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__ARM_common_switch8
@@ -1098,7 +1098,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task_Update_Game_State
 </UL>
 
-<P><STRONG><a name="[83]"></a>Display_Max_Stack_Stats</STRONG> (Thumb, 614 bytes, Stack size 32 bytes, utilization.o(.text))
+<P><STRONG><a name="[83]"></a>Display_Max_Stack_Stats</STRONG> (Thumb, 622 bytes, Stack size 32 bytes, utilization.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 108<LI>Call Chain = Display_Max_Stack_Stats &rArr; TFT_Text_PrintStr_RC &rArr; TFT_Text_PrintChar &rArr; TFT_Start_Rectangle
 </UL>
 <BR>[Calls]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TFT_Text_PrintStr_RC

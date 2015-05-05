@@ -105,6 +105,9 @@ void Game_Init(GAME_T * g) {
 	
 	// set initial life count
 	g->lives = GAME_INIT_LIVES;
+	
+	// reset brick count
+	g->hits = 0;
 }
 
 // Redraw, including movement, the vertical paddles
@@ -310,32 +313,32 @@ void Convert_Tilt(GAME_T * g) {
 		}
 		else if (abs_pitch_val > 5 && abs_pitch_val < 15){
 			if (pitch_val < 0){
-				g->paddles.lp.v = -4;
-				g->paddles.rp.v = -4;
+				g->paddles.lp.v = -5;
+				g->paddles.rp.v = -5;
 			}
 			else {
-				g->paddles.lp.v = 4;
-				g->paddles.rp.v = 4;
+				g->paddles.lp.v = 5;
+				g->paddles.rp.v = 5;
 			}
 		}
 		else if (abs_pitch_val > 15 && abs_pitch_val < 30){
 			if (pitch_val < 0){
-				g->paddles.lp.v = -8;
-				g->paddles.rp.v = -8;
+				g->paddles.lp.v = -10;
+				g->paddles.rp.v = -10;
 			}
 			else {
-				g->paddles.lp.v = 8;
-				g->paddles.rp.v = 8;
+				g->paddles.lp.v = 10;
+				g->paddles.rp.v = 10;
 			}
 		}
 		else if (abs_pitch_val > 30){
 			if (pitch_val < 0){
-				g->paddles.lp.v = -12;
-				g->paddles.rp.v = -12;
+				g->paddles.lp.v = -15;
+				g->paddles.rp.v = -15;
 			}
 			else {
-				g->paddles.lp.v = 12;
-				g->paddles.rp.v = 12;
+				g->paddles.lp.v = 15;
+				g->paddles.rp.v = 15;
 			}
 		}
 	}
