@@ -1,0 +1,24 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+C:\Users\Alex\Documents\Teaching\Book Writing\ARM Cortex M0Plus\Content\AdvancedCourse\Speed\Code\ProfilerProject - Solution\BasicUI.uvproj
+Project File Date:  02/06/2014
+
+<h2>Output:</h2>
+Build target 'KL25Z Flash'
+compiling main.c...
+compiling region.c...
+linking...
+Program Size: Code=3172 RO-data=1796 RW-data=40 ZI-data=1416  
+After Build - User command #1: Scripts\update_regions_MDK.bat
+C:\Users\Alex\Documents\Teaching\Book Writing\ARM Cortex M0Plus\Content\AdvancedCourse\Speed\Code\ProfilerProject - Solution>Scripts\getregions.exe obj/*.axf -c -s -osrc/region.c 
+".\obj\BasicUI.axf" - 0 Errors, 0 Warning(s).
+Build target 'KL25Z Flash'
+compiling region.c...
+linking...
+Program Size: Code=3172 RO-data=1796 RW-data=40 ZI-data=1416  
+After Build - User command #1: Scripts\update_regions_MDK.bat
+C:\Users\Alex\Documents\Teaching\Book Writing\ARM Cortex M0Plus\Content\AdvancedCourse\Speed\Code\ProfilerProject - Solution>Scripts\getregions.exe obj/*.axf -c -s -osrc/region.c 
+".\obj\BasicUI.axf" - 0 Errors, 0 Warning(s).
