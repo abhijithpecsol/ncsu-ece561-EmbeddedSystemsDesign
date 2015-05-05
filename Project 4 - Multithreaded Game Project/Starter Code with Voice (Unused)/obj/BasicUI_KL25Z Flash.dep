@@ -1,0 +1,166 @@
+Dependencies for Project 'BasicUI', Target 'KL25Z Flash': (DO NOT MODIFY !)
+F (.\src\system_MKL25Z4.c)(0x50047D60)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\system_mkl25z4.o --list_dir ".\\lst\\" --list --omf_browse .\obj\system_mkl25z4.crf --depend .\obj\system_mkl25z4.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+F (.\asm\startup_MKL25Z4.s)(0x553FDD42)(--cpu Cortex-M0+ --pd "__RTX SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1"-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis--pd "MKL25Z128xxx4 SETA 1"-o .\obj\startup_mkl25z4.o --depend .\obj\startup_mkl25z4.d)
+F (.\src\main.c)(0x553E3E91)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\main.o --list_dir ".\\lst\\" --list --omf_browse .\obj\main.crf --depend .\obj\main.d)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.H)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x541A544C)
+I (.\inc\gpio_defs.h)(0x5526FC0B)
+I (.\inc\tft_lcd.h)(0x553D3FD1)
+I (.\inc\font.h)(0x550864B6)
+I (.\inc\LEDs.h)(0x51A60DB0)
+I (.\inc\timers.h)(0x552FF65E)
+I (.\inc\sound.h)(0x553FDFA0)
+I (C:\Keil_v5\ARM\RV31\INC\RTL.h)(0x5468B7E4)
+I (.\inc\DMA.h)(0x553010A6)
+I (.\inc\I2C.h)(0x5302CB2E)
+I (.\inc\mma8451.h)(0x553E3E6B)
+I (.\inc\delay.h)(0x55283FE5)
+I (.\inc\profile.h)(0x55301D74)
+I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x541A544A)
+I (.\inc\tasks.h)(0x553907E4)
+F (.\src\LEDs.c)(0x51A60D7E)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\leds.o --list_dir ".\\lst\\" --list --omf_browse .\obj\leds.crf --depend .\obj\leds.d)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.H)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+I (.\inc\LEDs.h)(0x51A60DB0)
+I (.\inc\gpio_defs.h)(0x5526FC0B)
+F (.\src\timers.c)(0x552FF806)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\timers.o --list_dir ".\\lst\\" --list --omf_browse .\obj\timers.crf --depend .\obj\timers.d)
+I (.\inc\timers.h)(0x552FF65E)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+I (.\inc\region.h)(0x55301E8E)
+I (.\inc\profile.h)(0x55301D74)
+F (.\src\delay.c)(0x55283FB7)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\delay.o --list_dir ".\\lst\\" --list --omf_browse .\obj\delay.crf --depend .\obj\delay.d)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.H)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+F (.\src\profile.c)(0x552FF5BF)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\profile.o --list_dir ".\\lst\\" --list --omf_browse .\obj\profile.crf --depend .\obj\profile.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x541A544C)
+I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x541A544C)
+I (.\inc\timers.h)(0x552FF65E)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+I (.\inc\region.h)(0x55301E8E)
+I (.\inc\profile.h)(0x55301D74)
+I (.\inc\TFT_LCD.h)(0x553D3FD1)
+I (.\inc\font.h)(0x550864B6)
+F (.\src\region.c)(0x55301E9A)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\region.o --list_dir ".\\lst\\" --list --omf_browse .\obj\region.crf --depend .\obj\region.d)
+I (.\inc\region.h)(0x55301E8E)
+F (.\src\lucida_8x13.c)(0x54F0D2F0)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\lucida_8x13.o --list_dir ".\\lst\\" --list --omf_browse .\obj\lucida_8x13.crf --depend .\obj\lucida_8x13.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+F (.\src\lucida_12x19.c)(0x54F0B485)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\lucida_12x19.o --list_dir ".\\lst\\" --list --omf_browse .\obj\lucida_12x19.crf --depend .\obj\lucida_12x19.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+F (.\src\lucida_20x31.c)(0x54F0842A)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\lucida_20x31.o --list_dir ".\\lst\\" --list --omf_browse .\obj\lucida_20x31.crf --depend .\obj\lucida_20x31.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+F (.\src\RTX_Config.c)(0x5537C294)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\rtx_config.o --list_dir ".\\lst\\" --list --omf_browse .\obj\rtx_config.crf --depend .\obj\rtx_config.d)
+I (C:\Keil_v5\ARM\RV31\INC\RTL.h)(0x5468B7E4)
+I (C:\Keil_v5\ARM\RV31\INC\RTX_lib.c)(0x5468B7E4)
+F (.\src\sound.c)(0x553FF9B2)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\sound.o --list_dir ".\\lst\\" --list --omf_browse .\obj\sound.crf --depend .\obj\sound.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x541A544A)
+I (C:\Keil_v5\ARM\RV31\INC\RTL.h)(0x5468B7E4)
+I (.\inc\sound.h)(0x553FDFA0)
+I (.\inc\delay.h)(0x55283FE5)
+I (.\inc\gpio_defs.h)(0x5526FC0B)
+I (.\inc\timers.h)(0x552FF65E)
+I (.\inc\DMA.h)(0x553010A6)
+I (.\inc\tasks.h)(0x553907E4)
+I (.\inc\TFT_LCD.h)(0x553D3FD1)
+F (.\src\tasks.c)(0x55390404)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\tasks.o --list_dir ".\\lst\\" --list --omf_browse .\obj\tasks.crf --depend .\obj\tasks.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x541A544C)
+I (C:\Keil_v5\ARM\RV31\INC\RTL.h)(0x5468B7E4)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+I (.\inc\TFT_LCD.h)(0x553D3FD1)
+I (.\inc\font.h)(0x550864B6)
+I (.\inc\tasks.h)(0x553907E4)
+I (.\inc\MMA8451.h)(0x553E3E6B)
+I (.\inc\sound.h)(0x553FDFA0)
+I (.\inc\DMA.h)(0x553010A6)
+I (.\inc\gpio_defs.h)(0x5526FC0B)
+F (.\src\I2C.c)(0x552D6282)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\i2c.o --list_dir ".\\lst\\" --list --omf_browse .\obj\i2c.crf --depend .\obj\i2c.d)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.H)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+I (.\inc\I2C.h)(0x5302CB2E)
+F (.\src\DMA.c)(0x553E4018)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\dma.o --list_dir ".\\lst\\" --list --omf_browse .\obj\dma.crf --depend .\obj\dma.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+I (C:\Keil_v5\ARM\RV31\INC\RTL.h)(0x5468B7E4)
+I (.\inc\timers.h)(0x552FF65E)
+I (.\inc\LEDs.h)(0x51A60DB0)
+I (.\inc\tasks.h)(0x553907E4)
+I (.\inc\TFT_LCD.h)(0x553D3FD1)
+I (.\inc\gpio_defs.h)(0x5526FC0B)
+F (.\src\MMA8451.c)(0x552D62C3)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\mma8451.o --list_dir ".\\lst\\" --list --omf_browse .\obj\mma8451.crf --depend .\obj\mma8451.d)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.H)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+I (.\inc\MMA8451.h)(0x553E3E6B)
+I (.\inc\I2C.h)(0x5302CB2E)
+I (.\inc\delay.h)(0x55283FE5)
+I (.\inc\LEDs.h)(0x51A60DB0)
+I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x541A544A)
+F (.\src\TFT_graphics.c)(0x552D62CC)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\tft_graphics.o --list_dir ".\\lst\\" --list --omf_browse .\obj\tft_graphics.crf --depend .\obj\tft_graphics.d)
+I (.\inc\TFT_LCD.h)(0x553D3FD1)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+F (.\src\TFT_lcd.c)(0x553FDCD9)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\tft_lcd.o --list_dir ".\\lst\\" --list --omf_browse .\obj\tft_lcd.crf --depend .\obj\tft_lcd.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x541A544C)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\MKL25Z4.h)(0x5346EE14)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cm0plus.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmInstr.h)(0x5346F044)
+I (C:\Keil_v5\ARM\CMSIS\Include\core_cmFunc.h)(0x5346F044)
+I (C:\Keil_v5\ARM\Inc\Freescale\Kinetis\system_MKL25Z4.h)(0x5346EE14)
+I (.\inc\TFT_LCD.h)(0x553D3FD1)
+I (.\inc\gpio_defs.h)(0x5526FC0B)
+I (.\inc\timers.h)(0x552FF65E)
+I (.\inc\font.h)(0x550864B6)
+F (.\src\TFT_text.c)(0x552D63D7)(-c --cpu Cortex-M0+ -D__RTX -D__MICROLIB -g -O3 -Otime --apcs=interwork --asm --interleave --asm_dir ".\\lst\\" -I.\inc --fpmode=fast-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-I C:\Keil_v5\ARM\Inc\Freescale\Kinetis-DMKL25Z128xxx4-o .\obj\tft_text.o --list_dir ".\\lst\\" --list --omf_browse .\obj\tft_text.crf --depend .\obj\tft_text.d)
+I (.\inc\font.h)(0x550864B6)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x541A544A)
+I (.\inc\TFT_LCD.h)(0x553D3FD1)
